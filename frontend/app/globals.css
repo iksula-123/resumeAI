@@ -1,0 +1,205 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ============================================================
+   Design tokens
+   ============================================================ */
+:root {
+  --brand-500: #6366f1;
+  --brand-600: #4f46e5;
+  --brand-700: #4338ca;
+  --violet: #7c3aed;
+  --fuchsia: #d946ef;
+
+  --glass-bg: rgba(255, 255, 255, 0.62);
+  --glass-border: rgba(255, 255, 255, 0.55);
+  --surface: #f7f8fc;
+}
+
+/* ============================================================
+   Base
+   ============================================================ */
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    background-color: var(--surface);
+    color: #1f2430;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    font-feature-settings: 'cv02', 'cv03', 'cv04', 'ss01';
+  }
+
+  /* Ambient aurora behind everything — glass surfaces reveal it */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: -10;
+    pointer-events: none;
+    background:
+      radial-gradient(38rem 38rem at 12% -8%, rgba(99, 102, 241, 0.16), transparent 60%),
+      radial-gradient(34rem 34rem at 100% 0%, rgba(217, 70, 239, 0.12), transparent 55%),
+      radial-gradient(40rem 40rem at 78% 108%, rgba(124, 58, 237, 0.14), transparent 60%);
+  }
+
+  h1, h2, h3, h4 {
+    font-family: var(--font-display), var(--font-inter), sans-serif;
+    letter-spacing: -0.02em;
+  }
+
+  /* Premium scrollbar */
+  ::-webkit-scrollbar { width: 10px; height: 10px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb {
+    background: rgba(99, 102, 241, 0.28);
+    border-radius: 9999px;
+    border: 2px solid transparent;
+    background-clip: content-box;
+  }
+  ::-webkit-scrollbar-thumb:hover { background: rgba(99, 102, 241, 0.5); background-clip: content-box; }
+  ::selection { background: rgba(124, 58, 237, 0.22); }
+}
+
+/* ============================================================
+   Components
+   ============================================================ */
+@layer components {
+  /* Glassmorphism surfaces */
+  .glass {
+    background: var(--glass-bg);
+    backdrop-filter: blur(18px) saturate(160%);
+    -webkit-backdrop-filter: blur(18px) saturate(160%);
+    border: 1px solid var(--glass-border);
+  }
+
+  .glass-card {
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(20px) saturate(160%);
+    -webkit-backdrop-filter: blur(20px) saturate(160%);
+    border: 1px solid rgba(255, 255, 255, 0.6);
+    box-shadow: 0 8px 32px -10px rgba(31, 38, 135, 0.2);
+    border-radius: 1.25rem;
+    transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.3s ease;
+  }
+  .glass-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 18px 48px -14px rgba(79, 70, 229, 0.28);
+  }
+
+  /* Solid premium card (for content areas that need opacity) */
+  .card-premium {
+    background: #ffffff;
+    border: 1px solid rgba(17, 24, 39, 0.06);
+    box-shadow: 0 2px 12px -2px rgba(17, 24, 39, 0.08);
+    border-radius: 1.25rem;
+    transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.3s ease;
+  }
+  .card-premium:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 18px 44px -16px rgba(17, 24, 39, 0.22);
+  }
+
+  /* Static premium panel (large forms / content — no hover motion) */
+  .panel-premium {
+    background: #ffffff;
+    border: 1px solid rgba(17, 24, 39, 0.06);
+    box-shadow: 0 2px 14px -4px rgba(17, 24, 39, 0.1);
+    border-radius: 1.25rem;
+  }
+
+  /* Gradient CTA button with glow + lift */
+  .btn-primary {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    font-weight: 600;
+    color: #fff;
+    background-image: linear-gradient(135deg, #6366f1 0%, #7c3aed 55%, #a855f7 100%);
+    background-size: 160% 160%;
+    background-position: 0% 50%;
+    border-radius: 0.85rem;
+    padding: 0.65rem 1.25rem;
+    box-shadow: 0 8px 24px -8px rgba(99, 102, 241, 0.5);
+    transition: transform 0.2s ease, box-shadow 0.25s ease, background-position 0.5s ease;
+  }
+  .btn-primary:hover {
+    transform: translateY(-2px);
+    background-position: 100% 50%;
+    box-shadow: 0 14px 34px -8px rgba(124, 58, 237, 0.6);
+  }
+  .btn-primary:active { transform: translateY(0) scale(0.99); }
+  .btn-primary:disabled { opacity: 0.55; cursor: not-allowed; transform: none; }
+
+  /* Secondary / ghost glass button */
+  .btn-ghost {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    font-weight: 600;
+    color: #4338ca;
+    background: rgba(99, 102, 241, 0.08);
+    border: 1px solid rgba(99, 102, 241, 0.18);
+    border-radius: 0.85rem;
+    padding: 0.6rem 1.1rem;
+    transition: background 0.2s ease, transform 0.2s ease, border-color 0.2s ease;
+  }
+  .btn-ghost:hover { background: rgba(99, 102, 241, 0.14); transform: translateY(-1px); border-color: rgba(99, 102, 241, 0.35); }
+
+  /* Gradient text */
+  .gradient-text {
+    background-image: linear-gradient(120deg, #4f46e5 0%, #7c3aed 45%, #d946ef 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  /* Premium input */
+  .input-premium {
+    width: 100%;
+    border-radius: 0.85rem;
+    border: 1px solid rgba(17, 24, 39, 0.1);
+    background: rgba(255, 255, 255, 0.8);
+    padding: 0.6rem 0.9rem;
+    font-size: 0.875rem;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+  }
+  .input-premium:focus {
+    outline: none;
+    border-color: rgba(99, 102, 241, 0.6);
+    box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.14);
+    background: #fff;
+  }
+
+  /* Subtle animated gradient ring/border accent */
+  .ring-glow {
+    box-shadow: 0 0 0 1px rgba(99, 102, 241, 0.25), 0 8px 30px -8px rgba(124, 58, 237, 0.35);
+  }
+}
+
+/* ============================================================
+   Utilities
+   ============================================================ */
+@layer utilities {
+  .text-balance { text-wrap: balance; }
+
+  /* shimmer skeleton overlay */
+  .shimmer {
+    position: relative;
+    overflow: hidden;
+  }
+  .shimmer::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    transform: translateX(-100%);
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.6), transparent);
+    animation: shimmer 1.6s infinite;
+  }
+}
