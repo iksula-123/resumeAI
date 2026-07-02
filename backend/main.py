@@ -13,8 +13,7 @@ else:
 
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI, Request
-from fastapi.responses import JSONResponse
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from database import init_db, DATABASE_URL, IS_SQLITE
@@ -61,17 +60,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-
-# TEMP DEBUG: surface unhandled errors in the response so we can diagnose the
-# production 500 without digging through logs. Remove after fixing.
-@app.exception_handler(Exception)
-async def _debug_unhandled(request: Request, exc: Exception):
-    logger.exception("Unhandled error on %s", request.url.path)
-    return JSONResponse(
-        status_code=500,
-        content={"error_type": type(exc).__name__, "detail": str(exc)[:800]},
-    )
 
 
 @app.get("/health")
