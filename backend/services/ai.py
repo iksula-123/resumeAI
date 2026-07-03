@@ -93,6 +93,23 @@ def _extract_json_list(raw: str) -> list | None:
     return None
 
 
+def _extract_json_object(raw: str) -> dict | None:
+    """Pull a JSON object out of an LLM response, tolerating ``` fences / prose."""
+    if not raw:
+        return None
+    cleaned = raw.replace("```json", "").replace("```", "")
+    start = cleaned.find("{")
+    end = cleaned.rfind("}")
+    if start != -1 and end != -1 and end > start:
+        try:
+            parsed = json.loads(cleaned[start:end + 1])
+            if isinstance(parsed, dict):
+                return parsed
+        except json.JSONDecodeError:
+            pass
+    return None
+
+
 def _clean_lines(raw: str) -> list[str]:
     """Fallback parse: one item per line, stripped of bullets/quotes/fences."""
     out = []
@@ -317,3 +334,170 @@ and sound human, not robotic. Return only the answer text."""
                 "Actions you personally took, and finish with a measurable Result (e.g. a % improvement "
                 "or time saved). Tie it back to the role you're applying for.")
     return raw.strip()
+
+
+# ─── AI Resume Upgrade: parse raw text → structured content ───────────────────
+
+def _empty_content() -> dict:
+    return {
+        "personalInfo": {"fullName": "", "jobTitle": "", "email": "", "phone": "",
+                         "location": "", "linkedin": "", "website": "", "github": ""},
+        "summary": "", "experience": [], "education": [], "skills": [],
+        "projects": [], "certifications": [], "languages": [], "achievements": [], "interests": [],
+    }
+
+
+def _normalize_content(obj: dict) -> dict:
+    """Coerce an AI/parsed object into our canonical content shape."""
+    c = _empty_content()
+    if not isinstance(obj, dict):
+        return c
+    pi = obj.get("personalInfo") or {}
+    if isinstance(pi, dict):
+        for k in c["personalInfo"]:
+            c["personalInfo"][k] = str(pi.get(k, "") or "")
+    c["summary"] = str(obj.get("summary", "") or "")
+    for i, e in enumerate(obj.get("experience", []) or []):
+        if not isinstance(e, dict):
+            continue
+        bullets = e.get("bullets", [])
+        if isinstance(bullets, str):
+            bullets = [bullets]
+        c["experience"].append({
+            "id": f"exp{i}", "position": str(e.get("position", "") or ""),
+            "company": str(e.get("company", "") or ""), "location": str(e.get("location", "") or ""),
+            "startDate": str(e.get("startDate", "") or ""), "endDate": str(e.get("endDate", "") or ""),
+            "current": bool(e.get("current", False)),
+            "bullets": [str(b) for b in bullets if str(b).strip()],
+        })
+    for i, e in enumerate(obj.get("education", []) or []):
+        if not isinstance(e, dict):
+            continue
+        c["education"].append({
+            "id": f"edu{i}", "degree": str(e.get("degree", "") or ""), "field": str(e.get("field", "") or ""),
+            "institution": str(e.get("institution", "") or ""), "location": str(e.get("location", "") or ""),
+            "startDate": str(e.get("startDate", "") or ""), "endDate": str(e.get("endDate", "") or ""),
+            "gpa": str(e.get("gpa", "") or ""),
+        })
+    for s in obj.get("skills", []) or []:
+        if isinstance(s, dict) and s.get("name"):
+            c["skills"].append({"name": str(s["name"]), "level": int(s.get("level", 75) or 75)})
+        elif isinstance(s, str) and s.strip():
+            c["skills"].append({"name": s.strip(), "level": 75})
+    for i, p in enumerate(obj.get("projects", []) or []):
+        if isinstance(p, dict) and p.get("name"):
+            c["projects"].append({"id": f"proj{i}", "name": str(p["name"]),
+                                  "technologies": str(p.get("technologies", "") or ""),
+                                  "description": str(p.get("description", "") or "")})
+    for i, cert in enumerate(obj.get("certifications", []) or []):
+        if isinstance(cert, dict) and cert.get("name"):
+            c["certifications"].append({"id": f"cert{i}", "name": str(cert["name"]),
+                                        "issuer": str(cert.get("issuer", "") or ""),
+                                        "date": str(cert.get("date", "") or "")})
+    for l in obj.get("languages", []) or []:
+        if isinstance(l, dict) and l.get("name"):
+            c["languages"].append({"name": str(l["name"]), "proficiency": str(l.get("proficiency", "") or "")})
+        elif isinstance(l, str) and l.strip():
+            c["languages"].append({"name": l.strip(), "proficiency": ""})
+    ach = obj.get("achievements", []) or []
+    c["achievements"] = [str(a) for a in ach if str(a).strip()] if isinstance(ach, list) else []
+    return c
+
+
+async def parse_resume_to_content(text: str) -> dict | None:
+    """Use AI to turn raw resume text into our structured content JSON."""
+    snippet = text[:6000]
+    prompt = f"""Extract the following resume text into structured JSON.
+
+RESUME TEXT:
+{snippet}
+
+Return ONLY a JSON object with EXACTLY these keys:
+{{
+  "personalInfo": {{"fullName","jobTitle","email","phone","location","linkedin","github","website"}},
+  "summary": "professional summary text",
+  "experience": [{{"position","company","location","startDate","endDate","current":false,"bullets":["..."]}}],
+  "education": [{{"degree","field","institution","location","startDate","endDate","gpa"}}],
+  "skills": ["skill1","skill2"],
+  "projects": [{{"name","technologies","description"}}],
+  "certifications": [{{"name","issuer","date"}}],
+  "languages": [{{"name","proficiency"}}]
+}}
+Use the actual data from the text. If a field is unknown, use "". Return only valid JSON."""
+    raw = await _chat(prompt, max_tokens=4000)
+    if raw is None:
+        return None
+    obj = _extract_json_object(raw)
+    return _normalize_content(obj) if obj else None
+
+
+# ─── AI Resume Upgrade: enhance a structured resume ───────────────────────────
+
+async def enhance_resume(content: dict) -> dict:
+    """Return an improved copy of the resume content (stronger bullets, summary, skills)."""
+    import copy
+    job_title = (content.get("personalInfo") or {}).get("jobTitle", "")
+    skills_now = [s["name"] if isinstance(s, dict) else s for s in (content.get("skills") or [])]
+
+    payload = json.dumps({
+        "jobTitle": job_title,
+        "summary": content.get("summary", ""),
+        "experience": [
+            {"position": e.get("position", ""), "company": e.get("company", ""),
+             "bullets": e.get("bullets", [])}
+            for e in (content.get("experience") or [])
+        ],
+        "skills": skills_now,
+    })[:5000]
+
+    prompt = f"""You are an expert resume writer. Improve this resume data.
+
+CURRENT DATA (JSON):
+{payload}
+
+Rules:
+- Rewrite each experience bullet to start with a strong action verb and include a quantified result (%, $, time, scale) where plausible. Keep it truthful to the role. Max 22 words each.
+- Write a compelling 3-sentence professional summary.
+- Suggest a strong skill set (merge existing + add relevant in-demand ones for the job title).
+
+Return ONLY a JSON object:
+{{
+  "summary": "...",
+  "experience": [{{"position":"...","company":"...","bullets":["...","..."]}}],
+  "skills": ["...", "..."]
+}}"""
+    raw = await _chat(prompt, max_tokens=4000)
+    enhanced = copy.deepcopy(content)
+
+    obj = _extract_json_object(raw) if raw else None
+    if obj:
+        if obj.get("summary"):
+            enhanced["summary"] = str(obj["summary"]).strip()
+        ai_exps = obj.get("experience") or []
+        for i, exp in enumerate(enhanced.get("experience") or []):
+            if i < len(ai_exps) and isinstance(ai_exps[i], dict):
+                new_bullets = ai_exps[i].get("bullets") or []
+                new_bullets = [str(b).strip() for b in new_bullets if str(b).strip()]
+                if new_bullets:
+                    exp["bullets"] = new_bullets
+        ai_skills = obj.get("skills") or []
+        merged, seen = [], set()
+        for s in [*skills_now, *ai_skills]:
+            name = str(s).strip()
+            if name and name.lower() not in seen:
+                seen.add(name.lower())
+                merged.append({"name": name, "level": 80})
+        if merged:
+            enhanced["skills"] = merged
+        return enhanced
+
+    # ── Fallback (AI unavailable): targeted local improvements ────────────────
+    if not enhanced.get("summary"):
+        enhanced["summary"] = await generate_summary(
+            ", ".join(f"{e.get('position','')} at {e.get('company','')}" for e in enhanced.get("experience") or []),
+            ", ".join(skills_now),
+        )
+    if len(skills_now) < 6:
+        extra = await suggest_skills(job_title, skills_now)
+        enhanced["skills"] = [{"name": n, "level": 80} for n in [*skills_now, *extra]]
+    return enhanced

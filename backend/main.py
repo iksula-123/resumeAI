@@ -90,6 +90,7 @@ _try_include("ai")
 _try_include("ats")
 _try_include("export")
 _try_include("billing")
+_try_include("upgrade")
 
 if __name__ == "__main__":
     import uvicorn
