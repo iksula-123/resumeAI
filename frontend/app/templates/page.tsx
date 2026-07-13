@@ -46,10 +46,6 @@ export default function TemplatesPage() {
         <h1 className="text-sm font-semibold text-gray-800">Resume Templates</h1>
         <p className="text-xs text-gray-400">Choose a professional template to get started</p>
       </div>
-      <button onClick={() => router.push('/pricing')}
-        className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white text-xs font-medium px-4 py-2 rounded-full hover:opacity-90 transition">
-        Upgrade to Pro
-      </button>
     </>
   )
 

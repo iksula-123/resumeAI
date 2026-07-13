@@ -1,7 +1,6 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { useRouter } from 'next/navigation'
 import { useAuthStore } from '@/lib/store'
 import { api } from '@/lib/api'
 import AppShell from '@/components/AppShell'
@@ -18,7 +17,6 @@ interface Payment {
 
 export default function SettingsPage() {
   const { user } = useAuthStore()
-  const router = useRouter()
   const [name, setName] = useState(user?.full_name || '')
   const [saved, setSaved] = useState(false)
   const [payments, setPayments] = useState<Payment[]>([])
@@ -89,15 +87,8 @@ export default function SettingsPage() {
           <div className="flex items-center justify-between bg-indigo-50 rounded-xl p-4">
             <div>
               <div className="font-medium text-gray-800 capitalize">{user?.subscription_tier || 'Free'} Plan</div>
-              <div className="text-xs text-gray-500 mt-0.5">
-                {user?.subscription_tier === 'free' ? 'Upgrade to unlock AI features, unlimited resumes, and more.' : 'You have access to all features.'}
-              </div>
+              <div className="text-xs text-gray-500 mt-0.5">You have access to all features.</div>
             </div>
-            {user?.subscription_tier === 'free' && (
-              <button onClick={() => router.push('/pricing')} className="btn-primary text-xs !py-2 !px-4">
-                Upgrade to Pro
-              </button>
-            )}
           </div>
         </div>
 

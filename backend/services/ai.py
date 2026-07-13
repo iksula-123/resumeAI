@@ -336,6 +336,49 @@ and sound human, not robotic. Return only the answer text."""
     return raw.strip()
 
 
+# ─── Skill-gap analysis ───────────────────────────────────────────────────────
+
+async def required_skills_for(target: str) -> list[str]:
+    """AI list of the key skills required for a target role or job description."""
+    target = (target or "").strip()
+    is_jd = len(target) > 80
+    if is_jd:
+        prompt = (f"From this job description, extract the 15 most important required skills "
+                  f"and technologies:\n\n{target[:1800]}\n\n")
+    else:
+        prompt = f'List the 15 most important, in-demand skills required for a "{target or "professional"}" role.\n'
+    prompt += "Keep each 1-3 words. Return ONLY a JSON array of skill-name strings."
+
+    raw = await _chat(prompt, max_tokens=1500)
+    if not raw:
+        return []
+    parsed = _extract_json_list(raw)
+    items = [str(s) for s in parsed] if parsed else _clean_lines(raw)
+    out, seen = [], set()
+    for s in items:
+        name = s.strip().strip('"').strip(",").strip()
+        k = name.lower()
+        if name and len(name) <= 40 and k not in seen:
+            seen.add(k)
+            out.append(name)
+    return out[:15]
+
+
+async def skill_gap(target: str, current_skills: list[str]) -> dict:
+    """Compare a resume's skills against those required for a target role/JD."""
+    required = await required_skills_for(target)
+    cur_lc = {s.lower() for s in (current_skills or [])}
+    matched = [r for r in required if r.lower() in cur_lc]
+    missing = [r for r in required if r.lower() not in cur_lc]
+    match_score = round(len(matched) / len(required) * 100) if required else 0
+    return {
+        "required": required,
+        "matched": matched,
+        "missing": missing,
+        "match_score": match_score,
+    }
+
+
 # ─── AI Resume Upgrade: parse raw text → structured content ───────────────────
 
 def _empty_content() -> dict:

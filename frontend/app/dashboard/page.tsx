@@ -50,9 +50,6 @@ export default function DashboardPage() {
           <input placeholder="Search resumes..." className="w-full pl-9 pr-4 py-2 bg-white/70 border border-white/60 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300/60 backdrop-blur" />
         </div>
       </div>
-      <button onClick={() => router.push('/pricing')} className="btn-primary text-xs !py-2 !px-4">
-        ⭐ Upgrade to Pro
-      </button>
       {user?.avatar_url ? (
         // eslint-disable-next-line @next/next/no-img-element
         <img src={user.avatar_url} alt="" className="w-9 h-9 rounded-full object-cover cursor-pointer shadow-glow ring-2 ring-white" />

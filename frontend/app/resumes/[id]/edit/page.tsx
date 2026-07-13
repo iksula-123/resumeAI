@@ -7,6 +7,7 @@ import { api } from '@/lib/api'
 import AppShell from '@/components/AppShell'
 import CircularScore from '@/components/CircularScore'
 import ResumeTemplates, { TEMPLATE_LIST } from '@/components/ResumeTemplates'
+import VersionHistory from '@/components/VersionHistory'
 import { CATEGORY_NAMES, detectCategory, suggestSkills, popularForCategory } from '@/lib/skillsData'
 
 /* ─── Types ───────────────────────────────────────────────────── */
@@ -537,12 +538,27 @@ export default function EditResumePage() {
   const [aiGenerating, setAiGenerating] = useState<string | null>(null)
   const [aiMsg, setAiMsg] = useState('')
   const [centerTab, setCenterTab] = useState<'preview' | 'edit'>('preview')
-  const [rightTab, setRightTab] = useState<'assistant' | 'insights'>('insights')
+  const [rightTab, setRightTab] = useState<'assistant' | 'insights' | 'skillgap'>('insights')
+  const [gapTarget, setGapTarget] = useState('')
+  const [gapLoading, setGapLoading] = useState(false)
+  const [gap, setGap] = useState<{ required: string[]; matched: string[]; missing: string[]; match_score: number } | null>(null)
   const [templateId, setTemplateId] = useState('modern')
   const [showTemplatePicker, setShowTemplatePicker] = useState(false)
   const [sectionsWidth, setSectionsWidth] = useState(240)
+  const [showHistory, setShowHistory] = useState(false)
   const resizing = useRef(false)
   const autoSaveTimer = useRef<ReturnType<typeof setTimeout>>()
+
+  // Reload the resume from the server (used after a version rollback)
+  const reloadResume = useCallback(async () => {
+    if (!id || id === 'new') return
+    try {
+      const r = await api.get<Resume>(`/api/resumes/${id}`)
+      setResume(r); setTitle(r.title); setContent(r.content || emptyContent())
+      setTemplateId(r.template_id || 'modern')
+      if (r.ats_score != null) setAtsScore(r.ats_score)
+    } catch { /* ignore */ }
+  }, [id])
 
   // Drag-to-resize the sections panel
   useEffect(() => {
@@ -639,6 +655,38 @@ export default function EditResumePage() {
     const exists = content.skills.some(s => (typeof s === 'string' ? s : s.name).toLowerCase() === kw.toLowerCase())
     if (!exists) patch('skills', [...content.skills, { name: kw, level: 70 }])
     setAtsMissing(prev => prev.filter(k => k.toLowerCase() !== kw.toLowerCase()))
+    setGap(prev => prev ? {
+      ...prev,
+      missing: prev.missing.filter(k => k.toLowerCase() !== kw.toLowerCase()),
+      matched: prev.matched.some(m => m.toLowerCase() === kw.toLowerCase()) ? prev.matched : [...prev.matched, kw],
+      match_score: prev.required.length
+        ? Math.round((prev.matched.length + 1) / prev.required.length * 100)
+        : prev.match_score,
+    } : prev)
+  }
+
+  // Skill-gap: compare resume skills vs. what a target role/JD requires
+  const runSkillGap = async () => {
+    const target = (gapTarget.trim() || content.personalInfo?.jobTitle?.trim() || title).trim()
+    if (!target) return
+    setGapTarget(target)
+    setGapLoading(true)
+    const cur = content.skills.map(s => (typeof s === 'string' ? s : s.name))
+    const curLc = new Set(cur.map(s => s.toLowerCase()))
+    const staticFallback = () => {
+      const req = popularForCategory(detectCategory(target), []).slice(0, 15)
+      const matched = req.filter(s => curLc.has(s.toLowerCase()))
+      const missing = req.filter(s => !curLc.has(s.toLowerCase()))
+      return { required: req, matched, missing, match_score: req.length ? Math.round(matched.length / req.length * 100) : 0 }
+    }
+    try {
+      const r = await api.post<typeof gap>('/api/ai/skill-gap', { target, current_skills: cur })
+      setGap(r && r.required.length ? r : staticFallback())
+    } catch {
+      setGap(staticFallback())
+    } finally {
+      setGapLoading(false)
+    }
   }
 
   const generateBullets = async (expIndex: number) => {
@@ -809,6 +857,11 @@ export default function EditResumePage() {
         {['Color', 'Font', 'Spacing', 'Tips'].map(t => (
           <button key={t} className="text-xs text-gray-500 hover:text-indigo-600 px-2 py-1 rounded hover:bg-indigo-50 transition">{t}</button>
         ))}
+        <button onClick={() => setShowHistory(true)}
+          className="text-xs text-gray-600 bg-gray-50 hover:bg-gray-100 px-3 py-1.5 rounded-lg transition flex items-center gap-1"
+          title="Version history & rollback">
+          🕘 History
+        </button>
         <button onClick={() => router.push(`/resumes/${id}/preview`)}
           className="text-xs text-indigo-600 bg-indigo-50 hover:bg-indigo-100 px-3 py-1.5 rounded-lg transition">
           Preview
@@ -823,6 +876,14 @@ export default function EditResumePage() {
 
   return (
     <AppShell topBar={topBar}>
+      {resume && (
+        <VersionHistory
+          resumeId={resume.id}
+          open={showHistory}
+          onClose={() => setShowHistory(false)}
+          onRestored={reloadResume}
+        />
+      )}
       <div className="flex h-[calc(100vh-56px)] overflow-hidden">
 
         {/* ── LEFT: Sections panel ─────────────────────────────── */}
@@ -942,12 +1003,16 @@ export default function EditResumePage() {
         <div className="w-72 bg-white border-l border-gray-100 flex flex-col overflow-y-auto flex-shrink-0">
           {/* Tab selector */}
           <div className="flex border-b border-gray-100">
-            {(['insights', 'assistant'] as const).map(t => (
+            {([
+              ['insights', 'Insights'],
+              ['assistant', 'AI Assistant'],
+              ['skillgap', 'Skill Gap'],
+            ] as const).map(([t, label]) => (
               <button key={t} onClick={() => setRightTab(t)}
                 className={`flex-1 py-3 text-xs font-medium transition ${
                   rightTab === t ? 'text-indigo-700 border-b-2 border-indigo-600' : 'text-gray-400 hover:text-gray-600'
                 }`}>
-                {t === 'insights' ? 'Insights' : 'AI Assistant'}
+                {label}
               </button>
             ))}
           </div>
@@ -1082,7 +1147,7 @@ export default function EditResumePage() {
                 )}
               </div>
             </div>
-          ) : (
+          ) : rightTab === 'assistant' ? (
             /* AI Assistant panel */
             <div className="flex-1 overflow-y-auto p-4 space-y-4">
               {/* One-click starter draft */}
@@ -1142,6 +1207,79 @@ export default function EditResumePage() {
                   💬 Generate Questions
                 </button>
               </div>
+            </div>
+          ) : (
+            /* ── Skill Gap panel ─────────────────────────────────── */
+            <div className="flex-1 overflow-y-auto p-4 space-y-4">
+              <div>
+                <div className="text-xs font-semibold text-gray-800 mb-1">Target role or job description</div>
+                <p className="text-[11px] text-gray-400 mb-2">See which required skills you have vs. are missing.</p>
+                <textarea
+                  value={gapTarget}
+                  onChange={e => setGapTarget(e.target.value)}
+                  placeholder={content.personalInfo?.jobTitle ? `e.g. ${content.personalInfo.jobTitle}` : 'e.g. Senior React Developer, or paste a job description'}
+                  rows={3}
+                  className="w-full border border-gray-200 rounded-lg px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-300 resize-none mb-2"
+                />
+                <button onClick={runSkillGap} disabled={gapLoading}
+                  className="btn-primary w-full text-xs py-2 disabled:opacity-60">
+                  {gapLoading ? '✨ Analyzing…' : '🎯 Analyze Skill Gap'}
+                </button>
+              </div>
+
+              {gapLoading && !gap && (
+                <div className="space-y-3">
+                  <div className="h-24 rounded-2xl bg-gray-100 shimmer" />
+                  <div className="h-20 rounded-2xl bg-gray-100 shimmer" />
+                </div>
+              )}
+
+              {gap && (
+                <>
+                  <div className="card-premium p-4 flex flex-col items-center">
+                    <div className="text-xs font-semibold text-gray-800 mb-2">Skill Match</div>
+                    <CircularScore score={gap.match_score} size={96}
+                      color={gap.match_score >= 80 ? '#22c55e' : gap.match_score >= 50 ? '#f59e0b' : '#ef4444'} />
+                    <div className="text-xs text-gray-400 mt-2 text-center">
+                      {gap.matched.length} of {gap.required.length} key skills present
+                    </div>
+                  </div>
+
+                  {gap.missing.length > 0 && (
+                    <div>
+                      <div className="text-xs font-semibold text-gray-800 mb-1.5">
+                        ❌ Missing skills — tap to add
+                      </div>
+                      <div className="flex flex-wrap gap-1.5">
+                        {gap.missing.map(s => (
+                          <button key={s} onClick={() => addKeywordToSkills(s)}
+                            className="text-xs px-2.5 py-1 rounded-full border border-red-200 text-red-600 bg-red-50/60 hover:bg-green-50 hover:border-green-300 hover:text-green-700 transition"
+                            title="Add to Skills">
+                            + {s}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {gap.matched.length > 0 && (
+                    <div>
+                      <div className="text-xs font-semibold text-gray-800 mb-1.5">✓ You already have</div>
+                      <div className="flex flex-wrap gap-1.5">
+                        {gap.matched.map(s => (
+                          <span key={s} className="text-xs px-2.5 py-1 rounded-full border border-green-200 text-green-700 bg-green-50">{s}</span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {gap.missing.length === 0 && (
+                    <div className="text-xs text-green-700 bg-green-50 border border-green-100 rounded-lg px-3 py-2">
+                      🎉 You have all the key skills for this role!
+                    </div>
+                  )}
+                </>
+              )}
             </div>
           )}
         </div>

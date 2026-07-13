@@ -6,6 +6,18 @@ export function setAuthToken(token: string | null) {
   _token = token
 }
 
+/** Called on a 401 — the session expired or is invalid. Clear it and send to login. */
+export function handleSessionExpired() {
+  if (typeof window === 'undefined') return
+  _token = null
+  try {
+    window.localStorage.removeItem('auth-storage')
+  } catch { /* ignore */ }
+  if (!window.location.pathname.startsWith('/auth/')) {
+    window.location.href = '/auth/login?expired=1'
+  }
+}
+
 /** Resolve the auth token: prefer the in-memory token, fall back to persisted store. */
 function resolveToken(): string | null {
   if (_token) return _token
@@ -33,6 +45,11 @@ async function request<T>(path: string, options?: RequestInit): Promise<T> {
   }
 
   const response = await fetch(`${BASE_URL}${path}`, { ...options, headers })
+
+  if (response.status === 401) {
+    handleSessionExpired()
+    throw new Error('Your session expired — please log in again.')
+  }
 
   if (!response.ok) {
     const error = await response.json().catch(() => ({ detail: 'Request failed' }))

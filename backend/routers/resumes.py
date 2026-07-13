@@ -14,17 +14,21 @@ from typing import Optional, Any
 
 from fastapi import APIRouter, HTTPException, Depends
 from pydantic import BaseModel
-from sqlalchemy import select
+from sqlalchemy import select, delete
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
 from database import get_db
 from models import (
     Resume, Experience, Education, Skill, Project, Certification, Language, User,
+    ResumeVersion,
 )
 from services.deps import get_current_user
 
 router = APIRouter(prefix="/api/resumes", tags=["Resumes"])
+
+MAX_VERSIONS = 25          # keep the newest N snapshots per resume
+SNAPSHOT_THROTTLE_SEC = 45  # during active editing, snapshot at most this often
 
 _RESUME_LOADERS = (
     selectinload(Resume.experiences),
@@ -37,6 +41,7 @@ _RESUME_LOADERS = (
 
 
 class ResumeUpsert(BaseModel):
+    source: Optional[str] = None  # e.g. "ai_upgrade" — recorded on the version snapshot
     title: Optional[str] = "Untitled Resume"
     template_id: Optional[str] = "modern"
     content: Optional[Any] = None
@@ -213,6 +218,48 @@ async def _get_owned(db: AsyncSession, resume_id: str, user: User) -> Resume:
     return r
 
 
+# ── version history ───────────────────────────────────────────────────────────
+def _version_dict(v: ResumeVersion) -> dict:
+    return {
+        "id": str(v.id),
+        "title": v.title,
+        "ats_score": v.ats_score,
+        "source": v.source,
+        "created_at": v.created_at.isoformat() if v.created_at else None,
+    }
+
+
+async def _snapshot(db: AsyncSession, r: Resume, user_id, source: str, throttle: bool = False) -> None:
+    """Save a point-in-time snapshot of the resume; throttle + prune old ones."""
+    if throttle:
+        res = await db.execute(
+            select(ResumeVersion.created_at)
+            .where(ResumeVersion.resume_id == r.id)
+            .order_by(ResumeVersion.created_at.desc()).limit(1)
+        )
+        last = res.scalar_one_or_none()
+        if last is not None:
+            if last.tzinfo is None:
+                last = last.replace(tzinfo=timezone.utc)
+            if (datetime.now(timezone.utc) - last).total_seconds() < SNAPSHOT_THROTTLE_SEC:
+                return
+
+    db.add(ResumeVersion(
+        resume_id=r.id, user_id=user_id, title=r.title, template_id=r.template_id,
+        content=_to_content(r), ats_score=r.ats_score, source=source,
+    ))
+    await db.flush()
+
+    # prune: keep only the newest MAX_VERSIONS
+    old = await db.execute(
+        select(ResumeVersion.id).where(ResumeVersion.resume_id == r.id)
+        .order_by(ResumeVersion.created_at.desc()).offset(MAX_VERSIONS)
+    )
+    old_ids = [row[0] for row in old.all()]
+    if old_ids:
+        await db.execute(delete(ResumeVersion).where(ResumeVersion.id.in_(old_ids)))
+
+
 # ── endpoints ─────────────────────────────────────────────────────────────────
 @router.get("/")
 async def list_resumes(db: AsyncSession = Depends(get_db), user: User = Depends(get_current_user)):
@@ -243,6 +290,9 @@ async def create_resume(
     db.add(r)
     await db.commit()
     full = await _load_full(db, r.id)
+    # initial snapshot (AI-upgrade saves pass source="ai_upgrade")
+    await _snapshot(db, full, user.id, body.source or "initial")
+    await db.commit()
     return _to_dict(full)
 
 
@@ -274,6 +324,9 @@ async def update_resume(
     r.updated_at = datetime.now(timezone.utc)
     await db.commit()
     full = await _load_full(db, r.id)
+    # throttled snapshot so active editing doesn't spam the history
+    await _snapshot(db, full, user.id, body.source or "edit", throttle=True)
+    await db.commit()
     return _to_dict(full)
 
 
@@ -286,3 +339,74 @@ async def delete_resume(
     r = await _get_owned(db, resume_id, user)
     await db.delete(r)
     await db.commit()
+
+
+# ── version history endpoints ───────────────────────────────────────────────
+@router.get("/{resume_id}/versions")
+async def list_versions(
+    resume_id: str,
+    db: AsyncSession = Depends(get_db),
+    user: User = Depends(get_current_user),
+):
+    r = await _get_owned(db, resume_id, user)
+    res = await db.execute(
+        select(ResumeVersion).where(ResumeVersion.resume_id == r.id)
+        .order_by(ResumeVersion.created_at.desc())
+    )
+    return [_version_dict(v) for v in res.scalars().all()]
+
+
+@router.get("/{resume_id}/versions/{version_id}")
+async def get_version(
+    resume_id: str,
+    version_id: str,
+    db: AsyncSession = Depends(get_db),
+    user: User = Depends(get_current_user),
+):
+    r = await _get_owned(db, resume_id, user)
+    try:
+        vid = uuid.UUID(version_id)
+    except ValueError:
+        raise HTTPException(status_code=404, detail="Version not found")
+    res = await db.execute(select(ResumeVersion).where(ResumeVersion.id == vid))
+    v = res.scalar_one_or_none()
+    if not v or v.resume_id != r.id:
+        raise HTTPException(status_code=404, detail="Version not found")
+    return {**_version_dict(v), "content": v.content, "template_id": v.template_id}
+
+
+@router.post("/{resume_id}/versions/{version_id}/restore")
+async def restore_version(
+    resume_id: str,
+    version_id: str,
+    db: AsyncSession = Depends(get_db),
+    user: User = Depends(get_current_user),
+):
+    r = await _get_owned(db, resume_id, user)
+    try:
+        vid = uuid.UUID(version_id)
+    except ValueError:
+        raise HTTPException(status_code=404, detail="Version not found")
+    res = await db.execute(select(ResumeVersion).where(ResumeVersion.id == vid))
+    v = res.scalar_one_or_none()
+    if not v or v.resume_id != r.id:
+        raise HTTPException(status_code=404, detail="Version not found")
+
+    # Preserve the current state before overwriting, so rollback is reversible
+    await _snapshot(db, r, user.id, "edit")
+
+    if v.content is not None:
+        await _apply_content(db, r, v.content)
+    if v.title:
+        r.title = v.title
+    if v.template_id:
+        r.template_id = v.template_id
+    if v.ats_score is not None:
+        r.ats_score = v.ats_score
+    r.updated_at = datetime.now(timezone.utc)
+    await db.commit()
+
+    full = await _load_full(db, r.id)
+    await _snapshot(db, full, user.id, "rollback")
+    await db.commit()
+    return _to_dict(full)

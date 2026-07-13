@@ -78,22 +78,6 @@ export default function Sidebar() {
         })}
       </nav>
 
-      {/* Upgrade card */}
-      <div className="mx-3 mb-3 p-3.5 rounded-2xl bg-brand-gradient text-white shadow-glow relative overflow-hidden">
-        <div className="absolute -right-6 -top-6 w-20 h-20 rounded-full bg-white/15 blur-xl" />
-        <div className="flex items-center gap-2 mb-1 relative">
-          <span>⭐</span>
-          <span className="text-xs font-semibold">Upgrade to Pro</span>
-        </div>
-        <p className="text-[11px] text-white/80 mb-2.5 relative">Unlock premium templates and unlimited AI credits.</p>
-        <button
-          onClick={() => router.push('/pricing')}
-          className="relative w-full bg-white/95 hover:bg-white text-indigo-700 text-xs font-semibold py-1.5 rounded-lg transition"
-        >
-          Upgrade Now
-        </button>
-      </div>
-
       {/* User + logout */}
       <div className="px-3 py-3 border-t border-white/40">
         <div className="flex items-center justify-between">

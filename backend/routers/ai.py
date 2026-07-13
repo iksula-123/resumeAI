@@ -7,6 +7,7 @@ from services.auth import verify_token
 from services.ai import (
     generate_bullets, enhance_bullet, generate_summary, generate_cover_letter,
     suggest_skills, generate_interview_questions, answer_feedback, sample_answer,
+    skill_gap,
 )
 
 router = APIRouter(prefix="/api/ai", tags=["AI"])
@@ -82,6 +83,11 @@ class SampleAnswerRequest(BaseModel):
     job_title: str = ""
 
 
+class SkillGapRequest(BaseModel):
+    target: str = ""              # target job title OR pasted job description
+    current_skills: list[str] = []
+
+
 @router.post("/generate-bullets")
 async def api_generate_bullets(req: BulletRequest, _=Depends(_auth)):
     bullets = await generate_bullets(req.position, req.company, req.description)
@@ -131,3 +137,8 @@ async def api_answer_feedback(req: FeedbackRequest, _=Depends(_auth)):
 async def api_sample_answer(req: SampleAnswerRequest, _=Depends(_auth)):
     answer = await sample_answer(req.question, req.job_title)
     return {"answer": answer}
+
+
+@router.post("/skill-gap")
+async def api_skill_gap(req: SkillGapRequest, _=Depends(_auth)):
+    return await skill_gap(req.target, req.current_skills)

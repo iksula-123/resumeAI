@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuthStore } from '@/lib/store'
-import { api } from '@/lib/api'
+import { api, handleSessionExpired } from '@/lib/api'
 import AppShell from '@/components/AppShell'
 import CircularScore from '@/components/CircularScore'
 import ResumeTemplates from '@/components/ResumeTemplates'
@@ -34,7 +34,7 @@ const scoreColor = (s: number) => (s >= 80 ? '#22c55e' : s >= 60 ? '#f59e0b' : '
 
 export default function AiUpgradePage() {
   const router = useRouter()
-  const { user, accessToken } = useAuthStore()
+  const { user } = useAuthStore()
 
   const [step, setStep] = useState(1)
   const [dragging, setDragging] = useState(false)
@@ -64,11 +64,16 @@ export default function AiUpgradePage() {
     try {
       const form = new FormData()
       form.append('file', file)
+      const token = useAuthStore.getState().accessToken  // freshest token at call time
       const res = await fetch(`${API}/api/upgrade/parse`, {
         method: 'POST',
-        headers: { Authorization: `Bearer ${accessToken}` },
+        headers: { Authorization: `Bearer ${token}` },
         body: form,
       })
+      if (res.status === 401) {
+        handleSessionExpired()
+        throw new Error('Your session expired — please log in again.')
+      }
       if (!res.ok) {
         const e = await res.json().catch(() => ({}))
         throw new Error(e.detail || 'Could not read that file.')
@@ -118,6 +123,7 @@ export default function AiUpgradePage() {
         template_id: 'modern',
         content: result.enhanced,
         ats_score: result.ats_after.score,
+        source: 'ai_upgrade',
       })
       setSavedId(r.id)
     } catch (e) {
@@ -131,11 +137,13 @@ export default function AiUpgradePage() {
     if (!result) return
     setExporting(fmt)
     try {
+      const token = useAuthStore.getState().accessToken
       const res = await fetch(`${API}/api/export/${fmt}`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${accessToken}` },
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
         body: JSON.stringify({ content: result.enhanced, title: title || 'AI Upgraded Resume' }),
       })
+      if (res.status === 401) { handleSessionExpired(); throw new Error('Session expired') }
       if (!res.ok) throw new Error('Export failed')
       const blob = await res.blob()
       const url = URL.createObjectURL(blob)

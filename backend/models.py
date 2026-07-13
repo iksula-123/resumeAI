@@ -264,3 +264,21 @@ class Payment(Base):
 
     def __repr__(self):
         return f"<Payment {self.user_id} {self.amount}{self.currency} {self.status}>"
+
+
+class ResumeVersion(Base):
+    """Point-in-time snapshot of a resume, for history + one-click rollback."""
+    __tablename__ = "resume_versions"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    resume_id = Column(UUID(as_uuid=True), ForeignKey("resumes.id", ondelete="CASCADE"), nullable=False, index=True)
+    user_id = Column(UUID(as_uuid=True), ForeignKey("profiles.id", ondelete="CASCADE"), nullable=False, index=True)
+    title = Column(String(255), nullable=True)
+    template_id = Column(String(50), nullable=True)
+    content = Column(JSON, nullable=True)
+    ats_score = Column(Integer, nullable=True)
+    source = Column(String(50), nullable=False, default="edit")  # edit | ai_upgrade | rollback | initial
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+    def __repr__(self):
+        return f"<ResumeVersion {self.resume_id} {self.source}>"
