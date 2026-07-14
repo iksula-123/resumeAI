@@ -63,6 +63,8 @@ async def create_cover_letter(data: CoverLetterCreate, db: AsyncSession = Depend
     db.add(cl)
     await db.commit()
     await db.refresh(cl)
+    from services.webhooks import dispatch
+    dispatch(user.id, "coverletter.generated", {"id": str(cl.id), "title": cl.title})
     return _to_dict(cl)
 
 

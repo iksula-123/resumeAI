@@ -14,6 +14,8 @@ from services.deps import get_current_user
 from services.parsing import extract_text, quick_contact
 from services.ai import parse_resume_to_content, enhance_resume, _normalize_content
 from services.ats import analyze_resume
+from services.storage import upload_bytes
+from services.usage import set_usage_context
 
 router = APIRouter(prefix="/api/upgrade", tags=["AI Upgrade"])
 
@@ -40,12 +42,19 @@ async def parse(file: UploadFile = File(...), user: User = Depends(get_current_u
     if len(text.strip()) < 30:
         raise HTTPException(status_code=422, detail="Couldn't read text from this file. If it's a scanned image, try a text-based PDF or DOCX.")
 
+    set_usage_context(str(user.id), "parse")
     content = await parse_resume_to_content(text)
     if content is None:
         # AI unavailable → minimal heuristic parse so the flow still works
         content = _normalize_content({"personalInfo": quick_contact(text), "summary": text[:400]})
 
-    return {"content": content, "chars": len(text)}
+    # Best-effort: archive the original upload to Supabase Storage
+    stored_path = upload_bytes(
+        str(user.id), "original", file.filename or "resume", data,
+        file.content_type or "application/octet-stream",
+    )
+
+    return {"content": content, "chars": len(text), "stored_path": stored_path}
 
 
 @router.post("/analyze")
@@ -55,6 +64,7 @@ async def analyze(body: ContentBody, user: User = Depends(get_current_user)):
 
 @router.post("/enhance")
 async def enhance(body: ContentBody, user: User = Depends(get_current_user)):
+    set_usage_context(str(user.id), "upgrade")
     original = body.content or {}
     enhanced = await enhance_resume(original)
 

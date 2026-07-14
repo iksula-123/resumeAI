@@ -24,6 +24,8 @@ from models import (
     ResumeVersion,
 )
 from services.deps import get_current_user
+from services.webhooks import dispatch
+from services.audit import record as audit
 
 router = APIRouter(prefix="/api/resumes", tags=["Resumes"])
 
@@ -293,6 +295,10 @@ async def create_resume(
     # initial snapshot (AI-upgrade saves pass source="ai_upgrade")
     await _snapshot(db, full, user.id, body.source or "initial")
     await db.commit()
+    dispatch(user.id, "resume.upgraded" if body.source == "ai_upgrade" else "resume.created",
+             {"id": str(full.id), "title": full.title, "ats_score": full.ats_score})
+    audit(actor_id=str(user.id), actor_email=user.email, action="resume.create",
+          entity_type="resume", entity_id=str(full.id), meta={"title": full.title})
     return _to_dict(full)
 
 
@@ -327,6 +333,7 @@ async def update_resume(
     # throttled snapshot so active editing doesn't spam the history
     await _snapshot(db, full, user.id, body.source or "edit", throttle=True)
     await db.commit()
+    dispatch(user.id, "resume.updated", {"id": str(full.id), "title": full.title, "ats_score": full.ats_score})
     return _to_dict(full)
 
 
@@ -337,8 +344,12 @@ async def delete_resume(
     user: User = Depends(get_current_user),
 ):
     r = await _get_owned(db, resume_id, user)
+    title = r.title
     await db.delete(r)
     await db.commit()
+    dispatch(user.id, "resume.deleted", {"id": resume_id, "title": title})
+    audit(actor_id=str(user.id), actor_email=user.email, action="resume.delete",
+          entity_type="resume", entity_id=resume_id, meta={"title": title})
 
 
 # ── version history endpoints ───────────────────────────────────────────────
@@ -409,4 +420,6 @@ async def restore_version(
     full = await _load_full(db, r.id)
     await _snapshot(db, full, user.id, "rollback")
     await db.commit()
+    audit(actor_id=str(user.id), actor_email=user.email, action="resume.rollback",
+          entity_type="resume", entity_id=str(r.id), meta={"version_id": version_id})
     return _to_dict(full)

@@ -1,9 +1,10 @@
 from typing import Any, Union
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Request
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from pydantic import BaseModel, field_validator
 
 from services.auth import verify_token
+from services.usage import set_usage_context
 from services.ai import (
     generate_bullets, enhance_bullet, generate_summary, generate_cover_letter,
     suggest_skills, generate_interview_questions, answer_feedback, sample_answer,
@@ -14,8 +15,12 @@ router = APIRouter(prefix="/api/ai", tags=["AI"])
 security = HTTPBearer()
 
 
-async def _auth(c: HTTPAuthorizationCredentials = Depends(security)):
-    return await verify_token(c.credentials)
+async def _auth(request: Request, c: HTTPAuthorizationCredentials = Depends(security)):
+    user = await verify_token(c.credentials)
+    # tag AI token usage with the caller + which feature (last path segment)
+    feature = request.url.path.rstrip("/").rsplit("/", 1)[-1] or "ai"
+    set_usage_context(str(user.id), feature)
+    return user
 
 
 class BulletRequest(BaseModel):

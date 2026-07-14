@@ -113,6 +113,8 @@ async def _set_tier(db: AsyncSession, user_id: str, tier: str):
         if user:
             user.subscription_tier = tier
             await db.commit()
+            from services.webhooks import dispatch
+            dispatch(user_id, "subscription.cancelled" if tier == "free" else "subscription.updated", {"tier": tier})
     except Exception as exc:
         logger.error("Failed to update subscription tier: %s", exc)
 
@@ -133,6 +135,9 @@ async def _record_payment(db: AsyncSession, user_id: str, session: dict):
         )
         db.add(payment)
         await db.commit()
+        from services.webhooks import dispatch
+        dispatch(user_id, "payment.success" if payment.status == "succeeded" else "payment.failed",
+                 {"amount": payment.amount, "currency": payment.currency, "plan": payment.plan})
     except Exception as exc:
         logger.error("Failed to record payment: %s", exc)
         await db.rollback()

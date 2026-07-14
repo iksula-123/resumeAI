@@ -11,7 +11,7 @@ Notes for dual SQLite / Supabase-Postgres operation:
   * profiles.id is NOT declared as a FK to auth.users here (auth schema isn't
     managed by SQLAlchemy); the real FK lives in the SQL migration.
 """
-from sqlalchemy import Column, String, DateTime, Boolean, Text, Integer, ForeignKey, JSON
+from sqlalchemy import Column, String, DateTime, Boolean, Text, Integer, Float, ForeignKey, JSON
 from sqlalchemy import Uuid as UUID
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
@@ -264,6 +264,116 @@ class Payment(Base):
 
     def __repr__(self):
         return f"<Payment {self.user_id} {self.amount}{self.currency} {self.status}>"
+
+
+class Webhook(Base):
+    """A user's subscription to platform events."""
+    __tablename__ = "webhooks"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    user_id = Column(UUID(as_uuid=True), ForeignKey("profiles.id", ondelete="CASCADE"), nullable=False, index=True)
+    url = Column(Text, nullable=False)
+    secret = Column(String(80), nullable=False)              # signing secret (whsec_…)
+    events = Column(JSON, nullable=False, default=list)        # list[str] of subscribed events
+    active = Column(Boolean, default=True, nullable=False)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+    def __repr__(self):
+        return f"<Webhook {self.url}>"
+
+
+class WebhookDelivery(Base):
+    """A single delivery attempt record for a webhook."""
+    __tablename__ = "webhook_deliveries"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    webhook_id = Column(UUID(as_uuid=True), ForeignKey("webhooks.id", ondelete="CASCADE"), nullable=False, index=True)
+    event = Column(String(50), nullable=False)
+    success = Column(Boolean, default=False, nullable=False)
+    status_code = Column(Integer, nullable=True)
+    attempts = Column(Integer, default=0, nullable=False)
+    error = Column(Text, nullable=True)
+    created_at = Column(DateTime(timezone=True), server_default=func.now(), index=True)
+
+    def __repr__(self):
+        return f"<WebhookDelivery {self.event} {'ok' if self.success else 'fail'}>"
+
+
+class ApiKey(Base):
+    """A hashed API key for programmatic access to /api/v1."""
+    __tablename__ = "api_keys"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    user_id = Column(UUID(as_uuid=True), ForeignKey("profiles.id", ondelete="CASCADE"), nullable=False, index=True)
+    name = Column(String(100), nullable=False, default="API Key")
+    key_prefix = Column(String(24), nullable=False)          # shown in UI, e.g. rsk_live_ab12cd
+    key_hash = Column(String(64), nullable=False, unique=True, index=True)  # sha256 of full key
+    last_used = Column(DateTime(timezone=True), nullable=True)
+    revoked = Column(Boolean, default=False, nullable=False)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+    def __repr__(self):
+        return f"<ApiKey {self.key_prefix}… {'revoked' if self.revoked else 'active'}>"
+
+
+class AuditLog(Base):
+    """Immutable record of a security-relevant action (who did what, when)."""
+    __tablename__ = "audit_logs"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    user_id = Column(UUID(as_uuid=True), ForeignKey("profiles.id", ondelete="SET NULL"), nullable=True, index=True)
+    actor_email = Column(String(255), nullable=True)
+    action = Column(String(80), nullable=False, index=True)   # e.g. auth.login, resume.create
+    entity_type = Column(String(50), nullable=True)
+    entity_id = Column(String(64), nullable=True)
+    meta = Column(JSON, nullable=False, default=dict)
+    created_at = Column(DateTime(timezone=True), server_default=func.now(), index=True)
+
+    def __repr__(self):
+        return f"<AuditLog {self.action} by {self.actor_email}>"
+
+
+class AIUsage(Base):
+    """One row per AI (Gemini) call — for token accounting & cost analytics."""
+    __tablename__ = "ai_usage"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    user_id = Column(UUID(as_uuid=True), ForeignKey("profiles.id", ondelete="SET NULL"), nullable=True, index=True)
+    feature = Column(String(50), nullable=False, default="unknown", index=True)
+    model = Column(String(60), nullable=True)
+    input_tokens = Column(Integer, nullable=False, default=0)
+    output_tokens = Column(Integer, nullable=False, default=0)
+    total_tokens = Column(Integer, nullable=False, default=0)
+    est_cost = Column(Float, nullable=False, default=0.0)
+    created_at = Column(DateTime(timezone=True), server_default=func.now(), index=True)
+
+    def __repr__(self):
+        return f"<AIUsage {self.feature} {self.total_tokens}tok>"
+
+
+class JobApplication(Base):
+    """A job the user is tracking through their pipeline."""
+    __tablename__ = "job_applications"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    user_id = Column(UUID(as_uuid=True), ForeignKey("profiles.id", ondelete="CASCADE"), nullable=False, index=True)
+    company = Column(String(255), nullable=False)
+    position = Column(String(255), nullable=False)
+    status = Column(String(20), nullable=False, default="applied", index=True)  # applied|interview|offer|rejected|joined
+    location = Column(String(255), nullable=True)
+    job_url = Column(Text, nullable=True)
+    salary = Column(String(100), nullable=True)
+    source = Column(String(100), nullable=True)          # LinkedIn, referral, etc.
+    notes = Column(Text, nullable=True)
+    applied_date = Column(String(20), nullable=True)      # ISO date string
+    next_action = Column(String(20), nullable=True)       # ISO date string (reminder)
+    next_action_note = Column(String(255), nullable=True)
+    sort_order = Column(Integer, default=0, nullable=False)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
+
+    def __repr__(self):
+        return f"<JobApplication {self.company} · {self.status}>"
 
 
 class ResumeVersion(Base):

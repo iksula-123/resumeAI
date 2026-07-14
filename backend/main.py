@@ -30,6 +30,12 @@ async def lifespan(app: FastAPI):
         logger.info("Database ready — using %s", backend)
     except Exception as exc:
         logger.error("Database init failed (%s): %s", backend, exc)
+    # Best-effort: ensure the Supabase Storage bucket exists
+    try:
+        from services.storage import ensure_bucket
+        ensure_bucket()
+    except Exception as exc:
+        logger.warning("Storage bucket init skipped: %s", exc)
     yield
 
 
@@ -91,6 +97,11 @@ _try_include("ats")
 _try_include("export")
 _try_include("billing")
 _try_include("upgrade")
+_try_include("applications")
+_try_include("storage")
+_try_include("keys")
+_try_include("v1")
+_try_include("webhooks")
 
 if __name__ == "__main__":
     import uvicorn

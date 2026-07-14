@@ -8,6 +8,7 @@ const NAV = [
   { href: '/dashboard', icon: '⊞', label: 'Dashboard' },
   { href: '/resumes', icon: '📄', label: 'Resumes' },
   { href: '/ai-upgrade', icon: '🚀', label: 'AI Resume Upgrade' },
+  { href: '/job-match', icon: '🧲', label: 'Job Match' },
   { href: '/cover-letters', icon: '✉️', label: 'Cover Letters' },
   { href: '/templates', icon: '🎨', label: 'Templates' },
   { href: '/ai-writer', icon: '✨', label: 'AI Writer' },

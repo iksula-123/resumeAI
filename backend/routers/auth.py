@@ -11,6 +11,7 @@ from database import get_db
 from models import User, ROLE_USER, ROLE_ADMIN
 from services.auth import signup_user, login_user
 from services.deps import get_current_user, _admin_emails, _full_name
+from services.audit import record as audit
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/api/auth", tags=["Authentication"])
@@ -75,6 +76,7 @@ async def signup(request: SignupRequest, db: AsyncSession = Depends(get_db)):
     full_name = _full_name(auth_user, request.full_name)
 
     db_user = await _upsert_user(db, user_id, auth_user.email, full_name)
+    audit(actor_id=str(db_user.id), actor_email=db_user.email, action="auth.signup")
 
     return {
         "message": "User registered successfully",
@@ -94,6 +96,8 @@ async def login(request: LoginRequest, db: AsyncSession = Depends(get_db)):
 
     if not db_user.is_active:
         raise HTTPException(status_code=403, detail="Your account has been disabled. Contact support.")
+
+    audit(actor_id=str(db_user.id), actor_email=db_user.email, action="auth.login")
 
     return {
         "message": "Login successful",

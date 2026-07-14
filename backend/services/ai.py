@@ -31,7 +31,20 @@ async def _gemini_chat(prompt: str, max_tokens: int = 500) -> str | None:
             prompt,
             generation_config={"max_output_tokens": max_tokens, "temperature": 0.7},
         )
-        return response.text
+        text = response.text
+        # Best-effort token accounting (Phase 14)
+        try:
+            um = getattr(response, "usage_metadata", None)
+            if um is not None:
+                from services.usage import record_usage
+                await record_usage(
+                    "gemini-2.0-flash-lite",
+                    getattr(um, "prompt_token_count", 0),
+                    getattr(um, "candidates_token_count", 0),
+                )
+        except Exception:
+            pass
+        return text
     except Exception:
         return None
 

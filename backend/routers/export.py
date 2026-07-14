@@ -5,6 +5,8 @@ from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from pydantic import BaseModel
 
 from services.auth import verify_token
+from services.storage import upload_bytes
+from services.webhooks import dispatch
 
 router = APIRouter(prefix="/api/export", tags=["Export"])
 security = HTTPBearer()
@@ -50,9 +52,11 @@ def _pdf_safe(text) -> str:
 
 
 @router.post("/pdf")
-async def export_pdf(req: ExportRequest, _=Depends(_auth)):
+async def export_pdf(req: ExportRequest, user=Depends(_auth)):
     pdf_bytes = _build_pdf(req.content, req.title)
     safe_title = req.title.replace(" ", "_")
+    upload_bytes(str(user.id), "generated", f"{safe_title}.pdf", pdf_bytes, "application/pdf")
+    dispatch(user.id, "resume.exported", {"title": req.title, "format": "pdf"})
     return StreamingResponse(
         io.BytesIO(pdf_bytes),
         media_type="application/pdf",
@@ -61,9 +65,14 @@ async def export_pdf(req: ExportRequest, _=Depends(_auth)):
 
 
 @router.post("/docx")
-async def export_docx(req: ExportRequest, _=Depends(_auth)):
+async def export_docx(req: ExportRequest, user=Depends(_auth)):
     docx_bytes = _build_docx(req.content, req.title)
     safe_title = req.title.replace(" ", "_")
+    upload_bytes(
+        str(user.id), "generated", f"{safe_title}.docx", docx_bytes,
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    )
+    dispatch(user.id, "resume.exported", {"title": req.title, "format": "docx"})
     return StreamingResponse(
         io.BytesIO(docx_bytes),
         media_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document",

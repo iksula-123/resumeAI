@@ -73,6 +73,8 @@ async def ats_score(
                 await db.refresh(report)
                 saved_id = str(report.id)
 
+    from services.webhooks import dispatch
+    dispatch(user.id, "ats.completed", {"score": result["score"], "resume_id": req.resume_id})
     return {**result, "report_id": saved_id, "saved": saved_id is not None}
 
 

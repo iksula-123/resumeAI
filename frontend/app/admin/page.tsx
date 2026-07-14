@@ -25,10 +25,31 @@ interface Stats {
   pro_users: number
 }
 
+interface Analytics {
+  totals: { users: number; resumes: number; applications: number; cover_letters: number; ats_reports: number; avg_ats: number }
+  ai: {
+    requests: number; input_tokens: number; output_tokens: number; total_tokens: number; est_cost: number
+    per_feature: { feature: string; tokens: number; requests: number }[]
+    top_users: { email: string; tokens: number; cost: number }[]
+  }
+}
+
+interface AuditEntry {
+  id: string
+  actor_email: string | null
+  action: string
+  entity_type: string | null
+  entity_id: string | null
+  meta: Record<string, unknown>
+  created_at: string | null
+}
+
 export default function AdminPage() {
   const { user } = useAuthStore()
   const router = useRouter()
   const [stats, setStats] = useState<Stats | null>(null)
+  const [analytics, setAnalytics] = useState<Analytics | null>(null)
+  const [audit, setAudit] = useState<AuditEntry[]>([])
   const [users, setUsers] = useState<AdminUser[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
@@ -37,12 +58,16 @@ export default function AdminPage() {
   const load = useCallback(async () => {
     setLoading(true)
     try {
-      const [s, u] = await Promise.all([
+      const [s, an, u, al] = await Promise.all([
         api.get<Stats>('/api/admin/stats'),
+        api.get<Analytics>('/api/admin/analytics'),
         api.get<AdminUser[]>('/api/admin/users'),
+        api.get<AuditEntry[]>('/api/admin/audit-logs?limit=50'),
       ])
       setStats(s)
+      setAnalytics(an)
       setUsers(u)
+      setAudit(al)
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Failed to load admin data')
     } finally {
@@ -133,6 +158,75 @@ export default function AdminPage() {
             ))}
         </div>
 
+        {/* AI Usage & Cost Analytics */}
+        {analytics && (
+          <div className="mb-8">
+            <h2 className="font-bold text-gray-900 font-display mb-3">AI Usage & Cost</h2>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
+              {[
+                { label: 'AI Requests', value: analytics.ai.requests.toLocaleString(), icon: '⚡', color: 'bg-indigo-50 text-indigo-700' },
+                { label: 'Total Tokens', value: analytics.ai.total_tokens.toLocaleString(), icon: '🔢', color: 'bg-blue-50 text-blue-700' },
+                { label: 'Est. Cost', value: `$${analytics.ai.est_cost.toFixed(4)}`, icon: '💰', color: 'bg-green-50 text-green-700' },
+                { label: 'Avg ATS Score', value: analytics.totals.avg_ats || '—', icon: '🎯', color: 'bg-orange-50 text-orange-700' },
+              ].map(s => (
+                <div key={s.label} className="card-premium p-5">
+                  <div className={`w-11 h-11 ${s.color} rounded-xl flex items-center justify-center text-xl mb-3 shadow-soft`}>{s.icon}</div>
+                  <div className="text-2xl font-bold text-gray-800 font-display">{s.value}</div>
+                  <div className="text-xs text-gray-500 mt-1">{s.label}</div>
+                </div>
+              ))}
+            </div>
+
+            <div className="grid md:grid-cols-2 gap-4">
+              {/* Per-feature token usage */}
+              <div className="panel-premium p-5">
+                <h3 className="font-semibold text-gray-800 mb-3 text-sm">Tokens by feature</h3>
+                {analytics.ai.per_feature.length === 0 ? (
+                  <p className="text-xs text-gray-400 py-4">No AI usage recorded yet — it populates as AI features are used.</p>
+                ) : (
+                  <div className="space-y-2.5">
+                    {(() => {
+                      const max = Math.max(...analytics.ai.per_feature.map(f => f.tokens), 1)
+                      return analytics.ai.per_feature.map(f => (
+                        <div key={f.feature} className="flex items-center gap-2">
+                          <span className="text-xs text-gray-600 w-28 truncate capitalize">{f.feature.replace(/-/g, ' ')}</span>
+                          <div className="flex-1 h-2 bg-gray-100 rounded-full overflow-hidden">
+                            <div className="h-full bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full" style={{ width: `${(f.tokens / max) * 100}%` }} />
+                          </div>
+                          <span className="text-xs font-medium text-gray-700 w-16 text-right">{f.tokens.toLocaleString()}</span>
+                        </div>
+                      ))
+                    })()}
+                  </div>
+                )}
+              </div>
+
+              {/* Top users by tokens */}
+              <div className="panel-premium p-5">
+                <h3 className="font-semibold text-gray-800 mb-3 text-sm">Top users by AI usage</h3>
+                {analytics.ai.top_users.length === 0 ? (
+                  <p className="text-xs text-gray-400 py-4">No per-user usage yet.</p>
+                ) : (
+                  <div className="divide-y divide-gray-100">
+                    {analytics.ai.top_users.map((u, i) => (
+                      <div key={u.email} className="flex items-center justify-between py-2">
+                        <div className="flex items-center gap-2 min-w-0">
+                          <span className="text-xs text-gray-400 w-4">{i + 1}</span>
+                          <span className="text-sm text-gray-700 truncate">{u.email}</span>
+                        </div>
+                        <div className="text-right flex-shrink-0">
+                          <div className="text-xs font-semibold text-gray-800">{u.tokens.toLocaleString()} tok</div>
+                          <div className="text-[11px] text-gray-400">${u.cost.toFixed(4)}</div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Users table */}
         <div className="panel-premium overflow-hidden">
           <div className="px-5 py-4 border-b border-gray-100">
@@ -209,6 +303,34 @@ export default function AdminPage() {
               </tbody>
             </table>
           </div>
+        </div>
+
+        {/* Audit Log */}
+        <div className="panel-premium overflow-hidden mt-8">
+          <div className="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
+            <h2 className="font-semibold text-gray-800">Audit Log</h2>
+            <span className="text-xs text-gray-400">{audit.length} recent events</span>
+          </div>
+          {audit.length === 0 ? (
+            <p className="text-sm text-gray-400 text-center py-8">No audit events yet.</p>
+          ) : (
+            <div className="divide-y divide-gray-50 max-h-[420px] overflow-y-auto">
+              {audit.map(a => (
+                <div key={a.id} className="flex items-center gap-3 px-5 py-2.5 hover:bg-gray-50/50">
+                  <span className="text-xs font-mono px-2 py-0.5 rounded bg-indigo-50 text-indigo-700 flex-shrink-0">{a.action}</span>
+                  <div className="flex-1 min-w-0">
+                    <span className="text-sm text-gray-700">{a.actor_email || 'system'}</span>
+                    {a.entity_type && (
+                      <span className="text-xs text-gray-400"> · {a.entity_type}{a.meta?.title ? ` “${String(a.meta.title)}”` : a.meta?.email ? ` (${String(a.meta.email)})` : ''}</span>
+                    )}
+                  </div>
+                  <span className="text-xs text-gray-400 whitespace-nowrap flex-shrink-0">
+                    {a.created_at ? new Date(a.created_at).toLocaleString() : ''}
+                  </span>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </AppShell>
