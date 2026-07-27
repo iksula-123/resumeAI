@@ -6,8 +6,10 @@ import { useAuthStore } from '@/lib/store'
 
 const NAV = [
   { href: '/dashboard', icon: '⊞', label: 'Dashboard' },
+  { href: '/resumes/build', icon: '✨', label: 'Build from Role' },
   { href: '/resumes', icon: '📄', label: 'Resumes' },
   { href: '/ai-upgrade', icon: '🚀', label: 'AI Resume Upgrade' },
+  { href: '/copilot', icon: '🤖', label: 'Career Copilot' },
   { href: '/job-match', icon: '🧲', label: 'Job Match' },
   { href: '/cover-letters', icon: '✉️', label: 'Cover Letters' },
   { href: '/templates', icon: '🎨', label: 'Templates' },
@@ -23,11 +25,17 @@ export default function Sidebar() {
   const router = useRouter()
   const { logout, user } = useAuthStore()
 
-  const isActive = (href: string) => pathname === href || pathname.startsWith(href + '/')
-
   const navItems = user?.role === 'admin'
     ? [...NAV, { href: '/admin', icon: '🛡️', label: 'Admin Panel' }]
     : NAV
+
+  // Only the most specific matching tab is active (so /resumes/build doesn't also
+  // highlight /resumes).
+  const activeHref = navItems
+    .map((i) => i.href)
+    .filter((h) => pathname === h || pathname.startsWith(h + '/'))
+    .sort((a, b) => b.length - a.length)[0]
+  const isActive = (href: string) => href === activeHref
 
   return (
     <aside className="glass fixed top-0 left-0 h-screen w-56 border-r border-white/40 flex flex-col z-40 shadow-glass">
@@ -44,14 +52,20 @@ export default function Sidebar() {
         </div>
       </div>
 
-      {/* Create button */}
-      <div className="px-3 py-3">
+      {/* Create buttons */}
+      <div className="px-3 py-3 space-y-2">
         <button
-          onClick={() => router.push('/resumes/new')}
+          onClick={() => router.push('/resumes/build')}
           className="btn-primary w-full text-sm py-2.5"
         >
-          <span className="text-base leading-none">+</span>
-          Create New Resume
+          <span className="text-base leading-none">✨</span>
+          Build from Role
+        </button>
+        <button
+          onClick={() => router.push('/resumes/new')}
+          className="w-full text-sm py-2 rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50 transition"
+        >
+          Blank resume
         </button>
       </div>
 

@@ -134,6 +134,124 @@ def analyze_resume(content: dict) -> dict:
     }
 
 
+# India-tuned baseline keywords for entry-level BFSI / IT / retail / sales roles
+# (used when no specific target role is chosen). Kept lowercase for matching.
+INDIA_CORE_KEYWORDS = [
+    "communication", "english", "customer service", "sales", "ms excel", "ms office",
+    "tally", "data entry", "typing", "teamwork", "time management", "computer",
+    "marketing", "telecalling", "accounting", "problem solving",
+]
+
+
+def _keyword_coverage(content: dict, keywords: list[str]) -> dict:
+    """Match target-role keywords against the candidate's OWN content (never injects)."""
+    text = _resume_to_text(content).lower()
+    skills_text = " ".join(_skill_name(s) for s in (content.get("skills") or [])).lower()
+    haystack = f"{text} {skills_text}"
+    matched, missing = [], []
+    for kw in keywords:
+        k = kw.lower().strip()
+        head = k.split()[-1] if " " in k else k          # e.g. "ms excel" → "excel"
+        if k and (k in haystack or head in haystack):
+            matched.append(kw)
+        else:
+            missing.append(kw)
+    total = len(keywords) or 1
+    return {"matched": matched, "missing": missing,
+            "coverage_pct": round(len(matched) / total * 100)}
+
+
+def analyze_resume_prioritized(content: dict, role_keywords: list[str] | None = None,
+                               role_title: str = "") -> dict:
+    """India-tuned ATS analysis on the candidate's OWN content (spec Milestone D).
+
+    Score = section completeness + keyword coverage + skills + quantified bullets
+    (+ contact, summary, action verbs). Returns a per-section breakdown AND fixes
+    ranked by how many points each one would add — the "what to fix first" list.
+    """
+    content = content or {}
+    pi = content.get("personalInfo", {}) or {}
+    experience = content.get("experience", []) or []
+    education = content.get("education", []) or []
+    skills = content.get("skills", []) or []
+    summary = content.get("summary", "") or ""
+    all_bullets = [b for e in experience for b in (e.get("bullets") or []) if str(b).strip()]
+
+    keywords = role_keywords if role_keywords else INDIA_CORE_KEYWORDS
+    cov = _keyword_coverage(content, keywords)
+
+    # each component: (earned, possible, category, fix_title, fix_detail)
+    comps = []
+
+    contact_fields = [pi.get("fullName"), pi.get("email"), pi.get("phone"), pi.get("location")]
+    contact_earned = round(sum(1 for f in contact_fields if f) / len(contact_fields) * 10)
+    comps.append((contact_earned, 10, "Contact",
+                  "Complete your contact details",
+                  "Add your name, email, phone and city so recruiters can reach you."))
+
+    if len(summary) >= 120:
+        s_earned = 15
+    elif summary:
+        s_earned = 8
+    else:
+        s_earned = 0
+    comps.append((s_earned, 15, "Summary",
+                  "Strengthen your professional summary",
+                  "Write 2–3 sentences with your target role, top skills and what you offer."))
+
+    exp_earned = 0
+    if experience:
+        exp_earned += 8
+        quantified = sum(1 for b in all_bullets if re.search(r"\d", b))
+        ratio = quantified / len(all_bullets) if all_bullets else 0
+        exp_earned += round(ratio * 17)
+    comps.append((exp_earned, 25, "Experience & quantified impact",
+                  "Add numbers to your bullet points",
+                  "Quantify results — customers handled/day, % target met, time saved — in more bullets."))
+
+    action_verbs = ("led", "built", "developed", "designed", "improved", "increased",
+                    "reduced", "launched", "managed", "created", "delivered", "handled",
+                    "achieved", "assisted", "coordinated", "supported", "sold", "resolved")
+    strong = sum(1 for b in all_bullets if b.strip().split() and b.strip().split()[0].lower() in action_verbs)
+    verb_ratio = strong / len(all_bullets) if all_bullets else 0
+    comps.append((round(verb_ratio * 10), 10, "Action verbs",
+                  "Start bullets with strong action verbs",
+                  "Begin each bullet with a verb like Handled, Achieved, Sold, Managed."))
+
+    n_skills = len(skills)
+    comps.append((min(15, n_skills * 2), 15, "Skills",
+                  "List more relevant skills",
+                  f"You have {n_skills}; aim for 8–10 skills recruiters filter for."))
+
+    comps.append((10 if education else 0, 10, "Education",
+                  "Add your education",
+                  "Include your qualification, institution and year — important for freshers."))
+
+    kw_earned = round(cov["coverage_pct"] / 100 * 15)
+    tgt = f' for "{role_title}"' if role_title else ""
+    comps.append((kw_earned, 15, "Keyword coverage",
+                  f"Cover more role keywords{tgt}",
+                  ("Weave these TRUE-for-you keywords in: " + ", ".join(cov["missing"][:6]))
+                  if cov["missing"] else "Great keyword coverage for this role."))
+
+    total = max(0, min(sum(c[0] for c in comps), 99))
+    breakdown = {c[2]: round(c[0] / c[1] * 100) for c in comps}
+
+    fixes = [
+        {"title": c[3], "detail": c[4], "category": c[2], "impact_points": c[1] - c[0]}
+        for c in comps if c[0] < c[1]
+    ]
+    fixes.sort(key=lambda f: f["impact_points"], reverse=True)
+
+    return {
+        "score": total,
+        "breakdown": breakdown,
+        "prioritized_fixes": fixes[:6],           # "what to fix first"
+        "keyword_coverage": cov,
+        "target_role": role_title or None,
+    }
+
+
 def score_resume(resume_content: dict, job_description: str) -> dict:
     if not job_description.strip():
         return {"score": 0, "matched": [], "missing": [], "suggestions": ["Paste a job description to get your ATS score"]}

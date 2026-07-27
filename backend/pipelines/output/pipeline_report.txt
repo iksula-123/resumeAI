@@ -1,0 +1,47 @@
+TAF PIPELINE REPORT
+===================
+
+files: {'TAFs-1780317605918.csv': 239, 'TAFs-1780317812985.csv': 12478}
+rows_read: 12717
+rows_no_id: 24
+unique_taf_ids: 12693
+pii_columns_removed: ['Contact Person', 'Contact Mobile No', 'Recruiter Email Id', 'Approver Email Id', 'Verification Email', 'CreatedBy', 'TAF Manager', 'BD Manager', 'Recruiter Company', 'TAF Confirmation Doc Url', 'UpdatedBy', 'Approval Remarks']
+rows_after_pii: 12693
+junk_title_rows_dropped: 151
+rows_aggregated: 12542
+distinct_role_keys_pre_fuzzy: 3217
+roles_post_fuzzy: 3076
+roles_written: 100
+fuzzy_enabled: True
+
+Top 30 roles by demand:
+   1396  Sales Executive                        [BFSI] ₹185,000-265,000  skills: Communication, Sales, English Proficiency, Marketing, Computer Knowledge
+    444  Customer Care Executive                [BFSI] ₹180,000-250,000  skills: Communication, English Proficiency, Sales, Hindi, Computer Knowledge
+    426  Customer Service Associate             [BFSI] ₹200,000-235,000  skills: Communication, English Proficiency, Customer Service, Sales, Typing
+    373  Tele Caller                            [BFSI] ₹150,000-200,000  skills: Communication, Computer Knowledge, English Proficiency, Sales, Interpersonal Skills
+    364  Data Entry Operator                    [IT] ₹150,000-220,000  skills: Typing, Communication, Computer Knowledge, Data Entry, English Proficiency
+    351  Computer Operator                      [BFSI] n/a  skills: Communication, Computer Knowledge, Data Entry, Documentation, Typing
+    239  Trainer                                [BFSI] n/a  skills: Communication, MS Excel, MS Office, Sales, Presentation Skills
+    213  Customer Service Executive             [BFSI] ₹205,000-240,000  skills: Communication, English Proficiency, Hindi, Customer Service, Typing
+    190  Sales Associate                        [Retail] ₹270,000-310,000  skills: Communication, Sales, Interpersonal Skills, Computer Knowledge, English Proficiency
+    189  Software Engineer                      [IT] ₹150,000-280,000  skills: Communication, Analytical Skills, Problem Solving, Teamwork, Interpersonal Skills
+    183  Accountant                             [BFSI] ₹150,000-240,000  skills: Accounting, Communication, Tally, Computer Knowledge, MS Excel
+    172  Back Office Executive                  [BFSI] ₹170,000-225,000  skills: Communication, Typing, MS Office, Computer Knowledge, Sales
+    151  Sales Officer                          [BFSI] ₹200,000-210,000  skills: Communication, Sales, Interpersonal Skills, English Proficiency, Banking
+    140  Business Development Executive         [BFSI] ₹220,000-260,000  skills: Communication, Sales, Typing, Presentation Skills, Convincing Skills
+    132  Customer Support Executive             [BFSI] ₹200,000-250,000  skills: Communication, English Proficiency, Hindi, Customer Service, Problem Solving
+    130  Office Assistant                       [BFSI] n/a  skills: Communication, Computer Knowledge, Interpersonal Skills, Typing, MS Office
+    121  Marketing Executive                    [BFSI] ₹120,000-155,000  skills: Communication, Sales, Marketing, English Proficiency, Convincing Skills
+    115  Branch Relationship Executive          [BFSI] ₹200,000-250,000  skills: Communication, Sales, Banking, Convincing Skills, English Proficiency
+    113  Relationship Officer                   [BFSI] ₹200,000-250,000  skills: Communication, Banking, Sales, Interpersonal Skills, English Proficiency
+    112  Teacher                                [BFSI] n/a  skills: Communication, Presentation Skills, Computer Knowledge, English Proficiency, Sales
+    112  Data Analyst                           [IT] ₹250,000-350,000  skills: Communication, Analytical Skills, MS Excel, Problem Solving, English Proficiency
+    104  Sales Consultant                       [Retail] ₹200,000-250,000  skills: Sales, Communication, Interpersonal Skills, English Proficiency, Presentation Skills
+    103  Receptionist                           [IT] n/a  skills: Communication, Computer Knowledge, English Proficiency, Customer Service, Marketing
+     88  Accounts Executive                     [BFSI] ₹170,000-300,000  skills: Accounting, Communication, Tally, MS Excel, Computer Knowledge
+     85  Process Associate                      [BFSI] ₹150,000-260,000  skills: Communication, Typing, English Proficiency, Interpersonal Skills, Adaptability
+     82  Technician                             [Service] ₹290,000-300,000  skills: Communication, Interpersonal Skills, Teamwork, Computer Knowledge, Typing
+     79  System Operator                        [BFSI] n/a  skills: Communication, Interpersonal Skills, Typing, Computer Knowledge, MS Excel
+     77  Relationship Manager                   [BFSI] ₹180,000-240,000  skills: Communication, Sales, English Proficiency, Convincing Skills, Interpersonal Skills
+     75  Java Developer                         [IT] ₹250,000-350,000  skills: Communication, Analytical Skills, Problem Solving, Banking, Interpersonal Skills
+     72  Cashier                                [BFSI] ₹190,000-270,000  skills: Communication, Customer Service, Accounting, Computer Knowledge, Interpersonal Skills

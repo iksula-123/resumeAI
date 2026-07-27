@@ -8,6 +8,7 @@ This router translates between the two:
   * _to_content(resume)      → assemble content dict from the resume + children
   * _apply_content(db, r, c) → decompose content into normalized child rows
 """
+import re
 import uuid
 from datetime import datetime, timezone
 from typing import Optional, Any
@@ -26,6 +27,7 @@ from models import (
 from services.deps import get_current_user
 from services.webhooks import dispatch
 from services.audit import record as audit
+from services.usage import log_usage_event, tenant_of
 
 router = APIRouter(prefix="/api/resumes", tags=["Resumes"])
 
@@ -299,6 +301,83 @@ async def create_resume(
              {"id": str(full.id), "title": full.title, "ats_score": full.ats_score})
     audit(actor_id=str(user.id), actor_email=user.email, action="resume.create",
           entity_type="resume", entity_id=str(full.id), meta={"title": full.title})
+    await log_usage_event(str(user.id), "resume_created", tenant_id=tenant_of(user),
+                          metadata={"source": body.source or "manual"})
+    return _to_dict(full)
+
+
+def _slugify(text: str) -> str:
+    base = re.sub(r"[^a-z0-9]+", "-", (text or "resume").lower()).strip("-")[:40] or "resume"
+    return f"{base}-{uuid.uuid4().hex[:8]}"
+
+
+# ── public sharing (spec Milestone H) ───────────────────────────────────────
+@router.get("/public/{slug}")
+async def public_resume(slug: str, db: AsyncSession = Depends(get_db)):
+    """Public read-only view of a shared resume — NO auth (spec: shareable web link)."""
+    res = await db.execute(
+        select(Resume).where(Resume.slug == slug, Resume.is_public == True).options(*_RESUME_LOADERS)  # noqa: E712
+    )
+    r = res.scalar_one_or_none()
+    if not r:
+        raise HTTPException(status_code=404, detail="This resume link is private or doesn't exist.")
+    return {"title": r.title, "template_id": r.template_id, "content": _to_content(r)}
+
+
+@router.post("/{resume_id}/share")
+async def share_resume(
+    resume_id: str,
+    db: AsyncSession = Depends(get_db),
+    user: User = Depends(get_current_user),
+):
+    """Make a resume publicly viewable and return its shareable slug."""
+    r = await _get_owned(db, resume_id, user)
+    r.is_public = True
+    if not r.slug:
+        r.slug = _slugify(r.title)
+    await db.commit()
+    return {"slug": r.slug, "is_public": True}
+
+
+@router.post("/{resume_id}/unshare")
+async def unshare_resume(
+    resume_id: str,
+    db: AsyncSession = Depends(get_db),
+    user: User = Depends(get_current_user),
+):
+    """Revoke public access (the slug is kept so re-sharing gives the same link)."""
+    r = await _get_owned(db, resume_id, user)
+    r.is_public = False
+    await db.commit()
+    return {"slug": r.slug, "is_public": False}
+
+
+@router.post("/{resume_id}/duplicate")
+async def duplicate_resume(
+    resume_id: str,
+    db: AsyncSession = Depends(get_db),
+    user: User = Depends(get_current_user),
+):
+    """Duplicate a resume so the user can tailor a copy per job (spec Milestone F)."""
+    src = await _get_owned(db, resume_id, user)
+    content = _to_content(src)
+    copy = Resume(
+        user_id=user.id,
+        title=f"{src.title} (Copy)",
+        template_id=src.template_id,
+        ats_score=src.ats_score,
+        personal_info={}, achievements=[], interests=[],
+    )
+    await _apply_content(db, copy, content)
+    db.add(copy)
+    await db.commit()
+    full = await _load_full(db, copy.id)
+    await _snapshot(db, full, user.id, "duplicate")
+    await db.commit()
+    audit(actor_id=str(user.id), actor_email=user.email, action="resume.duplicate",
+          entity_type="resume", entity_id=str(full.id), meta={"from": resume_id})
+    await log_usage_event(str(user.id), "resume_duplicated", tenant_id=tenant_of(user),
+                          metadata={"from": resume_id})
     return _to_dict(full)
 
 

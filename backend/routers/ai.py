@@ -8,7 +8,8 @@ from services.usage import set_usage_context
 from services.ai import (
     generate_bullets, enhance_bullet, generate_summary, generate_cover_letter,
     suggest_skills, generate_interview_questions, answer_feedback, sample_answer,
-    skill_gap,
+    skill_gap, translate_resume, LANGUAGES,
+    career_copilot, COPILOT_PROMPTS,
 )
 
 router = APIRouter(prefix="/api/ai", tags=["AI"])
@@ -93,6 +94,22 @@ class SkillGapRequest(BaseModel):
     current_skills: list[str] = []
 
 
+class TranslateRequest(BaseModel):
+    content: dict
+    target_language: str = "en"
+
+
+class CopilotMessage(BaseModel):
+    role: str = "user"
+    content: str = ""
+
+
+class CopilotRequest(BaseModel):
+    message: str
+    history: list[CopilotMessage] = []
+    profile_context: str = ""
+
+
 @router.post("/generate-bullets")
 async def api_generate_bullets(req: BulletRequest, _=Depends(_auth)):
     bullets = await generate_bullets(req.position, req.company, req.description)
@@ -147,3 +164,28 @@ async def api_sample_answer(req: SampleAnswerRequest, _=Depends(_auth)):
 @router.post("/skill-gap")
 async def api_skill_gap(req: SkillGapRequest, _=Depends(_auth)):
     return await skill_gap(req.target, req.current_skills)
+
+
+@router.get("/languages")
+async def api_languages(_=Depends(_auth)):
+    return {"languages": [{"code": k, "name": v} for k, v in LANGUAGES.items()]}
+
+
+@router.post("/translate-resume")
+async def api_translate_resume(req: TranslateRequest, _=Depends(_auth)):
+    translated = await translate_resume(req.content, req.target_language)
+    if translated is None:
+        return {"translated": False, "content": req.content,
+                "detail": "AI translation is unavailable right now — please try again later."}
+    return {"translated": True, "content": translated}
+
+
+@router.get("/copilot/prompts")
+async def api_copilot_prompts(_=Depends(_auth)):
+    return {"prompts": COPILOT_PROMPTS}
+
+
+@router.post("/copilot")
+async def api_copilot(req: CopilotRequest, _=Depends(_auth)):
+    history = [{"role": m.role, "content": m.content} for m in req.history]
+    return await career_copilot(req.message, history, req.profile_context)

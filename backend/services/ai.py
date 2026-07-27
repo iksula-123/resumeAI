@@ -238,6 +238,42 @@ Return ONLY the body paragraphs, no salutation, no signature."""
     return raw.strip()
 
 
+async def role_summary_suggestion(
+    role_title: str,
+    skills: list[str] | None = None,
+    industry: str = "",
+    is_fresher: bool = True,
+) -> str:
+    """A role-tailored professional summary SUGGESTION (spec Milestone C, 'blue').
+
+    This is a candidate-confirmed suggestion, never asserted as fact: it stays
+    truthful for a fresher (aspiration + skills), never invents years of experience
+    or specific employers. The candidate edits/confirms it before it appears.
+    """
+    skills = skills or []
+    skill_str = ", ".join(skills[:8]) if skills else "relevant core skills"
+    level = ("an entry-level candidate / fresher" if is_fresher
+             else "an experienced professional")
+    ind = f" in the {industry} sector" if industry else ""
+    prompt = f"""Write a 2-3 sentence professional resume summary SUGGESTION for {level}
+targeting a "{role_title}"{ind} role.
+
+Strict rules (this is a suggestion the candidate will confirm, not a factual claim):
+- Do NOT invent specific years of experience, employers, projects, or metrics.
+- For a fresher, emphasise aptitude, the listed skills, and eagerness to contribute.
+- Keep it honest, generic enough to be true, and easy for the candidate to edit.
+- Weave in these skills naturally where relevant: {skill_str}.
+
+Return ONLY the summary text, no labels, no quotes."""
+    raw = await _chat(prompt, max_tokens=400)
+    if raw is None:
+        base = "Motivated" if is_fresher else "Results-driven"
+        return (f"{base} candidate seeking a {role_title} role{ind}, with a foundation in "
+                f"{skill_str}. Quick to learn, dependable, and eager to contribute and grow. "
+                "Edit this summary to reflect your own experience and strengths.")
+    return raw.strip().strip('"')
+
+
 async def suggest_skills(job_title: str, existing: list[str] | None = None) -> list[str]:
     """Return up to 12 relevant, in-demand skills for a job title (AI-powered)."""
     existing = existing or []
@@ -347,6 +383,149 @@ and sound human, not robotic. Return only the answer text."""
                 "Actions you personally took, and finish with a measurable Result (e.g. a % improvement "
                 "or time saved). Tie it back to the role you're applying for.")
     return raw.strip()
+
+
+# ─── Multilingual (Phase 3) ───────────────────────────────────────────────────
+
+LANGUAGES = {
+    "en": "English", "de": "German", "fr": "French", "es": "Spanish",
+    "it": "Italian", "nl": "Dutch", "ar": "Arabic", "ja": "Japanese",
+    "zh": "Chinese (Simplified)", "hi": "Hindi", "mr": "Marathi", "pt": "Portuguese",
+}
+
+
+async def translate_resume(content: dict, target_language: str) -> dict | None:
+    """Translate the descriptive text of a resume into the target language.
+
+    Proper nouns (names, companies, schools) are kept as-is; summary, bullets,
+    field/degree labels, project descriptions and achievements are translated.
+    Returns a translated copy of `content`, or None if AI is unavailable.
+    """
+    import copy
+    lang = LANGUAGES.get(target_language, target_language or "English")
+
+    payload = {
+        "summary": content.get("summary", ""),
+        "experience": [
+            {"bullets": e.get("bullets", [])} for e in (content.get("experience") or [])
+        ],
+        "education": [
+            {"degree": e.get("degree", ""), "field": e.get("field", "")}
+            for e in (content.get("education") or [])
+        ],
+        "projects": [
+            {"description": p.get("description", "")} for p in (content.get("projects") or [])
+        ],
+        "achievements": content.get("achievements", []),
+    }
+
+    prompt = f"""Translate the text values in this resume JSON into {lang}.
+Rules: translate descriptive text naturally and professionally; do NOT translate
+proper nouns, brand/tool names, or acronyms; keep the exact JSON structure and array
+lengths. Return ONLY the translated JSON object.
+
+{json.dumps(payload, ensure_ascii=False)[:5000]}"""
+
+    raw = await _chat(prompt, max_tokens=4000)
+    if raw is None:
+        return None
+    obj = _extract_json_object(raw)
+    if not obj:
+        return None
+
+    out = copy.deepcopy(content)
+    if obj.get("summary"):
+        out["summary"] = str(obj["summary"])
+    for i, e in enumerate(out.get("experience") or []):
+        tb = (obj.get("experience") or [])
+        if i < len(tb) and isinstance(tb[i], dict) and tb[i].get("bullets"):
+            e["bullets"] = [str(b) for b in tb[i]["bullets"]]
+    for i, e in enumerate(out.get("education") or []):
+        te = (obj.get("education") or [])
+        if i < len(te) and isinstance(te[i], dict):
+            if te[i].get("degree"):
+                e["degree"] = str(te[i]["degree"])
+            if te[i].get("field"):
+                e["field"] = str(te[i]["field"])
+    for i, p in enumerate(out.get("projects") or []):
+        tp = (obj.get("projects") or [])
+        if i < len(tp) and isinstance(tp[i], dict) and tp[i].get("description"):
+            p["description"] = str(tp[i]["description"])
+    if isinstance(obj.get("achievements"), list) and obj["achievements"]:
+        out["achievements"] = [str(a) for a in obj["achievements"]]
+    return out
+
+
+# ─── AI Career Copilot (Phase 7) ──────────────────────────────────────────────
+
+COPILOT_PROMPTS = [
+    "How can I make my resume stand out for a senior role?",
+    "What skills should I learn next for my career?",
+    "Help me write a strong professional summary.",
+    "How do I explain a career gap in interviews?",
+    "What are common mistakes that hurt ATS scores?",
+    "How should I negotiate a higher salary?",
+]
+
+
+def _copilot_fallback(message: str) -> str:
+    """Deterministic, genuinely useful guidance when the model is unavailable."""
+    m = (message or "").lower()
+    if any(k in m for k in ("ats", "applicant tracking", "keyword")):
+        return ("To pass ATS: mirror the exact keywords from the job description, use a single-column "
+                "layout with standard section headings (Experience, Education, Skills), avoid tables, "
+                "text boxes and images, and save as a text-based PDF. Quantify achievements so recruiters "
+                "see impact at a glance.")
+    if any(k in m for k in ("summary", "profile", "objective")):
+        return ("A strong summary is 2–3 sentences: your title + years of experience, your 2–3 strongest "
+                "skills tied to the target role, and one quantified achievement. Lead with impact, not duties — "
+                "e.g. 'Senior Engineer with 6 years scaling fintech platforms; cut latency 40%.'")
+    if any(k in m for k in ("gap", "unemploy", "break")):
+        return ("Address a career gap honestly and briefly: state what you did (upskilling, caregiving, "
+                "freelance, health) and pivot quickly to what you bring now. Frame it as growth. On the resume, "
+                "use years instead of months and consider a 'Professional Development' entry.")
+    if any(k in m for k in ("salary", "negotiat", "offer", "pay")):
+        return ("Research the market range first (Levels.fyi, Glassdoor). Never give a number first — ask for "
+                "their range. When you counter, anchor on value and a specific figure with a small buffer, and "
+                "negotiate the whole package (equity, bonus, PTO, remote), not just base.")
+    if any(k in m for k in ("skill", "learn", "grow", "next")):
+        return ("Pick skills where market demand meets your trajectory. Look at 5–10 target job postings and "
+                "list the skills that repeat — those are your priorities. Balance one deep technical skill with "
+                "one leadership/communication skill. Use our Skill-Gap tool to see exactly what's missing.")
+    if any(k in m for k in ("interview", "star", "answer")):
+        return ("Prepare 5–6 STAR stories (Situation, Task, Action, Result) covering leadership, conflict, "
+                "failure and impact. Quantify every result. Research the company, prepare thoughtful questions, "
+                "and practice out loud. Try our Interview Prep tool for role-specific questions.")
+    return ("Great career question! In general: tailor every resume to the specific role, quantify your impact "
+            "with numbers, keep formatting ATS-friendly, and keep learning in-demand skills. Ask me about your "
+            "resume, ATS scores, interviews, skills to learn, or salary negotiation and I'll go deeper.")
+
+
+async def career_copilot(message: str, history: list[dict] | None = None,
+                         profile_context: str = "") -> dict:
+    """Personalized career-coach chat reply. Always returns {reply, ai}."""
+    message = (message or "").strip()
+    if not message:
+        return {"reply": "Ask me anything about your resume, career, interviews or job search!", "ai": False}
+
+    convo = ""
+    for turn in (history or [])[-6:]:
+        role = "User" if turn.get("role") == "user" else "Copilot"
+        convo += f"{role}: {str(turn.get('content', '')).strip()}\n"
+
+    ctx = f"\nWhat you know about this user:\n{profile_context}\n" if profile_context else ""
+    prompt = f"""You are ResumeAI Copilot, an expert career coach and resume strategist inside a resume-builder app.
+Be warm, specific and actionable. Give concrete, tailored advice — not generic platitudes.
+Keep replies to 3–6 sentences unless the user asks for more. Use plain text (no markdown headers).
+When relevant, point the user to app tools: Resume Editor, ATS Scan, Skill-Gap, Interview Prep, AI Upgrade.
+{ctx}
+Recent conversation:
+{convo}User: {message}
+Copilot:"""
+    raw = await _chat(prompt, max_tokens=700)
+    if raw is None:
+        return {"reply": _copilot_fallback(message), "ai": False}
+    return {"reply": raw.strip(), "ai": True}
 
 
 # ─── Skill-gap analysis ───────────────────────────────────────────────────────

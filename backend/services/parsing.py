@@ -1,6 +1,61 @@
 """Extract plain text from an uploaded resume (PDF / DOCX / TXT)."""
 import io
 import re
+import zipfile
+
+
+class InvalidUpload(ValueError):
+    """Raised when an uploaded file is not a genuine, readable PDF/DOCX/TXT.
+
+    The message is user-facing and safe to surface directly in an API error.
+    """
+
+
+def validate_upload(filename: str, data: bytes) -> str:
+    """Validate that `data` really is the file type its extension claims.
+
+    Guards against files merely *renamed* to .pdf/.docx and against corrupt
+    uploads, so we reject them with a clear message instead of failing later
+    with a vague "couldn't read text" or sending garbage to the AI.
+
+    Returns the detected extension (".pdf" | ".docx" | ".txt").
+    Raises InvalidUpload with a friendly message on any problem.
+    """
+    name = (filename or "").lower()
+    if not data:
+        raise InvalidUpload("The file appears to be empty.")
+
+    if name.endswith(".pdf"):
+        # Real PDFs start with "%PDF-" (allow a few leading bytes/BOM some tools add).
+        if b"%PDF-" not in data[:1024]:
+            raise InvalidUpload("This file isn't a valid PDF — it may be renamed or corrupted. "
+                                "Please upload a genuine PDF, DOCX, or TXT.")
+        return ".pdf"
+
+    if name.endswith(".docx"):
+        # DOCX is a ZIP container; verify the ZIP signature and the Word part.
+        if not data[:4] == b"PK\x03\x04":
+            raise InvalidUpload("This file isn't a valid Word .docx — it may be renamed or corrupted. "
+                                "Please upload a genuine PDF, DOCX, or TXT.")
+        try:
+            with zipfile.ZipFile(io.BytesIO(data)) as zf:
+                names = set(zf.namelist())
+            if "word/document.xml" not in names:
+                raise InvalidUpload("This .docx is missing its Word content — it may be an .doc or a "
+                                    "different Office file. Please re-save as .docx and try again.")
+        except zipfile.BadZipFile:
+            raise InvalidUpload("This .docx file is corrupted and can't be opened. "
+                                "Please re-save it and try again.")
+        return ".docx"
+
+    if name.endswith(".txt"):
+        # Reject binary content masquerading as text (NUL bytes never appear in real text).
+        if b"\x00" in data[:4096]:
+            raise InvalidUpload("This .txt file looks like binary data, not text. "
+                                "Please upload a genuine PDF, DOCX, or TXT.")
+        return ".txt"
+
+    raise InvalidUpload("Please upload a PDF, DOCX, or TXT file.")
 
 
 def extract_text(filename: str, data: bytes) -> str:

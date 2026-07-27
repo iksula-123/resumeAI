@@ -2,6 +2,9 @@
 .env.local
 .env
 
+# Raw TAF exports — contain recruiter PII; never commit (pipeline output is PII-free)
+TAFs-*.csv
+
 # Local SQLite dev database
 *.db
 

@@ -5,8 +5,14 @@ import { useParams, useRouter } from 'next/navigation'
 import { useAuthStore } from '@/lib/store'
 import { api } from '@/lib/api'
 import AppShell from '@/components/AppShell'
-import ResumeTemplates from '@/components/ResumeTemplates'
+import dynamic from 'next/dynamic'
 import CircularScore from '@/components/CircularScore'
+
+// Templates carry all the print layouts — code-split them off the main bundle.
+const ResumeTemplates = dynamic(() => import('@/components/ResumeTemplates'), {
+  ssr: false,
+  loading: () => <div className="animate-pulse bg-gray-100 rounded-2xl h-[600px] w-full" />,
+})
 
 interface Resume {
   id: string

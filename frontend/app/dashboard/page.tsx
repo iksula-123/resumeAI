@@ -51,6 +51,7 @@ export default function DashboardPage() {
   const [apps, setApps] = useState<Application[]>([])
   const [loading, setLoading] = useState(true)
   const [deleting, setDeleting] = useState<string | null>(null)
+  const [duplicating, setDuplicating] = useState<string | null>(null)
 
   useEffect(() => {
     if (!user) { router.push('/auth/login'); return }
@@ -71,6 +72,27 @@ export default function DashboardPage() {
       setResumes(p => p.filter(r => r.id !== id))
     } finally {
       setDeleting(null)
+    }
+  }
+
+  const handleShare = async (id: string) => {
+    try {
+      const r = await api.post<{ slug: string }>(`/api/resumes/${id}/share`, {})
+      const url = `${window.location.origin}/r/${r.slug}`
+      try { await navigator.clipboard.writeText(url) } catch { /* ignore */ }
+      alert(`Public link (copied to clipboard):\n${url}`)
+    } catch (e) {
+      alert(e instanceof Error ? e.message : 'Could not create share link')
+    }
+  }
+
+  const handleDuplicate = async (id: string) => {
+    setDuplicating(id)
+    try {
+      const copy = await api.post<Resume>(`/api/resumes/${id}/duplicate`, {})
+      setResumes(p => [copy, ...p])           // show the new copy immediately
+    } finally {
+      setDuplicating(null)
     }
   }
 
@@ -184,9 +206,14 @@ export default function DashboardPage() {
           <div className="lg:col-span-2">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-xl font-bold text-gray-900 font-display">My Resumes</h2>
-              <button onClick={() => router.push('/resumes/new')} className="btn-primary text-sm">
-                <span>+</span> Create New Resume
-              </button>
+              <div className="flex gap-2">
+                <button onClick={() => router.push('/resumes/build')} className="btn-primary text-sm">
+                  <span>✨</span> Build from Role
+                </button>
+                <button onClick={() => router.push('/resumes/new')} className="text-sm px-3 py-2 rounded-lg border border-gray-200 text-gray-700 hover:bg-gray-50 transition">
+                  Blank resume
+                </button>
+              </div>
             </div>
 
             {loading ? (
@@ -222,6 +249,16 @@ export default function DashboardPage() {
                           className="flex-1 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-xs font-medium py-2 rounded-lg transition">Edit</button>
                         <button onClick={() => router.push(`/resumes/${resume.id}/preview`)}
                           className="flex-1 bg-gray-50 hover:bg-gray-100 text-gray-700 text-xs font-medium py-2 rounded-lg transition">Preview</button>
+                        <button onClick={() => handleShare(resume.id)}
+                          title="Get a public shareable link"
+                          className="bg-gray-50 hover:bg-gray-100 text-gray-700 text-xs font-medium px-3 py-2 rounded-lg transition">
+                          🔗
+                        </button>
+                        <button onClick={() => handleDuplicate(resume.id)} disabled={duplicating === resume.id}
+                          title="Duplicate & tailor for another job"
+                          className="bg-gray-50 hover:bg-gray-100 text-gray-700 text-xs font-medium px-3 py-2 rounded-lg transition disabled:opacity-50">
+                          {duplicating === resume.id ? '…' : '⧉'}
+                        </button>
                         <button onClick={() => handleDelete(resume.id)} disabled={deleting === resume.id}
                           className="bg-red-50 hover:bg-red-100 text-red-500 text-xs font-medium px-3 py-2 rounded-lg transition disabled:opacity-50">
                           {deleting === resume.id ? '…' : '🗑'}

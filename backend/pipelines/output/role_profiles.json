@@ -1,0 +1,5948 @@
+[
+  {
+    "slug": "sales-executive",
+    "canonical_title": "Sales Executive",
+    "skills": [
+      "Communication",
+      "Sales",
+      "English Proficiency",
+      "Marketing",
+      "Computer Knowledge",
+      "Hindi",
+      "Convincing Skills",
+      "Typing",
+      "Presentation Skills",
+      "Negotiation",
+      "Customer Service",
+      "Banking"
+    ],
+    "skills_detail": [
+      {
+        "skill": "Communication",
+        "count": 829
+      },
+      {
+        "skill": "Sales",
+        "count": 338
+      },
+      {
+        "skill": "English Proficiency",
+        "count": 79
+      },
+      {
+        "skill": "Marketing",
+        "count": 54
+      },
+      {
+        "skill": "Computer Knowledge",
+        "count": 54
+      },
+      {
+        "skill": "Hindi",
+        "count": 49
+      },
+      {
+        "skill": "Convincing Skills",
+        "count": 46
+      },
+      {
+        "skill": "Typing",
+        "count": 30
+      },
+      {
+        "skill": "Presentation Skills",
+        "count": 27
+      },
+      {
+        "skill": "Negotiation",
+        "count": 26
+      },
+      {
+        "skill": "Customer Service",
+        "count": 23
+      },
+      {
+        "skill": "Banking",
+        "count": 23
+      }
+    ],
+    "education": "12th standard",
+    "selection_process": "Interview",
+    "salary_min": 185000,
+    "salary_max": 265000,
+    "industry": "BFSI",
+    "sub_sector": "Retail",
+    "category": "Sales and Marketing",
+    "demand_count": 1396,
+    "raw_title_count": 91,
+    "source": "taf"
+  },
+  {
+    "slug": "customer-care-executive",
+    "canonical_title": "Customer Care Executive",
+    "skills": [
+      "Communication",
+      "English Proficiency",
+      "Sales",
+      "Hindi",
+      "Computer Knowledge",
+      "Typing",
+      "Customer Service",
+      "Interpersonal Skills",
+      "Problem Solving",
+      "Convincing Skills",
+      "MS Office",
+      "CRM"
+    ],
+    "skills_detail": [
+      {
+        "skill": "Communication",
+        "count": 325
+      },
+      {
+        "skill": "English Proficiency",
+        "count": 69
+      },
+      {
+        "skill": "Sales",
+        "count": 28
+      },
+      {
+        "skill": "Hindi",
+        "count": 25
+      },
+      {
+        "skill": "Computer Knowledge",
+        "count": 23
+      },
+      {
+        "skill": "Typing",
+        "count": 19
+      },
+      {
+        "skill": "Customer Service",
+        "count": 14
+      },
+      {
+        "skill": "Interpersonal Skills",
+        "count": 14
+      },
+      {
+        "skill": "Problem Solving",
+        "count": 9
+      },
+      {
+        "skill": "Convincing Skills",
+        "count": 9
+      },
+      {
+        "skill": "MS Office",
+        "count": 8
+      },
+      {
+        "skill": "CRM",
+        "count": 7
+      }
+    ],
+    "education": "12th standard",
+    "selection_process": "PI",
+    "salary_min": 180000,
+    "salary_max": 250000,
+    "industry": "BFSI",
+    "sub_sector": "BFSI",
+    "category": "Banking and Finance",
+    "demand_count": 444,
+    "raw_title_count": 24,
+    "source": "taf"
+  },
+  {
+    "slug": "customer-service-associate",
+    "canonical_title": "Customer Service Associate",
+    "skills": [
+      "Communication",
+      "English Proficiency",
+      "Customer Service",
+      "Sales",
+      "Typing",
+      "Hindi",
+      "Computer Knowledge",
+      "MS Excel",
+      "MS Office",
+      "Interpersonal Skills",
+      "Convincing Skills",
+      "Presentation Skills"
+    ],
+    "skills_detail": [
+      {
+        "skill": "Communication",
+        "count": 270
+      },
+      {
+        "skill": "English Proficiency",
+        "count": 47
+      },
+      {
+        "skill": "Customer Service",
+        "count": 35
+      },
+      {
+        "skill": "Sales",
+        "count": 35
+      },
+      {
+        "skill": "Typing",
+        "count": 29
+      },
+      {
+        "skill": "Hindi",
+        "count": 26
+      },
+      {
+        "skill": "Computer Knowledge",
+        "count": 23
+      },
+      {
+        "skill": "MS Excel",
+        "count": 22
+      },
+      {
+        "skill": "MS Office",
+        "count": 19
+      },
+      {
+        "skill": "Interpersonal Skills",
+        "count": 12
+      },
+      {
+        "skill": "Convincing Skills",
+        "count": 10
+      },
+      {
+        "skill": "Presentation Skills",
+        "count": 10
+      }
+    ],
+    "education": "12th standard",
+    "selection_process": "Direct Interview",
+    "salary_min": 200000,
+    "salary_max": 235000,
+    "industry": "BFSI",
+    "sub_sector": "Retail",
+    "category": "IT/ITES",
+    "demand_count": 426,
+    "raw_title_count": 42,
+    "source": "taf"
+  },
+  {
+    "slug": "tele-caller",
+    "canonical_title": "Tele Caller",
+    "skills": [
+      "Communication",
+      "Computer Knowledge",
+      "English Proficiency",
+      "Sales",
+      "Interpersonal Skills",
+      "Hindi",
+      "Convincing Skills",
+      "Telecalling",
+      "Banking",
+      "Typing",
+      "Negotiation",
+      "Local Language"
+    ],
+    "skills_detail": [
+      {
+        "skill": "Communication",
+        "count": 277
+      },
+      {
+        "skill": "Computer Knowledge",
+        "count": 29
+      },
+      {
+        "skill": "English Proficiency",
+        "count": 26
+      },
+      {
+        "skill": "Sales",
+        "count": 24
+      },
+      {
+        "skill": "Interpersonal Skills",
+        "count": 22
+      },
+      {
+        "skill": "Hindi",
+        "count": 14
+      },
+      {
+        "skill": "Convincing Skills",
+        "count": 12
+      },
+      {
+        "skill": "Telecalling",
+        "count": 10
+      },
+      {
+        "skill": "Banking",
+        "count": 7
+      },
+      {
+        "skill": "Typing",
+        "count": 6
+      },
+      {
+        "skill": "Negotiation",
+        "count": 5
+      },
+      {
+        "skill": "Local Language",
+        "count": 5
+      }
+    ],
+    "education": "12th standard",
+    "selection_process": "Interview",
+    "salary_min": 150000,
+    "salary_max": 200000,
+    "industry": "BFSI",
+    "sub_sector": "Sales & Marketing",
+    "category": "Banking and Finance",
+    "demand_count": 373,
+    "raw_title_count": 40,
+    "source": "taf"
+  },
+  {
+    "slug": "data-entry-operator",
+    "canonical_title": "Data Entry Operator",
+    "skills": [
+      "Typing",
+      "Communication",
+      "Computer Knowledge",
+      "Data Entry",
+      "English Proficiency",
+      "MS Office",
+      "Documentation",
+      "MS Excel",
+      "Hindi",
+      "Interpersonal Skills",
+      "Convincing Skills",
+      "Customer Service"
+    ],
+    "skills_detail": [
+      {
+        "skill": "Typing",
+        "count": 171
+      },
+      {
+        "skill": "Communication",
+        "count": 125
+      },
+      {
+        "skill": "Computer Knowledge",
+        "count": 44
+      },
+      {
+        "skill": "Data Entry",
+        "count": 37
+      },
+      {
+        "skill": "English Proficiency",
+        "count": 26
+      },
+      {
+        "skill": "MS Office",
+        "count": 11
+      },
+      {
+        "skill": "Documentation",
+        "count": 11
+      },
+      {
+        "skill": "MS Excel",
+        "count": 10
+      },
+      {
+        "skill": "Hindi",
+        "count": 9
+      },
+      {
+        "skill": "Interpersonal Skills",
+        "count": 4
+      },
+      {
+        "skill": "Convincing Skills",
+        "count": 4
+      },
+      {
+        "skill": "Customer Service",
+        "count": 3
+      }
+    ],
+    "education": "12th standard",
+    "selection_process": "Interview",
+    "salary_min": 150000,
+    "salary_max": 220000,
+    "industry": "IT",
+    "sub_sector": "BFSI",
+    "category": "Banking and Finance",
+    "demand_count": 364,
+    "raw_title_count": 25,
+    "source": "taf"
+  },
+  {
+    "slug": "computer-operator",
+    "canonical_title": "Computer Operator",
+    "skills": [
+      "Communication",
+      "Computer Knowledge",
+      "Data Entry",
+      "Documentation",
+      "Typing",
+      "Problem Solving",
+      "Sales",
+      "Customer Service",
+      "MS Office",
+      "Interpersonal Skills",
+      "MS Excel",
+      "Hindi"
+    ],
+    "skills_detail": [
+      {
+        "skill": "Communication",
+        "count": 197
+      },
+      {
+        "skill": "Computer Knowledge",
+        "count": 75
+      },
+      {
+        "skill": "Data Entry",
+        "count": 70
+      },
+      {
+        "skill": "Documentation",
+        "count": 68
+      },
+      {
+        "skill": "Typing",
+        "count": 40
+      },
+      {
+        "skill": "Problem Solving",
+        "count": 27
+      },
+      {
+        "skill": "Sales",
+        "count": 20
+      },
+      {
+        "skill": "Customer Service",
+        "count": 9
+      },
+      {
+        "skill": "MS Office",
+        "count": 6
+      },
+      {
+        "skill": "Interpersonal Skills",
+        "count": 6
+      },
+      {
+        "skill": "MS Excel",
+        "count": 5
+      },
+      {
+        "skill": "Hindi",
+        "count": 4
+      }
+    ],
+    "education": "12th standard",
+    "selection_process": "Direct Interview",
+    "salary_min": null,
+    "salary_max": null,
+    "industry": "BFSI",
+    "sub_sector": "BFSI",
+    "category": null,
+    "demand_count": 351,
+    "raw_title_count": 17,
+    "source": "taf"
+  },
+  {
+    "slug": "trainer",
+    "canonical_title": "Trainer",
+    "skills": [
+      "Communication",
+      "MS Excel",
+      "MS Office",
+      "Sales",
+      "Presentation Skills",
+      "Interpersonal Skills",
+      "Leadership",
+      "English Proficiency",
+      "Accounting",
+      "Computer Knowledge",
+      "Documentation",
+      "Tally"
+    ],
+    "skills_detail": [
+      {
+        "skill": "Communication",
+        "count": 184
+      },
+      {
+        "skill": "MS Excel",
+        "count": 42
+      },
+      {
+        "skill": "MS Office",
+        "count": 40
+      },
+      {
+        "skill": "Sales",
+        "count": 33
+      },
+      {
+        "skill": "Presentation Skills",
+        "count": 32
+      },
+      {
+        "skill": "Interpersonal Skills",
+        "count": 31
+      },
+      {
+        "skill": "Leadership",
+        "count": 27
+      },
+      {
+        "skill": "English Proficiency",
+        "count": 13
+      },
+      {
+        "skill": "Accounting",
+        "count": 5
+      },
+      {
+        "skill": "Computer Knowledge",
+        "count": 5
+      },
+      {
+        "skill": "Documentation",
+        "count": 3
+      },
+      {
+        "skill": "Tally",
+        "count": 3
+      }
+    ],
+    "education": "Any Graduate",
+    "selection_process": "Technical Interview/HR",
+    "salary_min": null,
+    "salary_max": null,
+    "industry": "BFSI",
+    "sub_sector": "Training",
+    "category": null,
+    "demand_count": 239,
+    "raw_title_count": 12,
+    "source": "taf"
+  },
+  {
+    "slug": "customer-service-executive",
+    "canonical_title": "Customer Service Executive",
+    "skills": [
+      "Communication",
+      "English Proficiency",
+      "Hindi",
+      "Customer Service",
+      "Typing",
+      "Sales",
+      "Adaptability",
+      "Computer Knowledge",
+      "Convincing Skills",
+      "Problem Solving",
+      "Presentation Skills",
+      "Negotiation"
+    ],
+    "skills_detail": [
+      {
+        "skill": "Communication",
+        "count": 126
+      },
+      {
+        "skill": "English Proficiency",
+        "count": 15
+      },
+      {
+        "skill": "Hindi",
+        "count": 14
+      },
+      {
+        "skill": "Customer Service",
+        "count": 14
+      },
+      {
+        "skill": "Typing",
+        "count": 12
+      },
+      {
+        "skill": "Sales",
+        "count": 11
+      },
+      {
+        "skill": "Adaptability",
+        "count": 7
+      },
+      {
+        "skill": "Computer Knowledge",
+        "count": 7
+      },
+      {
+        "skill": "Convincing Skills",
+        "count": 6
+      },
+      {
+        "skill": "Problem Solving",
+        "count": 5
+      },
+      {
+        "skill": "Presentation Skills",
+        "count": 5
+      },
+      {
+        "skill": "Negotiation",
+        "count": 4
+      }
+    ],
+    "education": "12th standard",
+    "selection_process": "Face to Face",
+    "salary_min": 205000,
+    "salary_max": 240000,
+    "industry": "BFSI",
+    "sub_sector": "BPO",
+    "category": "Banking and Finance",
+    "demand_count": 213,
+    "raw_title_count": 16,
+    "source": "taf"
+  },
+  {
+    "slug": "sales-associate",
+    "canonical_title": "Sales Associate",
+    "skills": [
+      "Communication",
+      "Sales",
+      "Interpersonal Skills",
+      "Computer Knowledge",
+      "English Proficiency",
+      "Hindi",
+      "Customer Service",
+      "Local Language",
+      "Convincing Skills",
+      "Teamwork",
+      "Marketing",
+      "Banking"
+    ],
+    "skills_detail": [
+      {
+        "skill": "Communication",
+        "count": 94
+      },
+      {
+        "skill": "Sales",
+        "count": 35
+      },
+      {
+        "skill": "Interpersonal Skills",
+        "count": 26
+      },
+      {
+        "skill": "Computer Knowledge",
+        "count": 12
+      },
+      {
+        "skill": "English Proficiency",
+        "count": 8
+      },
+      {
+        "skill": "Hindi",
+        "count": 8
+      },
+      {
+        "skill": "Customer Service",
+        "count": 7
+      },
+      {
+        "skill": "Local Language",
+        "count": 6
+      },
+      {
+        "skill": "Convincing Skills",
+        "count": 6
+      },
+      {
+        "skill": "Teamwork",
+        "count": 5
+      },
+      {
+        "skill": "Marketing",
+        "count": 4
+      },
+      {
+        "skill": "Banking",
+        "count": 2
+      }
+    ],
+    "education": "12th standard",
+    "selection_process": "Interview",
+    "salary_min": 270000,
+    "salary_max": 310000,
+    "industry": "Retail",
+    "sub_sector": "Retail",
+    "category": "Banking and Finance",
+    "demand_count": 190,
+    "raw_title_count": 23,
+    "source": "taf"
+  },
+  {
+    "slug": "software-engineer",
+    "canonical_title": "Software Engineer",
+    "skills": [
+      "Communication",
+      "Analytical Skills",
+      "Problem Solving",
+      "Teamwork",
+      "Interpersonal Skills",
+      "English Proficiency",
+      "MS Office",
+      "Windows OS",
+      "Adaptability",
+      "Computer Knowledge",
+      "Hardware Troubleshooting",
+      "MS Excel"
+    ],
+    "skills_detail": [
+      {
+        "skill": "Communication",
+        "count": 41
+      },
+      {
+        "skill": "Analytical Skills",
+        "count": 39
+      },
+      {
+        "skill": "Problem Solving",
+        "count": 14
+      },
+      {
+        "skill": "Teamwork",
+        "count": 9
+      },
+      {
+        "skill": "Interpersonal Skills",
+        "count": 5
+      },
+      {
+        "skill": "English Proficiency",
+        "count": 4
+      },
+      {
+        "skill": "MS Office",
+        "count": 2
+      },
+      {
+        "skill": "Windows OS",
+        "count": 2
+      },
+      {
+        "skill": "Adaptability",
+        "count": 2
+      },
+      {
+        "skill": "Computer Knowledge",
+        "count": 2
+      },
+      {
+        "skill": "Hardware Troubleshooting",
+        "count": 2
+      },
+      {
+        "skill": "MS Excel",
+        "count": 1
+      }
+    ],
+    "education": "B.Tech/B.E",
+    "selection_process": "Technical - HR",
+    "salary_min": 150000,
+    "salary_max": 280000,
+    "industry": "IT",
+    "sub_sector": "IT",
+    "category": "Technology",
+    "demand_count": 189,
+    "raw_title_count": 37,
+    "source": "taf"
+  },
+  {
+    "slug": "accountant",
+    "canonical_title": "Accountant",
+    "skills": [
+      "Accounting",
+      "Communication",
+      "Tally",
+      "Computer Knowledge",
+      "MS Excel",
+      "Typing",
+      "English Proficiency",
+      "Sales",
+      "Banking",
+      "Interpersonal Skills",
+      "Documentation",
+      "Data Entry"
+    ],
+    "skills_detail": [
+      {
+        "skill": "Accounting",
+        "count": 77
+      },
+      {
+        "skill": "Communication",
+        "count": 69
+      },
+      {
+        "skill": "Tally",
+        "count": 25
+      },
+      {
+        "skill": "Computer Knowledge",
+        "count": 13
+      },
+      {
+        "skill": "MS Excel",
+        "count": 10
+      },
+      {
+        "skill": "Typing",
+        "count": 8
+      },
+      {
+        "skill": "English Proficiency",
+        "count": 4
+      },
+      {
+        "skill": "Sales",
+        "count": 3
+      },
+      {
+        "skill": "Banking",
+        "count": 3
+      },
+      {
+        "skill": "Interpersonal Skills",
+        "count": 2
+      },
+      {
+        "skill": "Documentation",
+        "count": 2
+      },
+      {
+        "skill": "Data Entry",
+        "count": 2
+      }
+    ],
+    "education": "Any Graduate",
+    "selection_process": "Interview",
+    "salary_min": 150000,
+    "salary_max": 240000,
+    "industry": "BFSI",
+    "sub_sector": "IT",
+    "category": "Banking and Finance",
+    "demand_count": 183,
+    "raw_title_count": 14,
+    "source": "taf"
+  },
+  {
+    "slug": "back-office-executive",
+    "canonical_title": "Back Office Executive",
+    "skills": [
+      "Communication",
+      "Typing",
+      "MS Office",
+      "Computer Knowledge",
+      "Sales",
+      "MS Excel",
+      "English Proficiency",
+      "Data Entry",
+      "Accounting",
+      "Presentation Skills",
+      "CRM",
+      "Hindi"
+    ],
+    "skills_detail": [
+      {
+        "skill": "Communication",
+        "count": 70
+      },
+      {
+        "skill": "Typing",
+        "count": 29
+      },
+      {
+        "skill": "MS Office",
+        "count": 22
+      },
+      {
+        "skill": "Computer Knowledge",
+        "count": 21
+      },
+      {
+        "skill": "Sales",
+        "count": 10
+      },
+      {
+        "skill": "MS Excel",
+        "count": 9
+      },
+      {
+        "skill": "English Proficiency",
+        "count": 8
+      },
+      {
+        "skill": "Data Entry",
+        "count": 6
+      },
+      {
+        "skill": "Accounting",
+        "count": 5
+      },
+      {
+        "skill": "Presentation Skills",
+        "count": 5
+      },
+      {
+        "skill": "CRM",
+        "count": 4
+      },
+      {
+        "skill": "Hindi",
+        "count": 2
+      }
+    ],
+    "education": "12th standard",
+    "selection_process": "PI",
+    "salary_min": 170000,
+    "salary_max": 225000,
+    "industry": "BFSI",
+    "sub_sector": "BFSI",
+    "category": "Banking and Finance",
+    "demand_count": 172,
+    "raw_title_count": 15,
+    "source": "taf"
+  },
+  {
+    "slug": "sales-officer",
+    "canonical_title": "Sales Officer",
+    "skills": [
+      "Communication",
+      "Sales",
+      "Interpersonal Skills",
+      "English Proficiency",
+      "Banking",
+      "Hindi",
+      "Computer Knowledge",
+      "Convincing Skills",
+      "Local Language",
+      "Lead Generation",
+      "Customer Service",
+      "Marketing"
+    ],
+    "skills_detail": [
+      {
+        "skill": "Communication",
+        "count": 93
+      },
+      {
+        "skill": "Sales",
+        "count": 39
+      },
+      {
+        "skill": "Interpersonal Skills",
+        "count": 13
+      },
+      {
+        "skill": "English Proficiency",
+        "count": 13
+      },
+      {
+        "skill": "Banking",
+        "count": 11
+      },
+      {
+        "skill": "Hindi",
+        "count": 11
+      },
+      {
+        "skill": "Computer Knowledge",
+        "count": 9
+      },
+      {
+        "skill": "Convincing Skills",
+        "count": 9
+      },
+      {
+        "skill": "Local Language",
+        "count": 5
+      },
+      {
+        "skill": "Lead Generation",
+        "count": 4
+      },
+      {
+        "skill": "Customer Service",
+        "count": 3
+      },
+      {
+        "skill": "Marketing",
+        "count": 3
+      }
+    ],
+    "education": "Any Graduate",
+    "selection_process": "Interview",
+    "salary_min": 200000,
+    "salary_max": 210000,
+    "industry": "BFSI",
+    "sub_sector": "BFSI",
+    "category": "Banking and Finance",
+    "demand_count": 151,
+    "raw_title_count": 23,
+    "source": "taf"
+  },
+  {
+    "slug": "business-development-executive",
+    "canonical_title": "Business Development Executive",
+    "skills": [
+      "Communication",
+      "Sales",
+      "Typing",
+      "Presentation Skills",
+      "Convincing Skills",
+      "English Proficiency",
+      "Interpersonal Skills",
+      "Lead Generation",
+      "Problem Solving",
+      "Marketing",
+      "Banking",
+      "Customer Service"
+    ],
+    "skills_detail": [
+      {
+        "skill": "Communication",
+        "count": 98
+      },
+      {
+        "skill": "Sales",
+        "count": 36
+      },
+      {
+        "skill": "Typing",
+        "count": 14
+      },
+      {
+        "skill": "Presentation Skills",
+        "count": 12
+      },
+      {
+        "skill": "Convincing Skills",
+        "count": 9
+      },
+      {
+        "skill": "English Proficiency",
+        "count": 9
+      },
+      {
+        "skill": "Interpersonal Skills",
+        "count": 6
+      },
+      {
+        "skill": "Lead Generation",
+        "count": 6
+      },
+      {
+        "skill": "Problem Solving",
+        "count": 6
+      },
+      {
+        "skill": "Marketing",
+        "count": 6
+      },
+      {
+        "skill": "Banking",
+        "count": 6
+      },
+      {
+        "skill": "Customer Service",
+        "count": 5
+      }
+    ],
+    "education": "Any Graduate",
+    "selection_process": "F2F Interview",
+    "salary_min": 220000,
+    "salary_max": 260000,
+    "industry": "BFSI",
+    "sub_sector": "BFSI",
+    "category": "Sales and Marketing",
+    "demand_count": 140,
+    "raw_title_count": 20,
+    "source": "taf"
+  },
+  {
+    "slug": "customer-support-executive",
+    "canonical_title": "Customer Support Executive",
+    "skills": [
+      "Communication",
+      "English Proficiency",
+      "Hindi",
+      "Customer Service",
+      "Problem Solving",
+      "Computer Knowledge",
+      "Time Management",
+      "Adaptability",
+      "MS Excel",
+      "Convincing Skills",
+      "CRM",
+      "Multitasking"
+    ],
+    "skills_detail": [
+      {
+        "skill": "Communication",
+        "count": 101
+      },
+      {
+        "skill": "English Proficiency",
+        "count": 27
+      },
+      {
+        "skill": "Hindi",
+        "count": 17
+      },
+      {
+        "skill": "Customer Service",
+        "count": 11
+      },
+      {
+        "skill": "Problem Solving",
+        "count": 11
+      },
+      {
+        "skill": "Computer Knowledge",
+        "count": 10
+      },
+      {
+        "skill": "Time Management",
+        "count": 6
+      },
+      {
+        "skill": "Adaptability",
+        "count": 6
+      },
+      {
+        "skill": "MS Excel",
+        "count": 5
+      },
+      {
+        "skill": "Convincing Skills",
+        "count": 5
+      },
+      {
+        "skill": "CRM",
+        "count": 4
+      },
+      {
+        "skill": "Multitasking",
+        "count": 4
+      }
+    ],
+    "education": "Any Graduate",
+    "selection_process": "Face to Face",
+    "salary_min": 200000,
+    "salary_max": 250000,
+    "industry": "BFSI",
+    "sub_sector": "BFSI",
+    "category": "IT/ITES",
+    "demand_count": 132,
+    "raw_title_count": 12,
+    "source": "taf"
+  },
+  {
+    "slug": "office-assistant",
+    "canonical_title": "Office Assistant",
+    "skills": [
+      "Communication",
+      "Computer Knowledge",
+      "Interpersonal Skills",
+      "Typing",
+      "MS Office",
+      "Customer Service",
+      "Accounting",
+      "English Proficiency",
+      "Documentation",
+      "Problem Solving",
+      "Teamwork",
+      "Sales"
+    ],
+    "skills_detail": [
+      {
+        "skill": "Communication",
+        "count": 57
+      },
+      {
+        "skill": "Computer Knowledge",
+        "count": 30
+      },
+      {
+        "skill": "Interpersonal Skills",
+        "count": 23
+      },
+      {
+        "skill": "Typing",
+        "count": 11
+      },
+      {
+        "skill": "MS Office",
+        "count": 7
+      },
+      {
+        "skill": "Customer Service",
+        "count": 5
+      },
+      {
+        "skill": "Accounting",
+        "count": 4
+      },
+      {
+        "skill": "English Proficiency",
+        "count": 4
+      },
+      {
+        "skill": "Documentation",
+        "count": 3
+      },
+      {
+        "skill": "Problem Solving",
+        "count": 2
+      },
+      {
+        "skill": "Teamwork",
+        "count": 2
+      },
+      {
+        "skill": "Sales",
+        "count": 2
+      }
+    ],
+    "education": "12th standard",
+    "selection_process": "Interview",
+    "salary_min": null,
+    "salary_max": null,
+    "industry": "BFSI",
+    "sub_sector": "service",
+    "category": null,
+    "demand_count": 130,
+    "raw_title_count": 16,
+    "source": "taf"
+  },
+  {
+    "slug": "marketing-executive",
+    "canonical_title": "Marketing Executive",
+    "skills": [
+      "Communication",
+      "Sales",
+      "Marketing",
+      "English Proficiency",
+      "Convincing Skills",
+      "Hindi",
+      "Computer Knowledge",
+      "Lead Generation",
+      "Banking",
+      "Customer Service",
+      "Problem Solving",
+      "Interpersonal Skills"
+    ],
+    "skills_detail": [
+      {
+        "skill": "Communication",
+        "count": 79
+      },
+      {
+        "skill": "Sales",
+        "count": 17
+      },
+      {
+        "skill": "Marketing",
+        "count": 15
+      },
+      {
+        "skill": "English Proficiency",
+        "count": 11
+      },
+      {
+        "skill": "Convincing Skills",
+        "count": 9
+      },
+      {
+        "skill": "Hindi",
+        "count": 8
+      },
+      {
+        "skill": "Computer Knowledge",
+        "count": 5
+      },
+      {
+        "skill": "Lead Generation",
+        "count": 4
+      },
+      {
+        "skill": "Banking",
+        "count": 3
+      },
+      {
+        "skill": "Customer Service",
+        "count": 3
+      },
+      {
+        "skill": "Problem Solving",
+        "count": 3
+      },
+      {
+        "skill": "Interpersonal Skills",
+        "count": 2
+      }
+    ],
+    "education": "12th standard",
+    "selection_process": "Face to face",
+    "salary_min": 120000,
+    "salary_max": 155000,
+    "industry": "BFSI",
+    "sub_sector": "Sales & Marketing",
+    "category": "Sales and Marketing",
+    "demand_count": 121,
+    "raw_title_count": 18,
+    "source": "taf"
+  },
+  {
+    "slug": "branch-relationship-executive",
+    "canonical_title": "Branch Relationship Executive",
+    "skills": [
+      "Communication",
+      "Sales",
+      "Banking",
+      "Convincing Skills",
+      "English Proficiency",
+      "Hindi",
+      "Interpersonal Skills",
+      "Negotiation",
+      "CRM",
+      "Marketing",
+      "Local Language",
+      "Problem Solving"
+    ],
+    "skills_detail": [
+      {
+        "skill": "Communication",
+        "count": 86
+      },
+      {
+        "skill": "Sales",
+        "count": 27
+      },
+      {
+        "skill": "Banking",
+        "count": 18
+      },
+      {
+        "skill": "Convincing Skills",
+        "count": 8
+      },
+      {
+        "skill": "English Proficiency",
+        "count": 8
+      },
+      {
+        "skill": "Hindi",
+        "count": 8
+      },
+      {
+        "skill": "Interpersonal Skills",
+        "count": 7
+      },
+      {
+        "skill": "Negotiation",
+        "count": 7
+      },
+      {
+        "skill": "CRM",
+        "count": 5
+      },
+      {
+        "skill": "Marketing",
+        "count": 4
+      },
+      {
+        "skill": "Local Language",
+        "count": 4
+      },
+      {
+        "skill": "Problem Solving",
+        "count": 3
+      }
+    ],
+    "education": "12th standard",
+    "selection_process": "Interview",
+    "salary_min": 200000,
+    "salary_max": 250000,
+    "industry": "BFSI",
+    "sub_sector": "BFSI",
+    "category": "Banking and Finance",
+    "demand_count": 115,
+    "raw_title_count": 14,
+    "source": "taf"
+  },
+  {
+    "slug": "relationship-officer",
+    "canonical_title": "Relationship Officer",
+    "skills": [
+      "Communication",
+      "Banking",
+      "Sales",
+      "Interpersonal Skills",
+      "English Proficiency",
+      "Convincing Skills",
+      "Presentation Skills",
+      "Problem Solving",
+      "Negotiation",
+      "Hindi",
+      "Adaptability",
+      "CRM"
+    ],
+    "skills_detail": [
+      {
+        "skill": "Communication",
+        "count": 76
+      },
+      {
+        "skill": "Banking",
+        "count": 25
+      },
+      {
+        "skill": "Sales",
+        "count": 25
+      },
+      {
+        "skill": "Interpersonal Skills",
+        "count": 12
+      },
+      {
+        "skill": "English Proficiency",
+        "count": 11
+      },
+      {
+        "skill": "Convincing Skills",
+        "count": 10
+      },
+      {
+        "skill": "Presentation Skills",
+        "count": 7
+      },
+      {
+        "skill": "Problem Solving",
+        "count": 6
+      },
+      {
+        "skill": "Negotiation",
+        "count": 5
+      },
+      {
+        "skill": "Hindi",
+        "count": 5
+      },
+      {
+        "skill": "Adaptability",
+        "count": 4
+      },
+      {
+        "skill": "CRM",
+        "count": 3
+      }
+    ],
+    "education": "12th standard",
+    "selection_process": "Interview",
+    "salary_min": 200000,
+    "salary_max": 250000,
+    "industry": "BFSI",
+    "sub_sector": "BFSI",
+    "category": "Banking and Finance",
+    "demand_count": 113,
+    "raw_title_count": 20,
+    "source": "taf"
+  },
+  {
+    "slug": "teacher",
+    "canonical_title": "Teacher",
+    "skills": [
+      "Communication",
+      "Presentation Skills",
+      "Computer Knowledge",
+      "English Proficiency",
+      "Sales",
+      "MS Excel",
+      "MS Office",
+      "Interpersonal Skills",
+      "Local Language"
+    ],
+    "skills_detail": [
+      {
+        "skill": "Communication",
+        "count": 62
+      },
+      {
+        "skill": "Presentation Skills",
+        "count": 6
+      },
+      {
+        "skill": "Computer Knowledge",
+        "count": 6
+      },
+      {
+        "skill": "English Proficiency",
+        "count": 4
+      },
+      {
+        "skill": "Sales",
+        "count": 1
+      },
+      {
+        "skill": "MS Excel",
+        "count": 1
+      },
+      {
+        "skill": "MS Office",
+        "count": 1
+      },
+      {
+        "skill": "Interpersonal Skills",
+        "count": 1
+      },
+      {
+        "skill": "Local Language",
+        "count": 1
+      }
+    ],
+    "education": "Any Graduate",
+    "selection_process": "Direct Interview",
+    "salary_min": null,
+    "salary_max": null,
+    "industry": "BFSI",
+    "sub_sector": "Education",
+    "category": null,
+    "demand_count": 112,
+    "raw_title_count": 7,
+    "source": "taf"
+  },
+  {
+    "slug": "data-analyst",
+    "canonical_title": "Data Analyst",
+    "skills": [
+      "Communication",
+      "Analytical Skills",
+      "MS Excel",
+      "Problem Solving",
+      "English Proficiency",
+      "Typing",
+      "Interpersonal Skills",
+      "MS Office",
+      "Sales",
+      "Data Entry",
+      "Accounting",
+      "Adaptability"
+    ],
+    "skills_detail": [
+      {
+        "skill": "Communication",
+        "count": 47
+      },
+      {
+        "skill": "Analytical Skills",
+        "count": 17
+      },
+      {
+        "skill": "MS Excel",
+        "count": 12
+      },
+      {
+        "skill": "Problem Solving",
+        "count": 7
+      },
+      {
+        "skill": "English Proficiency",
+        "count": 6
+      },
+      {
+        "skill": "Typing",
+        "count": 6
+      },
+      {
+        "skill": "Interpersonal Skills",
+        "count": 5
+      },
+      {
+        "skill": "MS Office",
+        "count": 3
+      },
+      {
+        "skill": "Sales",
+        "count": 1
+      },
+      {
+        "skill": "Data Entry",
+        "count": 1
+      },
+      {
+        "skill": "Accounting",
+        "count": 1
+      },
+      {
+        "skill": "Adaptability",
+        "count": 1
+      }
+    ],
+    "education": "B.Tech/B.E",
+    "selection_process": "Aptitude, Face to Face, Group Discussion,HR round",
+    "salary_min": 250000,
+    "salary_max": 350000,
+    "industry": "IT",
+    "sub_sector": "IT",
+    "category": "Technology",
+    "demand_count": 112,
+    "raw_title_count": 21,
+    "source": "taf"
+  },
+  {
+    "slug": "sales-consultant",
+    "canonical_title": "Sales Consultant",
+    "skills": [
+      "Sales",
+      "Communication",
+      "Interpersonal Skills",
+      "English Proficiency",
+      "Presentation Skills",
+      "Computer Knowledge",
+      "Telecalling",
+      "Convincing Skills",
+      "MS Excel",
+      "Negotiation",
+      "Data Entry",
+      "Hindi"
+    ],
+    "skills_detail": [
+      {
+        "skill": "Sales",
+        "count": 61
+      },
+      {
+        "skill": "Communication",
+        "count": 31
+      },
+      {
+        "skill": "Interpersonal Skills",
+        "count": 3
+      },
+      {
+        "skill": "English Proficiency",
+        "count": 3
+      },
+      {
+        "skill": "Presentation Skills",
+        "count": 2
+      },
+      {
+        "skill": "Computer Knowledge",
+        "count": 2
+      },
+      {
+        "skill": "Telecalling",
+        "count": 2
+      },
+      {
+        "skill": "Convincing Skills",
+        "count": 2
+      },
+      {
+        "skill": "MS Excel",
+        "count": 2
+      },
+      {
+        "skill": "Negotiation",
+        "count": 1
+      },
+      {
+        "skill": "Data Entry",
+        "count": 1
+      },
+      {
+        "skill": "Hindi",
+        "count": 1
+      }
+    ],
+    "education": "12th standard",
+    "selection_process": "P.I.",
+    "salary_min": 200000,
+    "salary_max": 250000,
+    "industry": "Retail",
+    "sub_sector": "Retail",
+    "category": "Retail",
+    "demand_count": 104,
+    "raw_title_count": 9,
+    "source": "taf"
+  },
+  {
+    "slug": "receptionist",
+    "canonical_title": "Receptionist",
+    "skills": [
+      "Communication",
+      "Computer Knowledge",
+      "English Proficiency",
+      "Customer Service",
+      "Marketing",
+      "Interpersonal Skills",
+      "Local Language",
+      "Sales",
+      "MS Office",
+      "Hindi",
+      "Convincing Skills",
+      "Typing"
+    ],
+    "skills_detail": [
+      {
+        "skill": "Communication",
+        "count": 80
+      },
+      {
+        "skill": "Computer Knowledge",
+        "count": 19
+      },
+      {
+        "skill": "English Proficiency",
+        "count": 3
+      },
+      {
+        "skill": "Customer Service",
+        "count": 2
+      },
+      {
+        "skill": "Marketing",
+        "count": 2
+      },
+      {
+        "skill": "Interpersonal Skills",
+        "count": 2
+      },
+      {
+        "skill": "Local Language",
+        "count": 2
+      },
+      {
+        "skill": "Sales",
+        "count": 1
+      },
+      {
+        "skill": "MS Office",
+        "count": 1
+      },
+      {
+        "skill": "Hindi",
+        "count": 1
+      },
+      {
+        "skill": "Convincing Skills",
+        "count": 1
+      },
+      {
+        "skill": "Typing",
+        "count": 1
+      }
+    ],
+    "education": "12th standard",
+    "selection_process": "Interview",
+    "salary_min": null,
+    "salary_max": null,
+    "industry": "IT",
+    "sub_sector": "Retail",
+    "category": null,
+    "demand_count": 103,
+    "raw_title_count": 5,
+    "source": "taf"
+  },
+  {
+    "slug": "accounts-executive",
+    "canonical_title": "Accounts Executive",
+    "skills": [
+      "Accounting",
+      "Communication",
+      "Tally",
+      "MS Excel",
+      "Computer Knowledge",
+      "Presentation Skills",
+      "Interpersonal Skills",
+      "Banking",
+      "Billing",
+      "MS Office",
+      "Analytical Skills",
+      "Problem Solving"
+    ],
+    "skills_detail": [
+      {
+        "skill": "Accounting",
+        "count": 37
+      },
+      {
+        "skill": "Communication",
+        "count": 36
+      },
+      {
+        "skill": "Tally",
+        "count": 30
+      },
+      {
+        "skill": "MS Excel",
+        "count": 19
+      },
+      {
+        "skill": "Computer Knowledge",
+        "count": 8
+      },
+      {
+        "skill": "Presentation Skills",
+        "count": 5
+      },
+      {
+        "skill": "Interpersonal Skills",
+        "count": 5
+      },
+      {
+        "skill": "Banking",
+        "count": 4
+      },
+      {
+        "skill": "Billing",
+        "count": 4
+      },
+      {
+        "skill": "MS Office",
+        "count": 3
+      },
+      {
+        "skill": "Analytical Skills",
+        "count": 3
+      },
+      {
+        "skill": "Problem Solving",
+        "count": 3
+      }
+    ],
+    "education": "B.Com",
+    "selection_process": "Aptitude, Face to Face",
+    "salary_min": 170000,
+    "salary_max": 300000,
+    "industry": "BFSI",
+    "sub_sector": "BFSI",
+    "category": "Banking and Finance",
+    "demand_count": 88,
+    "raw_title_count": 15,
+    "source": "taf"
+  },
+  {
+    "slug": "process-associate",
+    "canonical_title": "Process Associate",
+    "skills": [
+      "Communication",
+      "Typing",
+      "English Proficiency",
+      "Interpersonal Skills",
+      "Adaptability",
+      "Analytical Skills",
+      "Teamwork",
+      "Sales",
+      "MS Office",
+      "Customer Service",
+      "Computer Knowledge",
+      "Hindi"
+    ],
+    "skills_detail": [
+      {
+        "skill": "Communication",
+        "count": 68
+      },
+      {
+        "skill": "Typing",
+        "count": 14
+      },
+      {
+        "skill": "English Proficiency",
+        "count": 10
+      },
+      {
+        "skill": "Interpersonal Skills",
+        "count": 6
+      },
+      {
+        "skill": "Adaptability",
+        "count": 4
+      },
+      {
+        "skill": "Analytical Skills",
+        "count": 3
+      },
+      {
+        "skill": "Teamwork",
+        "count": 3
+      },
+      {
+        "skill": "Sales",
+        "count": 3
+      },
+      {
+        "skill": "MS Office",
+        "count": 2
+      },
+      {
+        "skill": "Customer Service",
+        "count": 2
+      },
+      {
+        "skill": "Computer Knowledge",
+        "count": 2
+      },
+      {
+        "skill": "Hindi",
+        "count": 2
+      }
+    ],
+    "education": "Any Graduate",
+    "selection_process": "Interview",
+    "salary_min": 150000,
+    "salary_max": 260000,
+    "industry": "BFSI",
+    "sub_sector": "BFSI",
+    "category": "Technology",
+    "demand_count": 85,
+    "raw_title_count": 14,
+    "source": "taf"
+  },
+  {
+    "slug": "technician",
+    "canonical_title": "Technician",
+    "skills": [
+      "Communication",
+      "Interpersonal Skills",
+      "Teamwork",
+      "Computer Knowledge",
+      "Typing"
+    ],
+    "skills_detail": [
+      {
+        "skill": "Communication",
+        "count": 24
+      },
+      {
+        "skill": "Interpersonal Skills",
+        "count": 4
+      },
+      {
+        "skill": "Teamwork",
+        "count": 1
+      },
+      {
+        "skill": "Computer Knowledge",
+        "count": 1
+      },
+      {
+        "skill": "Typing",
+        "count": 1
+      }
+    ],
+    "education": "Any Graduate",
+    "selection_process": "mobile knowledge",
+    "salary_min": 290000,
+    "salary_max": 300000,
+    "industry": "Service",
+    "sub_sector": "service",
+    "category": "Logistics",
+    "demand_count": 82,
+    "raw_title_count": 10,
+    "source": "taf"
+  },
+  {
+    "slug": "system-operator",
+    "canonical_title": "System Operator",
+    "skills": [
+      "Communication",
+      "Interpersonal Skills",
+      "Typing",
+      "Computer Knowledge",
+      "MS Excel",
+      "English Proficiency",
+      "Sales"
+    ],
+    "skills_detail": [
+      {
+        "skill": "Communication",
+        "count": 60
+      },
+      {
+        "skill": "Interpersonal Skills",
+        "count": 8
+      },
+      {
+        "skill": "Typing",
+        "count": 5
+      },
+      {
+        "skill": "Computer Knowledge",
+        "count": 5
+      },
+      {
+        "skill": "MS Excel",
+        "count": 2
+      },
+      {
+        "skill": "English Proficiency",
+        "count": 1
+      },
+      {
+        "skill": "Sales",
+        "count": 1
+      }
+    ],
+    "education": "Any Graduate",
+    "selection_process": "Face to face interview",
+    "salary_min": null,
+    "salary_max": null,
+    "industry": "BFSI",
+    "sub_sector": "BFSI",
+    "category": null,
+    "demand_count": 79,
+    "raw_title_count": 4,
+    "source": "taf"
+  },
+  {
+    "slug": "relationship-manager",
+    "canonical_title": "Relationship Manager",
+    "skills": [
+      "Communication",
+      "Sales",
+      "English Proficiency",
+      "Convincing Skills",
+      "Interpersonal Skills",
+      "Insurance",
+      "Problem Solving",
+      "Adaptability",
+      "Banking",
+      "Hindi",
+      "Networking",
+      "CRM"
+    ],
+    "skills_detail": [
+      {
+        "skill": "Communication",
+        "count": 40
+      },
+      {
+        "skill": "Sales",
+        "count": 18
+      },
+      {
+        "skill": "English Proficiency",
+        "count": 7
+      },
+      {
+        "skill": "Convincing Skills",
+        "count": 5
+      },
+      {
+        "skill": "Interpersonal Skills",
+        "count": 4
+      },
+      {
+        "skill": "Insurance",
+        "count": 3
+      },
+      {
+        "skill": "Problem Solving",
+        "count": 3
+      },
+      {
+        "skill": "Adaptability",
+        "count": 3
+      },
+      {
+        "skill": "Banking",
+        "count": 2
+      },
+      {
+        "skill": "Hindi",
+        "count": 2
+      },
+      {
+        "skill": "Networking",
+        "count": 1
+      },
+      {
+        "skill": "CRM",
+        "count": 1
+      }
+    ],
+    "education": "Any Graduate",
+    "selection_process": "Interview",
+    "salary_min": 180000,
+    "salary_max": 240000,
+    "industry": "BFSI",
+    "sub_sector": "BFSI",
+    "category": "Banking and Finance",
+    "demand_count": 77,
+    "raw_title_count": 18,
+    "source": "taf"
+  },
+  {
+    "slug": "java-developer",
+    "canonical_title": "Java Developer",
+    "skills": [
+      "Communication",
+      "Analytical Skills",
+      "Problem Solving",
+      "Banking",
+      "Interpersonal Skills",
+      "Documentation",
+      "Presentation Skills"
+    ],
+    "skills_detail": [
+      {
+        "skill": "Communication",
+        "count": 24
+      },
+      {
+        "skill": "Analytical Skills",
+        "count": 10
+      },
+      {
+        "skill": "Problem Solving",
+        "count": 9
+      },
+      {
+        "skill": "Banking",
+        "count": 3
+      },
+      {
+        "skill": "Interpersonal Skills",
+        "count": 3
+      },
+      {
+        "skill": "Documentation",
+        "count": 1
+      },
+      {
+        "skill": "Presentation Skills",
+        "count": 1
+      }
+    ],
+    "education": "B.Tech/B.E",
+    "selection_process": "Screening round, Aptitude test, Final round",
+    "salary_min": 250000,
+    "salary_max": 350000,
+    "industry": "IT",
+    "sub_sector": "IT",
+    "category": "Technology",
+    "demand_count": 75,
+    "raw_title_count": 17,
+    "source": "taf"
+  },
+  {
+    "slug": "cashier",
+    "canonical_title": "Cashier",
+    "skills": [
+      "Communication",
+      "Customer Service",
+      "Accounting",
+      "Computer Knowledge",
+      "Interpersonal Skills",
+      "Billing",
+      "MS Office",
+      "Sales",
+      "Tally",
+      "Time Management",
+      "Presentation Skills",
+      "Local Language"
+    ],
+    "skills_detail": [
+      {
+        "skill": "Communication",
+        "count": 46
+      },
+      {
+        "skill": "Customer Service",
+        "count": 10
+      },
+      {
+        "skill": "Accounting",
+        "count": 8
+      },
+      {
+        "skill": "Computer Knowledge",
+        "count": 6
+      },
+      {
+        "skill": "Interpersonal Skills",
+        "count": 4
+      },
+      {
+        "skill": "Billing",
+        "count": 3
+      },
+      {
+        "skill": "MS Office",
+        "count": 2
+      },
+      {
+        "skill": "Sales",
+        "count": 1
+      },
+      {
+        "skill": "Tally",
+        "count": 1
+      },
+      {
+        "skill": "Time Management",
+        "count": 1
+      },
+      {
+        "skill": "Presentation Skills",
+        "count": 1
+      },
+      {
+        "skill": "Local Language",
+        "count": 1
+      }
+    ],
+    "education": "12th standard",
+    "selection_process": "Interview",
+    "salary_min": 190000,
+    "salary_max": 270000,
+    "industry": "BFSI",
+    "sub_sector": "BFSI",
+    "category": "Banking and Finance",
+    "demand_count": 72,
+    "raw_title_count": 3,
+    "source": "taf"
+  },
+  {
+    "slug": "front-office-associate",
+    "canonical_title": "Front Office Associate",
+    "skills": [
+      "Communication",
+      "Computer Knowledge",
+      "Customer Service",
+      "Convincing Skills",
+      "English Proficiency",
+      "MS Excel",
+      "Sales",
+      "Adaptability",
+      "Interpersonal Skills"
+    ],
+    "skills_detail": [
+      {
+        "skill": "Communication",
+        "count": 26
+      },
+      {
+        "skill": "Computer Knowledge",
+        "count": 23
+      },
+      {
+        "skill": "Customer Service",
+        "count": 16
+      },
+      {
+        "skill": "Convincing Skills",
+        "count": 3
+      },
+      {
+        "skill": "English Proficiency",
+        "count": 3
+      },
+      {
+        "skill": "MS Excel",
+        "count": 2
+      },
+      {
+        "skill": "Sales",
+        "count": 2
+      },
+      {
+        "skill": "Adaptability",
+        "count": 1
+      },
+      {
+        "skill": "Interpersonal Skills",
+        "count": 1
+      }
+    ],
+    "education": "12th standard",
+    "selection_process": "Face to Face",
+    "salary_min": null,
+    "salary_max": null,
+    "industry": "Hospitality",
+    "sub_sector": "Hospitality",
+    "category": null,
+    "demand_count": 61,
+    "raw_title_count": 10,
+    "source": "taf"
+  },
+  {
+    "slug": "supervisor",
+    "canonical_title": "Supervisor",
+    "skills": [
+      "Communication",
+      "Computer Knowledge",
+      "Typing",
+      "Sales",
+      "Interpersonal Skills",
+      "MS Office",
+      "Documentation",
+      "Negotiation",
+      "Accounting",
+      "Customer Service",
+      "Local Language"
+    ],
+    "skills_detail": [
+      {
+        "skill": "Communication",
+        "count": 29
+      },
+      {
+        "skill": "Computer Knowledge",
+        "count": 6
+      },
+      {
+        "skill": "Typing",
+        "count": 2
+      },
+      {
+        "skill": "Sales",
+        "count": 2
+      },
+      {
+        "skill": "Interpersonal Skills",
+        "count": 1
+      },
+      {
+        "skill": "MS Office",
+        "count": 1
+      },
+      {
+        "skill": "Documentation",
+        "count": 1
+      },
+      {
+        "skill": "Negotiation",
+        "count": 1
+      },
+      {
+        "skill": "Accounting",
+        "count": 1
+      },
+      {
+        "skill": "Customer Service",
+        "count": 1
+      },
+      {
+        "skill": "Local Language",
+        "count": 1
+      }
+    ],
+    "education": "12th standard",
+    "selection_process": "PI",
+    "salary_min": null,
+    "salary_max": null,
+    "industry": "BFSI",
+    "sub_sector": "Retail",
+    "category": null,
+    "demand_count": 56,
+    "raw_title_count": 5,
+    "source": "taf"
+  },
+  {
+    "slug": "sales-promoter",
+    "canonical_title": "Sales Promoter",
+    "skills": [
+      "Communication",
+      "Sales",
+      "Marketing",
+      "Interpersonal Skills",
+      "Hindi",
+      "English Proficiency",
+      "Convincing Skills",
+      "Computer Knowledge",
+      "Customer Service",
+      "Teamwork"
+    ],
+    "skills_detail": [
+      {
+        "skill": "Communication",
+        "count": 23
+      },
+      {
+        "skill": "Sales",
+        "count": 19
+      },
+      {
+        "skill": "Marketing",
+        "count": 7
+      },
+      {
+        "skill": "Interpersonal Skills",
+        "count": 7
+      },
+      {
+        "skill": "Hindi",
+        "count": 5
+      },
+      {
+        "skill": "English Proficiency",
+        "count": 4
+      },
+      {
+        "skill": "Convincing Skills",
+        "count": 2
+      },
+      {
+        "skill": "Computer Knowledge",
+        "count": 2
+      },
+      {
+        "skill": "Customer Service",
+        "count": 1
+      },
+      {
+        "skill": "Teamwork",
+        "count": 1
+      }
+    ],
+    "education": "12th standard",
+    "selection_process": "Interview",
+    "salary_min": null,
+    "salary_max": null,
+    "industry": "Retail",
+    "sub_sector": "Retail",
+    "category": null,
+    "demand_count": 56,
+    "raw_title_count": 10,
+    "source": "taf"
+  },
+  {
+    "slug": "bre",
+    "canonical_title": "Bre",
+    "skills": [
+      "Communication",
+      "Sales",
+      "English Proficiency",
+      "Marketing",
+      "Hindi",
+      "Interpersonal Skills",
+      "MS Excel",
+      "Typing",
+      "Computer Knowledge",
+      "Banking"
+    ],
+    "skills_detail": [
+      {
+        "skill": "Communication",
+        "count": 35
+      },
+      {
+        "skill": "Sales",
+        "count": 12
+      },
+      {
+        "skill": "English Proficiency",
+        "count": 5
+      },
+      {
+        "skill": "Marketing",
+        "count": 5
+      },
+      {
+        "skill": "Hindi",
+        "count": 4
+      },
+      {
+        "skill": "Interpersonal Skills",
+        "count": 2
+      },
+      {
+        "skill": "MS Excel",
+        "count": 1
+      },
+      {
+        "skill": "Typing",
+        "count": 1
+      },
+      {
+        "skill": "Computer Knowledge",
+        "count": 1
+      },
+      {
+        "skill": "Banking",
+        "count": 1
+      }
+    ],
+    "education": "12th standard",
+    "selection_process": "Face to face",
+    "salary_min": null,
+    "salary_max": null,
+    "industry": "BFSI",
+    "sub_sector": "BFSI",
+    "category": null,
+    "demand_count": 52,
+    "raw_title_count": 6,
+    "source": "taf"
+  },
+  {
+    "slug": "account-assistant",
+    "canonical_title": "Account Assistant",
+    "skills": [
+      "Accounting",
+      "Tally",
+      "MS Excel",
+      "Computer Knowledge",
+      "Banking",
+      "Communication",
+      "Marketing",
+      "Sales",
+      "Insurance",
+      "Data Entry",
+      "Typing"
+    ],
+    "skills_detail": [
+      {
+        "skill": "Accounting",
+        "count": 31
+      },
+      {
+        "skill": "Tally",
+        "count": 18
+      },
+      {
+        "skill": "MS Excel",
+        "count": 16
+      },
+      {
+        "skill": "Computer Knowledge",
+        "count": 7
+      },
+      {
+        "skill": "Banking",
+        "count": 3
+      },
+      {
+        "skill": "Communication",
+        "count": 3
+      },
+      {
+        "skill": "Marketing",
+        "count": 2
+      },
+      {
+        "skill": "Sales",
+        "count": 2
+      },
+      {
+        "skill": "Insurance",
+        "count": 1
+      },
+      {
+        "skill": "Data Entry",
+        "count": 1
+      },
+      {
+        "skill": "Typing",
+        "count": 1
+      }
+    ],
+    "education": "B.Com",
+    "selection_process": "1.Interview. 2. Demo Tally and Excel.",
+    "salary_min": 140000,
+    "salary_max": 200000,
+    "industry": "BFSI",
+    "sub_sector": "BFSI",
+    "category": "Banking and Finance",
+    "demand_count": 52,
+    "raw_title_count": 6,
+    "source": "taf"
+  },
+  {
+    "slug": "tele-calling-executive",
+    "canonical_title": "Tele Calling Executive",
+    "skills": [
+      "Communication",
+      "English Proficiency",
+      "Sales",
+      "Hindi",
+      "Convincing Skills",
+      "Typing",
+      "Computer Knowledge",
+      "Telecalling",
+      "Interpersonal Skills",
+      "Banking",
+      "Problem Solving",
+      "Windows OS"
+    ],
+    "skills_detail": [
+      {
+        "skill": "Communication",
+        "count": 31
+      },
+      {
+        "skill": "English Proficiency",
+        "count": 8
+      },
+      {
+        "skill": "Sales",
+        "count": 7
+      },
+      {
+        "skill": "Hindi",
+        "count": 6
+      },
+      {
+        "skill": "Convincing Skills",
+        "count": 5
+      },
+      {
+        "skill": "Typing",
+        "count": 4
+      },
+      {
+        "skill": "Computer Knowledge",
+        "count": 4
+      },
+      {
+        "skill": "Telecalling",
+        "count": 4
+      },
+      {
+        "skill": "Interpersonal Skills",
+        "count": 1
+      },
+      {
+        "skill": "Banking",
+        "count": 1
+      },
+      {
+        "skill": "Problem Solving",
+        "count": 1
+      },
+      {
+        "skill": "Windows OS",
+        "count": 1
+      }
+    ],
+    "education": "12th standard",
+    "selection_process": "face to face Interview",
+    "salary_min": 250000,
+    "salary_max": 300000,
+    "industry": "BFSI",
+    "sub_sector": "BFSI",
+    "category": "Sales and Marketing",
+    "demand_count": 48,
+    "raw_title_count": 14,
+    "source": "taf"
+  },
+  {
+    "slug": "customer-relationship-executive",
+    "canonical_title": "Customer Relationship Executive",
+    "skills": [
+      "Communication",
+      "Sales",
+      "Banking",
+      "Hindi",
+      "Computer Knowledge",
+      "English Proficiency",
+      "Interpersonal Skills",
+      "Negotiation",
+      "Typing"
+    ],
+    "skills_detail": [
+      {
+        "skill": "Communication",
+        "count": 31
+      },
+      {
+        "skill": "Sales",
+        "count": 7
+      },
+      {
+        "skill": "Banking",
+        "count": 3
+      },
+      {
+        "skill": "Hindi",
+        "count": 2
+      },
+      {
+        "skill": "Computer Knowledge",
+        "count": 2
+      },
+      {
+        "skill": "English Proficiency",
+        "count": 2
+      },
+      {
+        "skill": "Interpersonal Skills",
+        "count": 1
+      },
+      {
+        "skill": "Negotiation",
+        "count": 1
+      },
+      {
+        "skill": "Typing",
+        "count": 1
+      }
+    ],
+    "education": "12th standard",
+    "selection_process": "Interview",
+    "salary_min": 120000,
+    "salary_max": 140000,
+    "industry": "BFSI",
+    "sub_sector": "BFSI",
+    "category": "Sales and Marketing",
+    "demand_count": 45,
+    "raw_title_count": 6,
+    "source": "taf"
+  },
+  {
+    "slug": "software-developer",
+    "canonical_title": "Software Developer",
+    "skills": [
+      "Communication",
+      "Analytical Skills",
+      "English Proficiency",
+      "Problem Solving",
+      "Time Management",
+      "Teamwork",
+      "Interpersonal Skills"
+    ],
+    "skills_detail": [
+      {
+        "skill": "Communication",
+        "count": 6
+      },
+      {
+        "skill": "Analytical Skills",
+        "count": 4
+      },
+      {
+        "skill": "English Proficiency",
+        "count": 4
+      },
+      {
+        "skill": "Problem Solving",
+        "count": 3
+      },
+      {
+        "skill": "Time Management",
+        "count": 1
+      },
+      {
+        "skill": "Teamwork",
+        "count": 1
+      },
+      {
+        "skill": "Interpersonal Skills",
+        "count": 1
+      }
+    ],
+    "education": "B.Tech/B.E",
+    "selection_process": "Online Test and Face to Face Video Interviews",
+    "salary_min": 200000,
+    "salary_max": 400000,
+    "industry": "IT",
+    "sub_sector": "IT",
+    "category": "Technology",
+    "demand_count": 44,
+    "raw_title_count": 11,
+    "source": "taf"
+  },
+  {
+    "slug": "customer-support-associate",
+    "canonical_title": "Customer Support Associate",
+    "skills": [
+      "Communication",
+      "English Proficiency",
+      "Problem Solving",
+      "Hindi",
+      "Customer Service",
+      "Data Entry",
+      "Time Management",
+      "Sales",
+      "Computer Knowledge",
+      "Convincing Skills",
+      "Adaptability",
+      "Teamwork"
+    ],
+    "skills_detail": [
+      {
+        "skill": "Communication",
+        "count": 35
+      },
+      {
+        "skill": "English Proficiency",
+        "count": 15
+      },
+      {
+        "skill": "Problem Solving",
+        "count": 8
+      },
+      {
+        "skill": "Hindi",
+        "count": 8
+      },
+      {
+        "skill": "Customer Service",
+        "count": 7
+      },
+      {
+        "skill": "Data Entry",
+        "count": 5
+      },
+      {
+        "skill": "Time Management",
+        "count": 5
+      },
+      {
+        "skill": "Sales",
+        "count": 5
+      },
+      {
+        "skill": "Computer Knowledge",
+        "count": 4
+      },
+      {
+        "skill": "Convincing Skills",
+        "count": 4
+      },
+      {
+        "skill": "Adaptability",
+        "count": 3
+      },
+      {
+        "skill": "Teamwork",
+        "count": 3
+      }
+    ],
+    "education": "Any Graduate",
+    "selection_process": "Virtual Mode",
+    "salary_min": 180000,
+    "salary_max": 250000,
+    "industry": "BFSI",
+    "sub_sector": "BFSI & CRM",
+    "category": "IT/ITES",
+    "demand_count": 43,
+    "raw_title_count": 9,
+    "source": "taf"
+  },
+  {
+    "slug": "paint-applicator",
+    "canonical_title": "Paint Applicator",
+    "skills": [
+      "Communication",
+      "Local Language"
+    ],
+    "skills_detail": [
+      {
+        "skill": "Communication",
+        "count": 1
+      },
+      {
+        "skill": "Local Language",
+        "count": 1
+      }
+    ],
+    "education": "10th standard",
+    "selection_process": "Practical",
+    "salary_min": null,
+    "salary_max": null,
+    "industry": "Retail",
+    "sub_sector": "Construction",
+    "category": null,
+    "demand_count": 40,
+    "raw_title_count": 1,
+    "source": "taf"
+  },
+  {
+    "slug": "counsellor",
+    "canonical_title": "Counsellor",
+    "skills": [
+      "Communication",
+      "Computer Knowledge",
+      "Sales",
+      "English Proficiency",
+      "Local Language",
+      "Negotiation",
+      "Typing",
+      "Data Entry",
+      "Convincing Skills",
+      "Marketing"
+    ],
+    "skills_detail": [
+      {
+        "skill": "Communication",
+        "count": 24
+      },
+      {
+        "skill": "Computer Knowledge",
+        "count": 5
+      },
+      {
+        "skill": "Sales",
+        "count": 3
+      },
+      {
+        "skill": "English Proficiency",
+        "count": 2
+      },
+      {
+        "skill": "Local Language",
+        "count": 2
+      },
+      {
+        "skill": "Negotiation",
+        "count": 2
+      },
+      {
+        "skill": "Typing",
+        "count": 2
+      },
+      {
+        "skill": "Data Entry",
+        "count": 1
+      },
+      {
+        "skill": "Convincing Skills",
+        "count": 1
+      },
+      {
+        "skill": "Marketing",
+        "count": 1
+      }
+    ],
+    "education": "Any Graduate",
+    "selection_process": "PI",
+    "salary_min": null,
+    "salary_max": null,
+    "industry": "BFSI",
+    "sub_sector": "Service",
+    "category": null,
+    "demand_count": 40,
+    "raw_title_count": 7,
+    "source": "taf"
+  },
+  {
+    "slug": "sales-exe",
+    "canonical_title": "Sales Exe",
+    "skills": [
+      "Interpersonal Skills",
+      "Teamwork",
+      "Computer Knowledge",
+      "Communication",
+      "Typing",
+      "Problem Solving",
+      "Banking",
+      "Sales"
+    ],
+    "skills_detail": [
+      {
+        "skill": "Interpersonal Skills",
+        "count": 29
+      },
+      {
+        "skill": "Teamwork",
+        "count": 5
+      },
+      {
+        "skill": "Computer Knowledge",
+        "count": 5
+      },
+      {
+        "skill": "Communication",
+        "count": 4
+      },
+      {
+        "skill": "Typing",
+        "count": 3
+      },
+      {
+        "skill": "Problem Solving",
+        "count": 1
+      },
+      {
+        "skill": "Banking",
+        "count": 1
+      },
+      {
+        "skill": "Sales",
+        "count": 1
+      }
+    ],
+    "education": "12th standard",
+    "selection_process": "Interview",
+    "salary_min": 150000,
+    "salary_max": 240000,
+    "industry": "IT",
+    "sub_sector": "service",
+    "category": "Banking and Finance",
+    "demand_count": 39,
+    "raw_title_count": 13,
+    "source": "taf"
+  },
+  {
+    "slug": "front-office-executive",
+    "canonical_title": "Front Office Executive",
+    "skills": [
+      "Communication",
+      "English Proficiency",
+      "Computer Knowledge",
+      "Hindi",
+      "Problem Solving",
+      "Typing"
+    ],
+    "skills_detail": [
+      {
+        "skill": "Communication",
+        "count": 27
+      },
+      {
+        "skill": "English Proficiency",
+        "count": 5
+      },
+      {
+        "skill": "Computer Knowledge",
+        "count": 3
+      },
+      {
+        "skill": "Hindi",
+        "count": 2
+      },
+      {
+        "skill": "Problem Solving",
+        "count": 1
+      },
+      {
+        "skill": "Typing",
+        "count": 1
+      }
+    ],
+    "education": "12th standard",
+    "selection_process": "Face to Face",
+    "salary_min": null,
+    "salary_max": null,
+    "industry": "Hospitality",
+    "sub_sector": "Admin & Back Office",
+    "category": null,
+    "demand_count": 38,
+    "raw_title_count": 9,
+    "source": "taf"
+  },
+  {
+    "slug": "csr",
+    "canonical_title": "Csr",
+    "skills": [
+      "Communication",
+      "Computer Knowledge",
+      "Sales",
+      "English Proficiency",
+      "Customer Service",
+      "Typing",
+      "Convincing Skills",
+      "Hindi"
+    ],
+    "skills_detail": [
+      {
+        "skill": "Communication",
+        "count": 9
+      },
+      {
+        "skill": "Computer Knowledge",
+        "count": 8
+      },
+      {
+        "skill": "Sales",
+        "count": 4
+      },
+      {
+        "skill": "English Proficiency",
+        "count": 4
+      },
+      {
+        "skill": "Customer Service",
+        "count": 2
+      },
+      {
+        "skill": "Typing",
+        "count": 2
+      },
+      {
+        "skill": "Convincing Skills",
+        "count": 1
+      },
+      {
+        "skill": "Hindi",
+        "count": 1
+      }
+    ],
+    "education": "12th standard",
+    "selection_process": "2 rounds HR and Operation round",
+    "salary_min": 230000,
+    "salary_max": 250000,
+    "industry": "BFSI",
+    "sub_sector": "BPO",
+    "category": "Technology",
+    "demand_count": 37,
+    "raw_title_count": 1,
+    "source": "taf"
+  },
+  {
+    "slug": "painter",
+    "canonical_title": "Painter",
+    "skills": [],
+    "skills_detail": [],
+    "education": "< 8th standard",
+    "selection_process": "Face to Face interview on Construction Site",
+    "salary_min": null,
+    "salary_max": null,
+    "industry": "Service",
+    "sub_sector": "Paint",
+    "category": null,
+    "demand_count": 37,
+    "raw_title_count": 2,
+    "source": "taf"
+  },
+  {
+    "slug": "operation-executive",
+    "canonical_title": "Operation Executive",
+    "skills": [
+      "Communication",
+      "MS Excel",
+      "Sales",
+      "Accounting",
+      "Data Entry",
+      "Hindi",
+      "Telecalling",
+      "Convincing Skills",
+      "Analytical Skills",
+      "Computer Knowledge",
+      "Time Management",
+      "English Proficiency"
+    ],
+    "skills_detail": [
+      {
+        "skill": "Communication",
+        "count": 16
+      },
+      {
+        "skill": "MS Excel",
+        "count": 4
+      },
+      {
+        "skill": "Sales",
+        "count": 4
+      },
+      {
+        "skill": "Accounting",
+        "count": 4
+      },
+      {
+        "skill": "Data Entry",
+        "count": 3
+      },
+      {
+        "skill": "Hindi",
+        "count": 3
+      },
+      {
+        "skill": "Telecalling",
+        "count": 3
+      },
+      {
+        "skill": "Convincing Skills",
+        "count": 2
+      },
+      {
+        "skill": "Analytical Skills",
+        "count": 2
+      },
+      {
+        "skill": "Computer Knowledge",
+        "count": 1
+      },
+      {
+        "skill": "Time Management",
+        "count": 1
+      },
+      {
+        "skill": "English Proficiency",
+        "count": 1
+      }
+    ],
+    "education": "12th standard",
+    "selection_process": "1) Online Aptitude Test. 2) Technical Assessment. 3) HR Round.",
+    "salary_min": 240000,
+    "salary_max": 270000,
+    "industry": "BFSI",
+    "sub_sector": "Operation Executive",
+    "category": "IT/ITES",
+    "demand_count": 36,
+    "raw_title_count": 12,
+    "source": "taf"
+  },
+  {
+    "slug": "tech-support",
+    "canonical_title": "Tech Support",
+    "skills": [
+      "Communication",
+      "Problem Solving",
+      "Customer Service",
+      "Hardware Troubleshooting",
+      "Documentation",
+      "Multitasking",
+      "Adaptability",
+      "MS Excel",
+      "MS Word",
+      "English Proficiency",
+      "Time Management",
+      "CRM"
+    ],
+    "skills_detail": [
+      {
+        "skill": "Communication",
+        "count": 10
+      },
+      {
+        "skill": "Problem Solving",
+        "count": 4
+      },
+      {
+        "skill": "Customer Service",
+        "count": 3
+      },
+      {
+        "skill": "Hardware Troubleshooting",
+        "count": 3
+      },
+      {
+        "skill": "Documentation",
+        "count": 3
+      },
+      {
+        "skill": "Multitasking",
+        "count": 2
+      },
+      {
+        "skill": "Adaptability",
+        "count": 1
+      },
+      {
+        "skill": "MS Excel",
+        "count": 1
+      },
+      {
+        "skill": "MS Word",
+        "count": 1
+      },
+      {
+        "skill": "English Proficiency",
+        "count": 1
+      },
+      {
+        "skill": "Time Management",
+        "count": 1
+      },
+      {
+        "skill": "CRM",
+        "count": 1
+      }
+    ],
+    "education": "B.Tech/B.E",
+    "selection_process": "HR ROund Tech ROund",
+    "salary_min": 250000,
+    "salary_max": 300000,
+    "industry": "IT",
+    "sub_sector": "IT",
+    "category": "IT/ITES",
+    "demand_count": 34,
+    "raw_title_count": 6,
+    "source": "taf"
+  },
+  {
+    "slug": "relationship-executives",
+    "canonical_title": "Relationship Executives",
+    "skills": [
+      "Communication",
+      "Sales",
+      "MS Office",
+      "Local Language"
+    ],
+    "skills_detail": [
+      {
+        "skill": "Communication",
+        "count": 32
+      },
+      {
+        "skill": "Sales",
+        "count": 25
+      },
+      {
+        "skill": "MS Office",
+        "count": 1
+      },
+      {
+        "skill": "Local Language",
+        "count": 1
+      }
+    ],
+    "education": "12th standard",
+    "selection_process": "F2F (Direct) / Virtual (During lockdown)",
+    "salary_min": null,
+    "salary_max": null,
+    "industry": "BFSI",
+    "sub_sector": "BFSI",
+    "category": null,
+    "demand_count": 32,
+    "raw_title_count": 2,
+    "source": "taf"
+  },
+  {
+    "slug": "process-executive",
+    "canonical_title": "Process Executive",
+    "skills": [
+      "Communication",
+      "English Proficiency",
+      "Analytical Skills",
+      "Accounting",
+      "Interpersonal Skills",
+      "Typing",
+      "Sales",
+      "Time Management",
+      "Insurance",
+      "Customer Service",
+      "Banking",
+      "Computer Knowledge"
+    ],
+    "skills_detail": [
+      {
+        "skill": "Communication",
+        "count": 25
+      },
+      {
+        "skill": "English Proficiency",
+        "count": 5
+      },
+      {
+        "skill": "Analytical Skills",
+        "count": 2
+      },
+      {
+        "skill": "Accounting",
+        "count": 2
+      },
+      {
+        "skill": "Interpersonal Skills",
+        "count": 2
+      },
+      {
+        "skill": "Typing",
+        "count": 2
+      },
+      {
+        "skill": "Sales",
+        "count": 1
+      },
+      {
+        "skill": "Time Management",
+        "count": 1
+      },
+      {
+        "skill": "Insurance",
+        "count": 1
+      },
+      {
+        "skill": "Customer Service",
+        "count": 1
+      },
+      {
+        "skill": "Banking",
+        "count": 1
+      },
+      {
+        "skill": "Computer Knowledge",
+        "count": 1
+      }
+    ],
+    "education": "Any Graduate",
+    "selection_process": "Face to Face",
+    "salary_min": 185000,
+    "salary_max": 210000,
+    "industry": "BFSI",
+    "sub_sector": "IT",
+    "category": "IT/ITES",
+    "demand_count": 32,
+    "raw_title_count": 10,
+    "source": "taf"
+  },
+  {
+    "slug": "technical-support-associate",
+    "canonical_title": "Technical Support Associate",
+    "skills": [
+      "Communication",
+      "Problem Solving",
+      "Networking",
+      "Hardware Troubleshooting",
+      "Customer Service",
+      "English Proficiency",
+      "Analytical Skills",
+      "Interpersonal Skills",
+      "Windows OS",
+      "Computer Knowledge",
+      "Adaptability",
+      "Hindi"
+    ],
+    "skills_detail": [
+      {
+        "skill": "Communication",
+        "count": 18
+      },
+      {
+        "skill": "Problem Solving",
+        "count": 10
+      },
+      {
+        "skill": "Networking",
+        "count": 8
+      },
+      {
+        "skill": "Hardware Troubleshooting",
+        "count": 7
+      },
+      {
+        "skill": "Customer Service",
+        "count": 6
+      },
+      {
+        "skill": "English Proficiency",
+        "count": 5
+      },
+      {
+        "skill": "Analytical Skills",
+        "count": 5
+      },
+      {
+        "skill": "Interpersonal Skills",
+        "count": 3
+      },
+      {
+        "skill": "Windows OS",
+        "count": 3
+      },
+      {
+        "skill": "Computer Knowledge",
+        "count": 2
+      },
+      {
+        "skill": "Adaptability",
+        "count": 2
+      },
+      {
+        "skill": "Hindi",
+        "count": 2
+      }
+    ],
+    "education": "Any Graduate",
+    "selection_process": "interview",
+    "salary_min": 250000,
+    "salary_max": 340000,
+    "industry": "IT",
+    "sub_sector": "IT-Tech Support",
+    "category": "IT/ITES",
+    "demand_count": 32,
+    "raw_title_count": 10,
+    "source": "taf"
+  },
+  {
+    "slug": "delivery-executive",
+    "canonical_title": "Delivery Executive",
+    "skills": [
+      "Communication",
+      "Interpersonal Skills",
+      "Customer Service",
+      "Time Management",
+      "Marketing",
+      "Typing",
+      "Computer Knowledge",
+      "Sales"
+    ],
+    "skills_detail": [
+      {
+        "skill": "Communication",
+        "count": 12
+      },
+      {
+        "skill": "Interpersonal Skills",
+        "count": 2
+      },
+      {
+        "skill": "Customer Service",
+        "count": 2
+      },
+      {
+        "skill": "Time Management",
+        "count": 1
+      },
+      {
+        "skill": "Marketing",
+        "count": 1
+      },
+      {
+        "skill": "Typing",
+        "count": 1
+      },
+      {
+        "skill": "Computer Knowledge",
+        "count": 1
+      },
+      {
+        "skill": "Sales",
+        "count": 1
+      }
+    ],
+    "education": "12th standard",
+    "selection_process": "Face to Face interview",
+    "salary_min": null,
+    "salary_max": null,
+    "industry": "Retail",
+    "sub_sector": "Retail",
+    "category": null,
+    "demand_count": 29,
+    "raw_title_count": 5,
+    "source": "taf"
+  },
+  {
+    "slug": "salesmen",
+    "canonical_title": "Salesmen",
+    "skills": [
+      "Hindi",
+      "English Proficiency",
+      "Communication",
+      "Sales",
+      "Local Language"
+    ],
+    "skills_detail": [
+      {
+        "skill": "Hindi",
+        "count": 27
+      },
+      {
+        "skill": "English Proficiency",
+        "count": 13
+      },
+      {
+        "skill": "Communication",
+        "count": 3
+      },
+      {
+        "skill": "Sales",
+        "count": 3
+      },
+      {
+        "skill": "Local Language",
+        "count": 1
+      }
+    ],
+    "education": "10th standard",
+    "selection_process": "Face To Face",
+    "salary_min": null,
+    "salary_max": null,
+    "industry": "Retail",
+    "sub_sector": "Retail",
+    "category": null,
+    "demand_count": 28,
+    "raw_title_count": 1,
+    "source": "taf"
+  },
+  {
+    "slug": "collection-executive",
+    "canonical_title": "Collection Executive",
+    "skills": [
+      "Communication",
+      "English Proficiency",
+      "Computer Knowledge",
+      "Hindi",
+      "Sales",
+      "Interpersonal Skills",
+      "Adaptability",
+      "Customer Service",
+      "Banking",
+      "Local Language",
+      "Typing",
+      "Presentation Skills"
+    ],
+    "skills_detail": [
+      {
+        "skill": "Communication",
+        "count": 18
+      },
+      {
+        "skill": "English Proficiency",
+        "count": 4
+      },
+      {
+        "skill": "Computer Knowledge",
+        "count": 4
+      },
+      {
+        "skill": "Hindi",
+        "count": 3
+      },
+      {
+        "skill": "Sales",
+        "count": 2
+      },
+      {
+        "skill": "Interpersonal Skills",
+        "count": 1
+      },
+      {
+        "skill": "Adaptability",
+        "count": 1
+      },
+      {
+        "skill": "Customer Service",
+        "count": 1
+      },
+      {
+        "skill": "Banking",
+        "count": 1
+      },
+      {
+        "skill": "Local Language",
+        "count": 1
+      },
+      {
+        "skill": "Typing",
+        "count": 1
+      },
+      {
+        "skill": "Presentation Skills",
+        "count": 1
+      }
+    ],
+    "education": "12th standard",
+    "selection_process": "PI",
+    "salary_min": null,
+    "salary_max": null,
+    "industry": "BFSI",
+    "sub_sector": "Sales & Marketing",
+    "category": null,
+    "demand_count": 27,
+    "raw_title_count": 3,
+    "source": "taf"
+  },
+  {
+    "slug": "team-member",
+    "canonical_title": "Team Member",
+    "skills": [
+      "Communication",
+      "English Proficiency",
+      "Sales",
+      "Customer Service",
+      "Computer Knowledge",
+      "Billing",
+      "Tally",
+      "Accounting",
+      "Convincing Skills",
+      "MS Excel",
+      "Hindi",
+      "Interpersonal Skills"
+    ],
+    "skills_detail": [
+      {
+        "skill": "Communication",
+        "count": 16
+      },
+      {
+        "skill": "English Proficiency",
+        "count": 4
+      },
+      {
+        "skill": "Sales",
+        "count": 3
+      },
+      {
+        "skill": "Customer Service",
+        "count": 2
+      },
+      {
+        "skill": "Computer Knowledge",
+        "count": 2
+      },
+      {
+        "skill": "Billing",
+        "count": 1
+      },
+      {
+        "skill": "Tally",
+        "count": 1
+      },
+      {
+        "skill": "Accounting",
+        "count": 1
+      },
+      {
+        "skill": "Convincing Skills",
+        "count": 1
+      },
+      {
+        "skill": "MS Excel",
+        "count": 1
+      },
+      {
+        "skill": "Hindi",
+        "count": 1
+      },
+      {
+        "skill": "Interpersonal Skills",
+        "count": 1
+      }
+    ],
+    "education": "12th standard",
+    "selection_process": "PI",
+    "salary_min": null,
+    "salary_max": null,
+    "industry": "Retail",
+    "sub_sector": "Retail",
+    "category": null,
+    "demand_count": 26,
+    "raw_title_count": 4,
+    "source": "taf"
+  },
+  {
+    "slug": "cro",
+    "canonical_title": "Cro",
+    "skills": [
+      "Communication",
+      "Hindi",
+      "English Proficiency",
+      "Typing",
+      "Customer Service",
+      "Interpersonal Skills",
+      "Banking"
+    ],
+    "skills_detail": [
+      {
+        "skill": "Communication",
+        "count": 19
+      },
+      {
+        "skill": "Hindi",
+        "count": 4
+      },
+      {
+        "skill": "English Proficiency",
+        "count": 3
+      },
+      {
+        "skill": "Typing",
+        "count": 2
+      },
+      {
+        "skill": "Customer Service",
+        "count": 1
+      },
+      {
+        "skill": "Interpersonal Skills",
+        "count": 1
+      },
+      {
+        "skill": "Banking",
+        "count": 1
+      }
+    ],
+    "education": "12th standard",
+    "selection_process": "Face to Face",
+    "salary_min": null,
+    "salary_max": null,
+    "industry": "BFSI",
+    "sub_sector": "BFSI",
+    "category": null,
+    "demand_count": 26,
+    "raw_title_count": 4,
+    "source": "taf"
+  },
+  {
+    "slug": "agent-call-center",
+    "canonical_title": "Agent Call Center",
+    "skills": [
+      "Communication",
+      "Computer Knowledge",
+      "English Proficiency",
+      "Local Language",
+      "Hindi",
+      "Banking",
+      "Data Entry",
+      "Typing"
+    ],
+    "skills_detail": [
+      {
+        "skill": "Communication",
+        "count": 21
+      },
+      {
+        "skill": "Computer Knowledge",
+        "count": 16
+      },
+      {
+        "skill": "English Proficiency",
+        "count": 12
+      },
+      {
+        "skill": "Local Language",
+        "count": 12
+      },
+      {
+        "skill": "Hindi",
+        "count": 1
+      },
+      {
+        "skill": "Banking",
+        "count": 1
+      },
+      {
+        "skill": "Data Entry",
+        "count": 1
+      },
+      {
+        "skill": "Typing",
+        "count": 1
+      }
+    ],
+    "education": "12th standard",
+    "selection_process": "HR Round – Ops Round – Client Round",
+    "salary_min": null,
+    "salary_max": null,
+    "industry": "IT",
+    "sub_sector": "BPO",
+    "category": null,
+    "demand_count": 26,
+    "raw_title_count": 10,
+    "source": "taf"
+  },
+  {
+    "slug": "web-developer",
+    "canonical_title": "Web Developer",
+    "skills": [
+      "Analytical Skills",
+      "Communication",
+      "Hardware Troubleshooting"
+    ],
+    "skills_detail": [
+      {
+        "skill": "Analytical Skills",
+        "count": 2
+      },
+      {
+        "skill": "Communication",
+        "count": 1
+      },
+      {
+        "skill": "Hardware Troubleshooting",
+        "count": 1
+      }
+    ],
+    "education": "B.Tech/B.E",
+    "selection_process": "Zoom meeting",
+    "salary_min": 100000,
+    "salary_max": 200000,
+    "industry": "IT",
+    "sub_sector": "IT",
+    "category": "Technology",
+    "demand_count": 25,
+    "raw_title_count": 4,
+    "source": "taf"
+  },
+  {
+    "slug": "office-staff",
+    "canonical_title": "Office Staff",
+    "skills": [
+      "Interpersonal Skills",
+      "Computer Knowledge",
+      "Communication",
+      "MS Excel",
+      "Data Entry",
+      "Tally",
+      "Accounting",
+      "English Proficiency"
+    ],
+    "skills_detail": [
+      {
+        "skill": "Interpersonal Skills",
+        "count": 11
+      },
+      {
+        "skill": "Computer Knowledge",
+        "count": 11
+      },
+      {
+        "skill": "Communication",
+        "count": 11
+      },
+      {
+        "skill": "MS Excel",
+        "count": 2
+      },
+      {
+        "skill": "Data Entry",
+        "count": 2
+      },
+      {
+        "skill": "Tally",
+        "count": 2
+      },
+      {
+        "skill": "Accounting",
+        "count": 1
+      },
+      {
+        "skill": "English Proficiency",
+        "count": 1
+      }
+    ],
+    "education": "12th standard",
+    "selection_process": "Interview",
+    "salary_min": null,
+    "salary_max": null,
+    "industry": "IT",
+    "sub_sector": "service",
+    "category": null,
+    "demand_count": 25,
+    "raw_title_count": 6,
+    "source": "taf"
+  },
+  {
+    "slug": "office-asst",
+    "canonical_title": "Office Asst",
+    "skills": [
+      "Interpersonal Skills",
+      "Computer Knowledge",
+      "Communication",
+      "MS Excel",
+      "Accounting"
+    ],
+    "skills_detail": [
+      {
+        "skill": "Interpersonal Skills",
+        "count": 12
+      },
+      {
+        "skill": "Computer Knowledge",
+        "count": 9
+      },
+      {
+        "skill": "Communication",
+        "count": 5
+      },
+      {
+        "skill": "MS Excel",
+        "count": 1
+      },
+      {
+        "skill": "Accounting",
+        "count": 1
+      }
+    ],
+    "education": "12th standard",
+    "selection_process": "Interview",
+    "salary_min": null,
+    "salary_max": null,
+    "industry": "IT",
+    "sub_sector": "service",
+    "category": null,
+    "demand_count": 25,
+    "raw_title_count": 9,
+    "source": "taf"
+  },
+  {
+    "slug": "self-employed",
+    "canonical_title": "Self Employed",
+    "skills": [
+      "Communication",
+      "Sales",
+      "Customer Service"
+    ],
+    "skills_detail": [
+      {
+        "skill": "Communication",
+        "count": 4
+      },
+      {
+        "skill": "Sales",
+        "count": 1
+      },
+      {
+        "skill": "Customer Service",
+        "count": 1
+      }
+    ],
+    "education": "Any Graduate",
+    "selection_process": "PI",
+    "salary_min": null,
+    "salary_max": null,
+    "industry": "BFSI",
+    "sub_sector": "BFSI",
+    "category": null,
+    "demand_count": 25,
+    "raw_title_count": 5,
+    "source": "taf"
+  },
+  {
+    "slug": "business-associate",
+    "canonical_title": "Business Associate",
+    "skills": [
+      "Communication",
+      "Negotiation",
+      "Analytical Skills",
+      "Hindi",
+      "Convincing Skills",
+      "Computer Knowledge",
+      "Interpersonal Skills",
+      "MS Office",
+      "Marketing",
+      "Typing",
+      "Presentation Skills",
+      "English Proficiency"
+    ],
+    "skills_detail": [
+      {
+        "skill": "Communication",
+        "count": 15
+      },
+      {
+        "skill": "Negotiation",
+        "count": 3
+      },
+      {
+        "skill": "Analytical Skills",
+        "count": 3
+      },
+      {
+        "skill": "Hindi",
+        "count": 2
+      },
+      {
+        "skill": "Convincing Skills",
+        "count": 2
+      },
+      {
+        "skill": "Computer Knowledge",
+        "count": 2
+      },
+      {
+        "skill": "Interpersonal Skills",
+        "count": 2
+      },
+      {
+        "skill": "MS Office",
+        "count": 1
+      },
+      {
+        "skill": "Marketing",
+        "count": 1
+      },
+      {
+        "skill": "Typing",
+        "count": 1
+      },
+      {
+        "skill": "Presentation Skills",
+        "count": 1
+      },
+      {
+        "skill": "English Proficiency",
+        "count": 1
+      }
+    ],
+    "education": "Any Graduate",
+    "selection_process": "Communication RoundHr Round",
+    "salary_min": 240000,
+    "salary_max": 290000,
+    "industry": "BFSI",
+    "sub_sector": "BFSI",
+    "category": "Sales and Marketing",
+    "demand_count": 25,
+    "raw_title_count": 4,
+    "source": "taf"
+  },
+  {
+    "slug": "sales-manager",
+    "canonical_title": "Sales Manager",
+    "skills": [
+      "Communication",
+      "Sales",
+      "Interpersonal Skills",
+      "Negotiation",
+      "Problem Solving",
+      "Time Management",
+      "Insurance",
+      "Leadership",
+      "Analytical Skills",
+      "Marketing",
+      "Banking",
+      "English Proficiency"
+    ],
+    "skills_detail": [
+      {
+        "skill": "Communication",
+        "count": 18
+      },
+      {
+        "skill": "Sales",
+        "count": 7
+      },
+      {
+        "skill": "Interpersonal Skills",
+        "count": 1
+      },
+      {
+        "skill": "Negotiation",
+        "count": 1
+      },
+      {
+        "skill": "Problem Solving",
+        "count": 1
+      },
+      {
+        "skill": "Time Management",
+        "count": 1
+      },
+      {
+        "skill": "Insurance",
+        "count": 1
+      },
+      {
+        "skill": "Leadership",
+        "count": 1
+      },
+      {
+        "skill": "Analytical Skills",
+        "count": 1
+      },
+      {
+        "skill": "Marketing",
+        "count": 1
+      },
+      {
+        "skill": "Banking",
+        "count": 1
+      },
+      {
+        "skill": "English Proficiency",
+        "count": 1
+      }
+    ],
+    "education": "Any Graduate",
+    "selection_process": "Interview",
+    "salary_min": 300000,
+    "salary_max": 340000,
+    "industry": "BFSI",
+    "sub_sector": "BFSI",
+    "category": "Banking and Finance",
+    "demand_count": 24,
+    "raw_title_count": 6,
+    "source": "taf"
+  },
+  {
+    "slug": "customer-care-associate",
+    "canonical_title": "Customer Care Associate",
+    "skills": [
+      "Communication",
+      "English Proficiency",
+      "Sales",
+      "Customer Service",
+      "Typing",
+      "Adaptability",
+      "Hindi",
+      "Analytical Skills",
+      "Convincing Skills",
+      "Computer Knowledge",
+      "Time Management",
+      "Windows OS"
+    ],
+    "skills_detail": [
+      {
+        "skill": "Communication",
+        "count": 14
+      },
+      {
+        "skill": "English Proficiency",
+        "count": 6
+      },
+      {
+        "skill": "Sales",
+        "count": 5
+      },
+      {
+        "skill": "Customer Service",
+        "count": 4
+      },
+      {
+        "skill": "Typing",
+        "count": 3
+      },
+      {
+        "skill": "Adaptability",
+        "count": 3
+      },
+      {
+        "skill": "Hindi",
+        "count": 2
+      },
+      {
+        "skill": "Analytical Skills",
+        "count": 1
+      },
+      {
+        "skill": "Convincing Skills",
+        "count": 1
+      },
+      {
+        "skill": "Computer Knowledge",
+        "count": 1
+      },
+      {
+        "skill": "Time Management",
+        "count": 1
+      },
+      {
+        "skill": "Windows OS",
+        "count": 1
+      }
+    ],
+    "education": "12th standard",
+    "selection_process": "hr /operations / online test",
+    "salary_min": 215000,
+    "salary_max": 290000,
+    "industry": "BFSI",
+    "sub_sector": "BPO",
+    "category": "IT/ITES",
+    "demand_count": 23,
+    "raw_title_count": 5,
+    "source": "taf"
+  },
+  {
+    "slug": "mis-executive",
+    "canonical_title": "Mis Executive",
+    "skills": [
+      "Communication",
+      "MS Excel",
+      "Presentation Skills",
+      "Analytical Skills",
+      "Sales",
+      "Computer Knowledge",
+      "Data Entry",
+      "Problem Solving",
+      "Typing",
+      "Accounting",
+      "MS Word"
+    ],
+    "skills_detail": [
+      {
+        "skill": "Communication",
+        "count": 9
+      },
+      {
+        "skill": "MS Excel",
+        "count": 9
+      },
+      {
+        "skill": "Presentation Skills",
+        "count": 3
+      },
+      {
+        "skill": "Analytical Skills",
+        "count": 3
+      },
+      {
+        "skill": "Sales",
+        "count": 2
+      },
+      {
+        "skill": "Computer Knowledge",
+        "count": 2
+      },
+      {
+        "skill": "Data Entry",
+        "count": 1
+      },
+      {
+        "skill": "Problem Solving",
+        "count": 1
+      },
+      {
+        "skill": "Typing",
+        "count": 1
+      },
+      {
+        "skill": "Accounting",
+        "count": 1
+      },
+      {
+        "skill": "MS Word",
+        "count": 1
+      }
+    ],
+    "education": "Any Graduate",
+    "selection_process": "Communication RoundHr Round",
+    "salary_min": 215000,
+    "salary_max": 280000,
+    "industry": "BFSI",
+    "sub_sector": "IT",
+    "category": "Technology",
+    "demand_count": 21,
+    "raw_title_count": 6,
+    "source": "taf"
+  },
+  {
+    "slug": "crm",
+    "canonical_title": "Crm",
+    "skills": [
+      "Communication",
+      "Typing",
+      "Sales",
+      "Convincing Skills",
+      "Customer Service",
+      "CRM"
+    ],
+    "skills_detail": [
+      {
+        "skill": "Communication",
+        "count": 16
+      },
+      {
+        "skill": "Typing",
+        "count": 5
+      },
+      {
+        "skill": "Sales",
+        "count": 2
+      },
+      {
+        "skill": "Convincing Skills",
+        "count": 2
+      },
+      {
+        "skill": "Customer Service",
+        "count": 1
+      },
+      {
+        "skill": "CRM",
+        "count": 1
+      }
+    ],
+    "education": "Any Graduate",
+    "selection_process": "personal Interview, 2 rounds",
+    "salary_min": null,
+    "salary_max": null,
+    "industry": "BFSI",
+    "sub_sector": "BFSI",
+    "category": null,
+    "demand_count": 21,
+    "raw_title_count": 2,
+    "source": "taf"
+  },
+  {
+    "slug": "f-b-housekeeping",
+    "canonical_title": "F B Housekeeping",
+    "skills": [
+      "Communication"
+    ],
+    "skills_detail": [
+      {
+        "skill": "Communication",
+        "count": 12
+      }
+    ],
+    "education": "12th standard",
+    "selection_process": "P.I",
+    "salary_min": null,
+    "salary_max": null,
+    "industry": "Hospitality",
+    "sub_sector": "FOA",
+    "category": null,
+    "demand_count": 21,
+    "raw_title_count": 2,
+    "source": "taf"
+  },
+  {
+    "slug": "tally-operator",
+    "canonical_title": "Tally Operator",
+    "skills": [
+      "Tally",
+      "MS Office",
+      "Communication",
+      "MS Excel",
+      "Interpersonal Skills",
+      "Accounting",
+      "Computer Knowledge",
+      "Problem Solving",
+      "Documentation"
+    ],
+    "skills_detail": [
+      {
+        "skill": "Tally",
+        "count": 16
+      },
+      {
+        "skill": "MS Office",
+        "count": 13
+      },
+      {
+        "skill": "Communication",
+        "count": 12
+      },
+      {
+        "skill": "MS Excel",
+        "count": 12
+      },
+      {
+        "skill": "Interpersonal Skills",
+        "count": 11
+      },
+      {
+        "skill": "Accounting",
+        "count": 2
+      },
+      {
+        "skill": "Computer Knowledge",
+        "count": 1
+      },
+      {
+        "skill": "Problem Solving",
+        "count": 1
+      },
+      {
+        "skill": "Documentation",
+        "count": 1
+      }
+    ],
+    "education": "Any Graduate",
+    "selection_process": "INTERVIEW",
+    "salary_min": null,
+    "salary_max": null,
+    "industry": "Service",
+    "sub_sector": "BFSI",
+    "category": null,
+    "demand_count": 20,
+    "raw_title_count": 2,
+    "source": "taf"
+  },
+  {
+    "slug": "billing-exe",
+    "canonical_title": "Billing Exe",
+    "skills": [
+      "Computer Knowledge",
+      "Interpersonal Skills",
+      "Typing"
+    ],
+    "skills_detail": [
+      {
+        "skill": "Computer Knowledge",
+        "count": 19
+      },
+      {
+        "skill": "Interpersonal Skills",
+        "count": 8
+      },
+      {
+        "skill": "Typing",
+        "count": 1
+      }
+    ],
+    "education": "12th standard",
+    "selection_process": "Interview",
+    "salary_min": null,
+    "salary_max": null,
+    "industry": "IT",
+    "sub_sector": "service",
+    "category": null,
+    "demand_count": 20,
+    "raw_title_count": 3,
+    "source": "taf"
+  },
+  {
+    "slug": "sales-person",
+    "canonical_title": "Sales Person",
+    "skills": [
+      "Communication",
+      "Sales",
+      "Customer Service",
+      "Accounting"
+    ],
+    "skills_detail": [
+      {
+        "skill": "Communication",
+        "count": 15
+      },
+      {
+        "skill": "Sales",
+        "count": 3
+      },
+      {
+        "skill": "Customer Service",
+        "count": 1
+      },
+      {
+        "skill": "Accounting",
+        "count": 1
+      }
+    ],
+    "education": "Any Graduate",
+    "selection_process": "1 face to face interview",
+    "salary_min": null,
+    "salary_max": null,
+    "industry": "IT",
+    "sub_sector": "Retail",
+    "category": null,
+    "demand_count": 20,
+    "raw_title_count": 2,
+    "source": "taf"
+  },
+  {
+    "slug": "cust-care-exe",
+    "canonical_title": "Cust Care Exe",
+    "skills": [
+      "Interpersonal Skills",
+      "Communication",
+      "Computer Knowledge",
+      "Teamwork"
+    ],
+    "skills_detail": [
+      {
+        "skill": "Interpersonal Skills",
+        "count": 15
+      },
+      {
+        "skill": "Communication",
+        "count": 6
+      },
+      {
+        "skill": "Computer Knowledge",
+        "count": 2
+      },
+      {
+        "skill": "Teamwork",
+        "count": 2
+      }
+    ],
+    "education": "12th standard",
+    "selection_process": "Interview",
+    "salary_min": null,
+    "salary_max": null,
+    "industry": "IT",
+    "sub_sector": "service",
+    "category": null,
+    "demand_count": 19,
+    "raw_title_count": 5,
+    "source": "taf"
+  },
+  {
+    "slug": "owner",
+    "canonical_title": "Owner",
+    "skills": [
+      "Sales",
+      "Marketing",
+      "Communication",
+      "Networking"
+    ],
+    "skills_detail": [
+      {
+        "skill": "Sales",
+        "count": 7
+      },
+      {
+        "skill": "Marketing",
+        "count": 2
+      },
+      {
+        "skill": "Communication",
+        "count": 1
+      },
+      {
+        "skill": "Networking",
+        "count": 1
+      }
+    ],
+    "education": "12th standard",
+    "selection_process": "PI",
+    "salary_min": null,
+    "salary_max": null,
+    "industry": "BFSI",
+    "sub_sector": "BFSI",
+    "category": null,
+    "demand_count": 18,
+    "raw_title_count": 2,
+    "source": "taf"
+  },
+  {
+    "slug": "operation-associate",
+    "canonical_title": "Operation Associate",
+    "skills": [
+      "Communication",
+      "Analytical Skills",
+      "Customer Service",
+      "Inventory Management",
+      "English Proficiency",
+      "Adaptability",
+      "Billing",
+      "Convincing Skills"
+    ],
+    "skills_detail": [
+      {
+        "skill": "Communication",
+        "count": 12
+      },
+      {
+        "skill": "Analytical Skills",
+        "count": 2
+      },
+      {
+        "skill": "Customer Service",
+        "count": 2
+      },
+      {
+        "skill": "Inventory Management",
+        "count": 1
+      },
+      {
+        "skill": "English Proficiency",
+        "count": 1
+      },
+      {
+        "skill": "Adaptability",
+        "count": 1
+      },
+      {
+        "skill": "Billing",
+        "count": 1
+      },
+      {
+        "skill": "Convincing Skills",
+        "count": 1
+      }
+    ],
+    "education": "Any Graduate",
+    "selection_process": "F2F",
+    "salary_min": null,
+    "salary_max": null,
+    "industry": "BFSI",
+    "sub_sector": "IT",
+    "category": null,
+    "demand_count": 18,
+    "raw_title_count": 6,
+    "source": "taf"
+  },
+  {
+    "slug": "voice-process",
+    "canonical_title": "Voice Process",
+    "skills": [
+      "Communication",
+      "English Proficiency",
+      "Hindi",
+      "Customer Service",
+      "Sales",
+      "Problem Solving",
+      "Interpersonal Skills",
+      "Adaptability",
+      "Typing"
+    ],
+    "skills_detail": [
+      {
+        "skill": "Communication",
+        "count": 14
+      },
+      {
+        "skill": "English Proficiency",
+        "count": 5
+      },
+      {
+        "skill": "Hindi",
+        "count": 2
+      },
+      {
+        "skill": "Customer Service",
+        "count": 1
+      },
+      {
+        "skill": "Sales",
+        "count": 1
+      },
+      {
+        "skill": "Problem Solving",
+        "count": 1
+      },
+      {
+        "skill": "Interpersonal Skills",
+        "count": 1
+      },
+      {
+        "skill": "Adaptability",
+        "count": 1
+      },
+      {
+        "skill": "Typing",
+        "count": 1
+      }
+    ],
+    "education": "Any Graduate",
+    "selection_process": "Hr round and Manager round",
+    "salary_min": 180000,
+    "salary_max": 240000,
+    "industry": "BFSI",
+    "sub_sector": "BPO",
+    "category": "Banking and Finance",
+    "demand_count": 18,
+    "raw_title_count": 12,
+    "source": "taf"
+  },
+  {
+    "slug": "business-development-manager",
+    "canonical_title": "Business Development Manager",
+    "skills": [
+      "Communication",
+      "Sales",
+      "Banking",
+      "Convincing Skills",
+      "Customer Service",
+      "Teamwork",
+      "Local Language",
+      "Negotiation"
+    ],
+    "skills_detail": [
+      {
+        "skill": "Communication",
+        "count": 12
+      },
+      {
+        "skill": "Sales",
+        "count": 4
+      },
+      {
+        "skill": "Banking",
+        "count": 3
+      },
+      {
+        "skill": "Convincing Skills",
+        "count": 3
+      },
+      {
+        "skill": "Customer Service",
+        "count": 3
+      },
+      {
+        "skill": "Teamwork",
+        "count": 1
+      },
+      {
+        "skill": "Local Language",
+        "count": 1
+      },
+      {
+        "skill": "Negotiation",
+        "count": 1
+      }
+    ],
+    "education": "Any Graduate",
+    "selection_process": "Face to face interview",
+    "salary_min": 220000,
+    "salary_max": 330000,
+    "industry": "BFSI",
+    "sub_sector": "Banking",
+    "category": "Banking and Finance",
+    "demand_count": 16,
+    "raw_title_count": 3,
+    "source": "taf"
+  },
+  {
+    "slug": "bpo",
+    "canonical_title": "Bpo",
+    "skills": [
+      "Communication",
+      "Customer Service",
+      "Problem Solving",
+      "Typing",
+      "CRM"
+    ],
+    "skills_detail": [
+      {
+        "skill": "Communication",
+        "count": 7
+      },
+      {
+        "skill": "Customer Service",
+        "count": 4
+      },
+      {
+        "skill": "Problem Solving",
+        "count": 2
+      },
+      {
+        "skill": "Typing",
+        "count": 2
+      },
+      {
+        "skill": "CRM",
+        "count": 1
+      }
+    ],
+    "education": "Any Graduate",
+    "selection_process": "communicationteam leaderHR",
+    "salary_min": 170000,
+    "salary_max": 200000,
+    "industry": "BFSI",
+    "sub_sector": "BFSI",
+    "category": "Banking and Finance",
+    "demand_count": 16,
+    "raw_title_count": 3,
+    "source": "taf"
+  },
+  {
+    "slug": "business-development-officer",
+    "canonical_title": "Business Development Officer",
+    "skills": [
+      "Communication",
+      "Sales"
+    ],
+    "skills_detail": [
+      {
+        "skill": "Communication",
+        "count": 16
+      },
+      {
+        "skill": "Sales",
+        "count": 1
+      }
+    ],
+    "education": "12th standard",
+    "selection_process": "Interview",
+    "salary_min": null,
+    "salary_max": null,
+    "industry": "BFSI",
+    "sub_sector": "Date entry",
+    "category": null,
+    "demand_count": 16,
+    "raw_title_count": 3,
+    "source": "taf"
+  },
+  {
+    "slug": "beauty-advisor",
+    "canonical_title": "Beauty Advisor",
+    "skills": [
+      "Communication",
+      "Sales",
+      "Hindi",
+      "English Proficiency",
+      "Convincing Skills",
+      "MS Office",
+      "Adaptability",
+      "Insurance"
+    ],
+    "skills_detail": [
+      {
+        "skill": "Communication",
+        "count": 7
+      },
+      {
+        "skill": "Sales",
+        "count": 4
+      },
+      {
+        "skill": "Hindi",
+        "count": 3
+      },
+      {
+        "skill": "English Proficiency",
+        "count": 2
+      },
+      {
+        "skill": "Convincing Skills",
+        "count": 1
+      },
+      {
+        "skill": "MS Office",
+        "count": 1
+      },
+      {
+        "skill": "Adaptability",
+        "count": 1
+      },
+      {
+        "skill": "Insurance",
+        "count": 1
+      }
+    ],
+    "education": "12th standard",
+    "selection_process": "face to face ,",
+    "salary_min": null,
+    "salary_max": null,
+    "industry": "BFSI",
+    "sub_sector": "Fashion",
+    "category": null,
+    "demand_count": 16,
+    "raw_title_count": 4,
+    "source": "taf"
+  },
+  {
+    "slug": "admin",
+    "canonical_title": "Admin",
+    "skills": [
+      "Communication",
+      "Typing",
+      "Telecalling",
+      "English Proficiency",
+      "MS Excel",
+      "Customer Service",
+      "Presentation Skills"
+    ],
+    "skills_detail": [
+      {
+        "skill": "Communication",
+        "count": 8
+      },
+      {
+        "skill": "Typing",
+        "count": 2
+      },
+      {
+        "skill": "Telecalling",
+        "count": 1
+      },
+      {
+        "skill": "English Proficiency",
+        "count": 1
+      },
+      {
+        "skill": "MS Excel",
+        "count": 1
+      },
+      {
+        "skill": "Customer Service",
+        "count": 1
+      },
+      {
+        "skill": "Presentation Skills",
+        "count": 1
+      }
+    ],
+    "education": "Any Graduate",
+    "selection_process": "3 rounds",
+    "salary_min": null,
+    "salary_max": null,
+    "industry": "BFSI",
+    "sub_sector": "Service",
+    "category": null,
+    "demand_count": 16,
+    "raw_title_count": 5,
+    "source": "taf"
+  },
+  {
+    "slug": "customer-service-representativ",
+    "canonical_title": "Customer Service Representativ",
+    "skills": [
+      "Communication",
+      "Customer Service",
+      "English Proficiency",
+      "Convincing Skills",
+      "Computer Knowledge",
+      "Local Language",
+      "Hindi"
+    ],
+    "skills_detail": [
+      {
+        "skill": "Communication",
+        "count": 8
+      },
+      {
+        "skill": "Customer Service",
+        "count": 3
+      },
+      {
+        "skill": "English Proficiency",
+        "count": 2
+      },
+      {
+        "skill": "Convincing Skills",
+        "count": 2
+      },
+      {
+        "skill": "Computer Knowledge",
+        "count": 1
+      },
+      {
+        "skill": "Local Language",
+        "count": 1
+      },
+      {
+        "skill": "Hindi",
+        "count": 1
+      }
+    ],
+    "education": "Any Graduate",
+    "selection_process": "Assessement TestHR RoundPanel Round",
+    "salary_min": 180000,
+    "salary_max": 180000,
+    "industry": "BFSI",
+    "sub_sector": "Sales & Marketing",
+    "category": "Banking and Finance",
+    "demand_count": 15,
+    "raw_title_count": 3,
+    "source": "taf"
+  },
+  {
+    "slug": "test-engineer",
+    "canonical_title": "Test Engineer",
+    "skills": [
+      "Communication",
+      "Analytical Skills",
+      "Adaptability",
+      "Problem Solving"
+    ],
+    "skills_detail": [
+      {
+        "skill": "Communication",
+        "count": 7
+      },
+      {
+        "skill": "Analytical Skills",
+        "count": 4
+      },
+      {
+        "skill": "Adaptability",
+        "count": 2
+      },
+      {
+        "skill": "Problem Solving",
+        "count": 2
+      }
+    ],
+    "education": "B.Tech/B.E",
+    "selection_process": "1. Aptitude 2. Technical discussion with panel",
+    "salary_min": 190000,
+    "salary_max": 250000,
+    "industry": "IT",
+    "sub_sector": "IT",
+    "category": "Technology",
+    "demand_count": 15,
+    "raw_title_count": 4,
+    "source": "taf"
+  },
+  {
+    "slug": "tele-sales",
+    "canonical_title": "Tele Sales",
+    "skills": [
+      "Communication",
+      "English Proficiency",
+      "Sales",
+      "Computer Knowledge",
+      "Typing",
+      "Local Language"
+    ],
+    "skills_detail": [
+      {
+        "skill": "Communication",
+        "count": 12
+      },
+      {
+        "skill": "English Proficiency",
+        "count": 3
+      },
+      {
+        "skill": "Sales",
+        "count": 1
+      },
+      {
+        "skill": "Computer Knowledge",
+        "count": 1
+      },
+      {
+        "skill": "Typing",
+        "count": 1
+      },
+      {
+        "skill": "Local Language",
+        "count": 1
+      }
+    ],
+    "education": "12th standard",
+    "selection_process": "PI",
+    "salary_min": 120000,
+    "salary_max": 150000,
+    "industry": "BFSI",
+    "sub_sector": "Education Sector",
+    "category": "Sales and Marketing",
+    "demand_count": 14,
+    "raw_title_count": 5,
+    "source": "taf"
+  },
+  {
+    "slug": "hr-executive",
+    "canonical_title": "Hr Executive",
+    "skills": [
+      "Communication",
+      "English Proficiency",
+      "Hindi"
+    ],
+    "skills_detail": [
+      {
+        "skill": "Communication",
+        "count": 11
+      },
+      {
+        "skill": "English Proficiency",
+        "count": 1
+      },
+      {
+        "skill": "Hindi",
+        "count": 1
+      }
+    ],
+    "education": "Any Graduate",
+    "selection_process": "Face to face 3 rounds",
+    "salary_min": 135000,
+    "salary_max": 165000,
+    "industry": "IT",
+    "sub_sector": "HR & Recruitment Solutions",
+    "category": "IT/ITES",
+    "demand_count": 14,
+    "raw_title_count": 8,
+    "source": "taf"
+  },
+  {
+    "slug": "sales-representative",
+    "canonical_title": "Sales Representative",
+    "skills": [
+      "Communication",
+      "Presentation Skills",
+      "Computer Knowledge",
+      "English Proficiency",
+      "Sales",
+      "Local Language"
+    ],
+    "skills_detail": [
+      {
+        "skill": "Communication",
+        "count": 7
+      },
+      {
+        "skill": "Presentation Skills",
+        "count": 5
+      },
+      {
+        "skill": "Computer Knowledge",
+        "count": 3
+      },
+      {
+        "skill": "English Proficiency",
+        "count": 3
+      },
+      {
+        "skill": "Sales",
+        "count": 2
+      },
+      {
+        "skill": "Local Language",
+        "count": 1
+      }
+    ],
+    "education": "10th standard",
+    "selection_process": "Interview",
+    "salary_min": null,
+    "salary_max": null,
+    "industry": "Retail",
+    "sub_sector": "Retail",
+    "category": null,
+    "demand_count": 14,
+    "raw_title_count": 2,
+    "source": "taf"
+  },
+  {
+    "slug": "date-entry-operater",
+    "canonical_title": "Date Entry Operater",
+    "skills": [],
+    "skills_detail": [],
+    "education": "12th standard",
+    "selection_process": null,
+    "salary_min": null,
+    "salary_max": null,
+    "industry": "IT",
+    "sub_sector": "Date entry Operater",
+    "category": null,
+    "demand_count": 14,
+    "raw_title_count": 1,
+    "source": "taf"
+  },
+  {
+    "slug": "tele-marketing-executives",
+    "canonical_title": "Tele Marketing Executives",
+    "skills": [
+      "Communication",
+      "Hindi",
+      "English Proficiency",
+      "Convincing Skills",
+      "Banking",
+      "Insurance",
+      "Negotiation"
+    ],
+    "skills_detail": [
+      {
+        "skill": "Communication",
+        "count": 10
+      },
+      {
+        "skill": "Hindi",
+        "count": 3
+      },
+      {
+        "skill": "English Proficiency",
+        "count": 2
+      },
+      {
+        "skill": "Convincing Skills",
+        "count": 2
+      },
+      {
+        "skill": "Banking",
+        "count": 1
+      },
+      {
+        "skill": "Insurance",
+        "count": 1
+      },
+      {
+        "skill": "Negotiation",
+        "count": 1
+      }
+    ],
+    "education": "12th standard",
+    "selection_process": "Telephonic round of interview, Face to face round",
+    "salary_min": null,
+    "salary_max": null,
+    "industry": "BFSI",
+    "sub_sector": "Sales & Marketing",
+    "category": null,
+    "demand_count": 14,
+    "raw_title_count": 5,
+    "source": "taf"
+  },
+  {
+    "slug": "field-executive",
+    "canonical_title": "Field Executive",
+    "skills": [
+      "Communication",
+      "Sales",
+      "Computer Knowledge",
+      "Telecalling",
+      "Convincing Skills",
+      "Local Language"
+    ],
+    "skills_detail": [
+      {
+        "skill": "Communication",
+        "count": 9
+      },
+      {
+        "skill": "Sales",
+        "count": 3
+      },
+      {
+        "skill": "Computer Knowledge",
+        "count": 2
+      },
+      {
+        "skill": "Telecalling",
+        "count": 1
+      },
+      {
+        "skill": "Convincing Skills",
+        "count": 1
+      },
+      {
+        "skill": "Local Language",
+        "count": 1
+      }
+    ],
+    "education": "12th standard",
+    "selection_process": "Face to face interview",
+    "salary_min": null,
+    "salary_max": null,
+    "industry": "BFSI",
+    "sub_sector": "Retail",
+    "category": null,
+    "demand_count": 13,
+    "raw_title_count": 3,
+    "source": "taf"
+  },
+  {
+    "slug": "service-engineer",
+    "canonical_title": "Service Engineer",
+    "skills": [
+      "Problem Solving",
+      "Hardware Troubleshooting",
+      "Communication",
+      "Documentation",
+      "Networking",
+      "Sales",
+      "Computer Knowledge"
+    ],
+    "skills_detail": [
+      {
+        "skill": "Problem Solving",
+        "count": 2
+      },
+      {
+        "skill": "Hardware Troubleshooting",
+        "count": 2
+      },
+      {
+        "skill": "Communication",
+        "count": 1
+      },
+      {
+        "skill": "Documentation",
+        "count": 1
+      },
+      {
+        "skill": "Networking",
+        "count": 1
+      },
+      {
+        "skill": "Sales",
+        "count": 1
+      },
+      {
+        "skill": "Computer Knowledge",
+        "count": 1
+      }
+    ],
+    "education": "Any Graduate",
+    "selection_process": "PI Technical Round",
+    "salary_min": null,
+    "salary_max": null,
+    "industry": "Service",
+    "sub_sector": "Service",
+    "category": null,
+    "demand_count": 13,
+    "raw_title_count": 6,
+    "source": "taf"
+  },
+  {
+    "slug": "foa",
+    "canonical_title": "Foa",
+    "skills": [
+      "Communication",
+      "Customer Service"
+    ],
+    "skills_detail": [
+      {
+        "skill": "Communication",
+        "count": 7
+      },
+      {
+        "skill": "Customer Service",
+        "count": 2
+      }
+    ],
+    "education": "Any Graduate",
+    "selection_process": "2 P.I. rounds",
+    "salary_min": null,
+    "salary_max": null,
+    "industry": "Hospitality",
+    "sub_sector": "Office",
+    "category": null,
+    "demand_count": 13,
+    "raw_title_count": 1,
+    "source": "taf"
+  },
+  {
+    "slug": "cust-care-associate",
+    "canonical_title": "Cust Care Associate",
+    "skills": [
+      "Communication",
+      "Interpersonal Skills",
+      "Typing"
+    ],
+    "skills_detail": [
+      {
+        "skill": "Communication",
+        "count": 9
+      },
+      {
+        "skill": "Interpersonal Skills",
+        "count": 2
+      },
+      {
+        "skill": "Typing",
+        "count": 1
+      }
+    ],
+    "education": "12th standard",
+    "selection_process": "Interview",
+    "salary_min": null,
+    "salary_max": null,
+    "industry": "IT",
+    "sub_sector": "service",
+    "category": null,
+    "demand_count": 13,
+    "raw_title_count": 5,
+    "source": "taf"
+  },
+  {
+    "slug": "telecallers",
+    "canonical_title": "Telecallers",
+    "skills": [
+      "Communication",
+      "Typing",
+      "English Proficiency",
+      "Interpersonal Skills",
+      "Negotiation",
+      "Hindi"
+    ],
+    "skills_detail": [
+      {
+        "skill": "Communication",
+        "count": 10
+      },
+      {
+        "skill": "Typing",
+        "count": 2
+      },
+      {
+        "skill": "English Proficiency",
+        "count": 2
+      },
+      {
+        "skill": "Interpersonal Skills",
+        "count": 1
+      },
+      {
+        "skill": "Negotiation",
+        "count": 1
+      },
+      {
+        "skill": "Hindi",
+        "count": 1
+      }
+    ],
+    "education": "12th standard",
+    "selection_process": "Online Communication RoundF2F Hr Round",
+    "salary_min": 160000,
+    "salary_max": 205000,
+    "industry": "IT",
+    "sub_sector": "IT",
+    "category": "Retail",
+    "demand_count": 12,
+    "raw_title_count": 3,
+    "source": "taf"
+  },
+  {
+    "slug": "collection-officer",
+    "canonical_title": "Collection Officer",
+    "skills": [
+      "Communication",
+      "Negotiation",
+      "Customer Service",
+      "Time Management",
+      "Sales",
+      "Accounting",
+      "Presentation Skills"
+    ],
+    "skills_detail": [
+      {
+        "skill": "Communication",
+        "count": 8
+      },
+      {
+        "skill": "Negotiation",
+        "count": 4
+      },
+      {
+        "skill": "Customer Service",
+        "count": 4
+      },
+      {
+        "skill": "Time Management",
+        "count": 1
+      },
+      {
+        "skill": "Sales",
+        "count": 1
+      },
+      {
+        "skill": "Accounting",
+        "count": 1
+      },
+      {
+        "skill": "Presentation Skills",
+        "count": 1
+      }
+    ],
+    "education": "Any Graduate",
+    "selection_process": "Manager and HR round",
+    "salary_min": 190000,
+    "salary_max": 210000,
+    "industry": "BFSI",
+    "sub_sector": "Collections",
+    "category": "Banking and Finance",
+    "demand_count": 12,
+    "raw_title_count": 3,
+    "source": "taf"
+  },
+  {
+    "slug": "self-placed",
+    "canonical_title": "Self Placed",
+    "skills": [
+      "Communication"
+    ],
+    "skills_detail": [
+      {
+        "skill": "Communication",
+        "count": 7
+      }
+    ],
+    "education": "12th standard",
+    "selection_process": "Self placed",
+    "salary_min": null,
+    "salary_max": null,
+    "industry": "IT",
+    "sub_sector": "Skill Development",
+    "category": null,
+    "demand_count": 12,
+    "raw_title_count": 4,
+    "source": "taf"
+  },
+  {
+    "slug": "relationship-exe",
+    "canonical_title": "Relationship Exe",
+    "skills": [
+      "Interpersonal Skills",
+      "Communication",
+      "Sales",
+      "Computer Knowledge"
+    ],
+    "skills_detail": [
+      {
+        "skill": "Interpersonal Skills",
+        "count": 9
+      },
+      {
+        "skill": "Communication",
+        "count": 2
+      },
+      {
+        "skill": "Sales",
+        "count": 1
+      },
+      {
+        "skill": "Computer Knowledge",
+        "count": 1
+      }
+    ],
+    "education": "12th standard",
+    "selection_process": "Interview",
+    "salary_min": null,
+    "salary_max": null,
+    "industry": "BFSI",
+    "sub_sector": "service",
+    "category": null,
+    "demand_count": 12,
+    "raw_title_count": 1,
+    "source": "taf"
+  },
+  {
+    "slug": "credit-officer",
+    "canonical_title": "Credit Officer",
+    "skills": [
+      "Communication",
+      "Customer Service",
+      "Analytical Skills",
+      "Adaptability",
+      "Sales",
+      "Marketing",
+      "English Proficiency",
+      "Computer Knowledge",
+      "Teamwork",
+      "Interpersonal Skills"
+    ],
+    "skills_detail": [
+      {
+        "skill": "Communication",
+        "count": 6
+      },
+      {
+        "skill": "Customer Service",
+        "count": 2
+      },
+      {
+        "skill": "Analytical Skills",
+        "count": 2
+      },
+      {
+        "skill": "Adaptability",
+        "count": 2
+      },
+      {
+        "skill": "Sales",
+        "count": 1
+      },
+      {
+        "skill": "Marketing",
+        "count": 1
+      },
+      {
+        "skill": "English Proficiency",
+        "count": 1
+      },
+      {
+        "skill": "Computer Knowledge",
+        "count": 1
+      },
+      {
+        "skill": "Teamwork",
+        "count": 1
+      },
+      {
+        "skill": "Interpersonal Skills",
+        "count": 1
+      }
+    ],
+    "education": "12th standard",
+    "selection_process": "Face to face HR",
+    "salary_min": null,
+    "salary_max": null,
+    "industry": "BFSI",
+    "sub_sector": "BFSI",
+    "category": null,
+    "demand_count": 12,
+    "raw_title_count": 4,
+    "source": "taf"
+  },
+  {
+    "slug": "cloud-infra-engineer",
+    "canonical_title": "Cloud Infra Engineer",
+    "skills": [
+      "Communication",
+      "Problem Solving",
+      "Networking",
+      "Adaptability"
+    ],
+    "skills_detail": [
+      {
+        "skill": "Communication",
+        "count": 9
+      },
+      {
+        "skill": "Problem Solving",
+        "count": 2
+      },
+      {
+        "skill": "Networking",
+        "count": 1
+      },
+      {
+        "skill": "Adaptability",
+        "count": 1
+      }
+    ],
+    "education": "B.Tech/B.E",
+    "selection_process": "HR Round, Tech round, Group discussion",
+    "salary_min": 250000,
+    "salary_max": 500000,
+    "industry": "IT",
+    "sub_sector": "IT",
+    "category": null,
+    "demand_count": 12,
+    "raw_title_count": 2,
+    "source": "taf"
+  },
+  {
+    "slug": "stack-developer",
+    "canonical_title": "Stack Developer",
+    "skills": [
+      "Problem Solving",
+      "Communication",
+      "Analytical Skills",
+      "Teamwork",
+      "Interpersonal Skills"
+    ],
+    "skills_detail": [
+      {
+        "skill": "Problem Solving",
+        "count": 5
+      },
+      {
+        "skill": "Communication",
+        "count": 5
+      },
+      {
+        "skill": "Analytical Skills",
+        "count": 1
+      },
+      {
+        "skill": "Teamwork",
+        "count": 1
+      },
+      {
+        "skill": "Interpersonal Skills",
+        "count": 1
+      }
+    ],
+    "education": "B.Tech/B.E",
+    "selection_process": "Face to Fcae",
+    "salary_min": 240000,
+    "salary_max": 320000,
+    "industry": "Technology",
+    "sub_sector": "Advance IT",
+    "category": "Technology",
+    "demand_count": 11,
+    "raw_title_count": 3,
+    "source": "taf"
+  },
+  {
+    "slug": "technical-support-engineer",
+    "canonical_title": "Technical Support Engineer",
+    "skills": [
+      "Communication",
+      "Adaptability",
+      "Customer Service",
+      "Teamwork",
+      "Problem Solving",
+      "Time Management",
+      "Windows OS",
+      "Insurance",
+      "Hindi"
+    ],
+    "skills_detail": [
+      {
+        "skill": "Communication",
+        "count": 7
+      },
+      {
+        "skill": "Adaptability",
+        "count": 2
+      },
+      {
+        "skill": "Customer Service",
+        "count": 1
+      },
+      {
+        "skill": "Teamwork",
+        "count": 1
+      },
+      {
+        "skill": "Problem Solving",
+        "count": 1
+      },
+      {
+        "skill": "Time Management",
+        "count": 1
+      },
+      {
+        "skill": "Windows OS",
+        "count": 1
+      },
+      {
+        "skill": "Insurance",
+        "count": 1
+      },
+      {
+        "skill": "Hindi",
+        "count": 1
+      }
+    ],
+    "education": "B.Tech/B.E",
+    "selection_process": "Face to Face",
+    "salary_min": 230000,
+    "salary_max": 270000,
+    "industry": "Technology",
+    "sub_sector": "IT-Tech Support",
+    "category": "IT/ITES",
+    "demand_count": 11,
+    "raw_title_count": 1,
+    "source": "taf"
+  },
+  {
+    "slug": "financial-analyst",
+    "canonical_title": "Financial Analyst",
+    "skills": [
+      "Communication",
+      "Banking",
+      "Analytical Skills",
+      "MS Excel",
+      "MS Office",
+      "Presentation Skills",
+      "English Proficiency",
+      "Typing",
+      "Adaptability",
+      "Convincing Skills",
+      "Data Entry",
+      "Insurance"
+    ],
+    "skills_detail": [
+      {
+        "skill": "Communication",
+        "count": 5
+      },
+      {
+        "skill": "Banking",
+        "count": 4
+      },
+      {
+        "skill": "Analytical Skills",
+        "count": 4
+      },
+      {
+        "skill": "MS Excel",
+        "count": 3
+      },
+      {
+        "skill": "MS Office",
+        "count": 2
+      },
+      {
+        "skill": "Presentation Skills",
+        "count": 2
+      },
+      {
+        "skill": "English Proficiency",
+        "count": 2
+      },
+      {
+        "skill": "Typing",
+        "count": 1
+      },
+      {
+        "skill": "Adaptability",
+        "count": 1
+      },
+      {
+        "skill": "Convincing Skills",
+        "count": 1
+      },
+      {
+        "skill": "Data Entry",
+        "count": 1
+      },
+      {
+        "skill": "Insurance",
+        "count": 1
+      }
+    ],
+    "education": "Any Graduate",
+    "selection_process": "HR Screening.Discussion with Business Head.",
+    "salary_min": 220000,
+    "salary_max": 345000,
+    "industry": "BFSI",
+    "sub_sector": "BFSI",
+    "category": "Banking and Finance",
+    "demand_count": 11,
+    "raw_title_count": 4,
+    "source": "taf"
+  },
+  {
+    "slug": "python-developer",
+    "canonical_title": "Python Developer",
+    "skills": [
+      "Problem Solving",
+      "Analytical Skills",
+      "Communication",
+      "Time Management",
+      "Teamwork"
+    ],
+    "skills_detail": [
+      {
+        "skill": "Problem Solving",
+        "count": 3
+      },
+      {
+        "skill": "Analytical Skills",
+        "count": 3
+      },
+      {
+        "skill": "Communication",
+        "count": 3
+      },
+      {
+        "skill": "Time Management",
+        "count": 1
+      },
+      {
+        "skill": "Teamwork",
+        "count": 1
+      }
+    ],
+    "education": "B.Tech/B.E",
+    "selection_process": "Aptitude TestTechnical Test Project RoundHr Round",
+    "salary_min": 220000,
+    "salary_max": 250000,
+    "industry": "Technology",
+    "sub_sector": "Python Developer",
+    "category": "Technology",
+    "demand_count": 11,
+    "raw_title_count": 4,
+    "source": "taf"
+  },
+  {
+    "slug": "management",
+    "canonical_title": "Management",
+    "skills": [
+      "Communication",
+      "Sales",
+      "Data Entry"
+    ],
+    "skills_detail": [
+      {
+        "skill": "Communication",
+        "count": 3
+      },
+      {
+        "skill": "Sales",
+        "count": 1
+      },
+      {
+        "skill": "Data Entry",
+        "count": 1
+      }
+    ],
+    "education": "Any Graduate",
+    "selection_process": "1st Round - Coding Test2nd Round - Technical Interview3rd Round - Hiring Manager Interview4th Round - HR Round",
+    "salary_min": 300000,
+    "salary_max": 600000,
+    "industry": "BFSI",
+    "sub_sector": "BFSI",
+    "category": "Technology",
+    "demand_count": 11,
+    "raw_title_count": 4,
+    "source": "taf"
+  }
+]

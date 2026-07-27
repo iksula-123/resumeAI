@@ -7,6 +7,7 @@ from pydantic import BaseModel
 from services.auth import verify_token
 from services.storage import upload_bytes
 from services.webhooks import dispatch
+from services.usage import log_usage_event
 
 router = APIRouter(prefix="/api/export", tags=["Export"])
 security = HTTPBearer()
@@ -57,6 +58,7 @@ async def export_pdf(req: ExportRequest, user=Depends(_auth)):
     safe_title = req.title.replace(" ", "_")
     upload_bytes(str(user.id), "generated", f"{safe_title}.pdf", pdf_bytes, "application/pdf")
     dispatch(user.id, "resume.exported", {"title": req.title, "format": "pdf"})
+    await log_usage_event(str(user.id), "download_pdf", metadata={"title": req.title})
     return StreamingResponse(
         io.BytesIO(pdf_bytes),
         media_type="application/pdf",
@@ -73,6 +75,7 @@ async def export_docx(req: ExportRequest, user=Depends(_auth)):
         "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
     )
     dispatch(user.id, "resume.exported", {"title": req.title, "format": "docx"})
+    await log_usage_event(str(user.id), "download_docx", metadata={"title": req.title})
     return StreamingResponse(
         io.BytesIO(docx_bytes),
         media_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
@@ -84,6 +87,37 @@ async def export_docx(req: ExportRequest, user=Depends(_auth)):
 # PDF generation via fpdf2
 # ──────────────────────────────────────────────
 
+def _pdf_font(pdf):
+    """Set up Unicode fonts for the PDF and return (family, safe_fn).
+
+    Uses bundled Noto Sans (Latin) as the primary font with Noto Sans Devanagari
+    registered as a *fallback*, so English AND Devanagari/Indian scripts both
+    render correctly (spec Section 6). Falls back to the latin-1 core font when
+    the TTFs aren't bundled. Drop the OFL TTFs into backend/assets/fonts/.
+    """
+    import os
+    base = os.path.join(os.path.dirname(__file__), "..", "assets", "fonts")
+    latin_reg = os.path.join(base, "NotoSans-Regular.ttf")
+    if not os.path.exists(latin_reg):
+        return "Helvetica", _pdf_safe   # no Unicode font bundled → core font
+
+    latin_bold = os.path.join(base, "NotoSans-Bold.ttf")
+    pdf.add_font("NotoSans", "", latin_reg)
+    pdf.add_font("NotoSans", "B", latin_bold if os.path.exists(latin_bold) else latin_reg)
+
+    # Devanagari as a fallback so mixed English/Hindi text renders in one run.
+    dev_reg = os.path.join(base, "NotoSansDevanagari-Regular.ttf")
+    if os.path.exists(dev_reg):
+        dev_bold = os.path.join(base, "NotoSansDevanagari-Bold.ttf")
+        pdf.add_font("NotoDev", "", dev_reg)
+        pdf.add_font("NotoDev", "B", dev_bold if os.path.exists(dev_bold) else dev_reg)
+        try:
+            pdf.set_fallback_fonts(["NotoDev"])
+        except Exception:
+            pass
+    return "NotoSans", (lambda t: str(t or ""))   # pass Unicode straight through
+
+
 def _build_pdf(content: dict, title: str) -> bytes:
     from fpdf import FPDF
 
@@ -93,34 +127,35 @@ def _build_pdf(content: dict, title: str) -> bytes:
     pdf.set_auto_page_break(auto=True, margin=15)
     pdf.add_page()
     pdf.set_margins(20, 20, 20)
+    font, safe = _pdf_font(pdf)   # Unicode-capable when the font is bundled
 
     # Name
-    pdf.set_font("Helvetica", "B", 20)
+    pdf.set_font(font, "B", 20)
     pdf.set_text_color(30, 64, 175)
-    pdf.cell(0, 10, _pdf_safe(pi.get("fullName", title)), ln=True)
+    pdf.cell(0, 10, safe(pi.get("fullName", title)), ln=True)
 
     # Contact line
     contact_parts = [s for s in [pi.get("email"), pi.get("phone"), pi.get("location")] if s]
     if contact_parts:
-        pdf.set_font("Helvetica", "", 9)
+        pdf.set_font(font, "", 9)
         pdf.set_text_color(100, 100, 100)
-        pdf.cell(0, 6, _pdf_safe("  |  ".join(contact_parts)), ln=True)
+        pdf.cell(0, 6, safe("  |  ".join(contact_parts)), ln=True)
 
     pdf.ln(3)
 
     def section(heading: str):
-        pdf.set_font("Helvetica", "B", 10)
+        pdf.set_font(font, "B", 10)
         pdf.set_text_color(30, 64, 175)
         pdf.set_fill_color(239, 246, 255)
-        pdf.cell(0, 7, _pdf_safe(heading.upper()), ln=True, fill=True)
+        pdf.cell(0, 7, safe(heading.upper()), ln=True, fill=True)
         pdf.set_text_color(30, 30, 30)
-        pdf.set_font("Helvetica", "", 10)
+        pdf.set_font(font, "", 10)
 
     def body_line(text: str, size: int = 10, bold: bool = False, grey: bool = False):
         pdf.set_x(pdf.l_margin)  # always start at left margin so width is never 0
-        pdf.set_font("Helvetica", "B" if bold else "", size)
+        pdf.set_font(font, "B" if bold else "", size)
         pdf.set_text_color(120, 120, 120) if grey else pdf.set_text_color(30, 30, 30)
-        pdf.multi_cell(0, 5 if not bold else 6, _pdf_safe(text))
+        pdf.multi_cell(0, 5 if not bold else 6, safe(text))
         pdf.set_text_color(30, 30, 30)
 
     # Summary

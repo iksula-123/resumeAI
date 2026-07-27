@@ -102,6 +102,10 @@ _try_include("storage")
 _try_include("keys")
 _try_include("v1")
 _try_include("webhooks")
+_try_include("roles")
+_try_include("career_record")
+_try_include("voice")
+_try_include("writing")
 
 if __name__ == "__main__":
     import uvicorn

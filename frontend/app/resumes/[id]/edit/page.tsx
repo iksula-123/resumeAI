@@ -7,7 +7,10 @@ import { api } from '@/lib/api'
 import AppShell from '@/components/AppShell'
 import CircularScore from '@/components/CircularScore'
 import ResumeTemplates, { TEMPLATE_LIST } from '@/components/ResumeTemplates'
-import VersionHistory from '@/components/VersionHistory'
+import dynamic from 'next/dynamic'
+
+// Version history is a rarely-opened drawer — load its code on demand.
+const VersionHistory = dynamic(() => import('@/components/VersionHistory'), { ssr: false })
 import { CATEGORY_NAMES, detectCategory, suggestSkills, popularForCategory } from '@/lib/skillsData'
 
 /* ─── Types ───────────────────────────────────────────────────── */
@@ -537,6 +540,7 @@ export default function EditResumePage() {
   const [atsMissing, setAtsMissing] = useState<string[]>([])
   const [aiGenerating, setAiGenerating] = useState<string | null>(null)
   const [aiMsg, setAiMsg] = useState('')
+  const [translateLang, setTranslateLang] = useState('es')
   const [centerTab, setCenterTab] = useState<'preview' | 'edit'>('preview')
   const [rightTab, setRightTab] = useState<'assistant' | 'insights' | 'skillgap'>('insights')
   const [gapTarget, setGapTarget] = useState('')
@@ -614,8 +618,6 @@ export default function EditResumePage() {
   const patch = useCallback(<K extends keyof ResumeContent>(key: K, val: ResumeContent[K]) => {
     setContent(c => ({ ...c, [key]: val }))
     setSaved(false)
-    clearTimeout(autoSaveTimer.current)
-    autoSaveTimer.current = setTimeout(() => doSave(), 2000)
   }, [])
 
   const doSave = async () => {
@@ -629,6 +631,19 @@ export default function EditResumePage() {
       setSaving(false)
     }
   }
+
+  // Debounced auto-save: fires whenever the resume actually changes (spec Milestone C).
+  // Skips the initial populate after load so we don't re-save unchanged content.
+  const didLoad = useRef(false)
+  useEffect(() => {
+    if (!resume) return
+    if (!didLoad.current) { didLoad.current = true; return }
+    setSaved(false)
+    clearTimeout(autoSaveTimer.current)
+    autoSaveTimer.current = setTimeout(() => { doSave() }, 1500)
+    return () => clearTimeout(autoSaveTimer.current)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [content, title, templateId, resume])
 
   const scoreAts = async () => {
     if (!jd.trim()) return
@@ -773,6 +788,32 @@ export default function EditResumePage() {
       clearTimeout(autoSaveTimer.current)
       autoSaveTimer.current = setTimeout(() => doSave(), 1200)
       setAiMsg(changes.length ? `✓ Improved: ${changes.join(', ')}` : 'Already looks great — nothing to add!')
+    } finally {
+      setAiGenerating(null)
+      setTimeout(() => setAiMsg(''), 6000)
+    }
+  }
+
+  // Translate the resume and save a localized copy
+  const LANGS: [string, string][] = [
+    ['es', 'Spanish'], ['fr', 'French'], ['de', 'German'], ['it', 'Italian'],
+    ['nl', 'Dutch'], ['pt', 'Portuguese'], ['ar', 'Arabic'], ['ja', 'Japanese'],
+    ['zh', 'Chinese'], ['hi', 'Hindi'], ['mr', 'Marathi'], ['en', 'English'],
+  ]
+  const translateAndSave = async () => {
+    setAiGenerating('translate'); setAiMsg('')
+    try {
+      const r = await api.post<{ translated: boolean; content: ResumeContent; detail?: string }>(
+        '/api/ai/translate-resume', { content, target_language: translateLang })
+      if (!r.translated) { setAiMsg(r.detail || 'Translation unavailable right now.'); return }
+      const langName = LANGS.find(l => l[0] === translateLang)?.[1] || translateLang
+      const saved = await api.post<{ id: string }>('/api/resumes/', {
+        title: `${title} (${langName})`, template_id: templateId, content: r.content,
+      })
+      setAiMsg(`✓ Saved a ${langName} copy`)
+      setTimeout(() => router.push(`/resumes/${saved.id}/edit`), 800)
+    } catch (e) {
+      setAiMsg(e instanceof Error ? e.message : 'Translation failed.')
     } finally {
       setAiGenerating(null)
       setTimeout(() => setAiMsg(''), 6000)
@@ -1176,6 +1217,22 @@ export default function EditResumePage() {
                 {content.summary && (
                   <div className="mt-2 text-xs text-gray-600 bg-gray-50 rounded-lg p-3">{content.summary}</div>
                 )}
+              </div>
+
+              {/* Multilingual (Phase 3) */}
+              <div className="rounded-xl border border-gray-100 p-3">
+                <div className="text-xs font-semibold text-gray-700 mb-2">🌐 Translate resume</div>
+                <div className="flex gap-2">
+                  <select value={translateLang} onChange={e => setTranslateLang(e.target.value)}
+                    className="flex-1 border border-gray-200 rounded-lg px-2 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-300">
+                    {LANGS.map(([code, name]) => <option key={code} value={code}>{name}</option>)}
+                  </select>
+                  <button onClick={translateAndSave} disabled={aiGenerating !== null}
+                    className="bg-gradient-to-r from-teal-500 to-cyan-500 text-white px-3 py-2 rounded-lg text-xs hover:opacity-90 transition disabled:opacity-50 whitespace-nowrap">
+                    {aiGenerating === 'translate' ? '🌐 Translating…' : 'Translate & Save'}
+                  </button>
+                </div>
+                <p className="text-[11px] text-gray-400 mt-1.5">Saves a translated copy as a new resume.</p>
               </div>
 
               <div>

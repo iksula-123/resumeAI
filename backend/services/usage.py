@@ -34,6 +34,59 @@ def _as_uuid(v):
         return None
 
 
+# Active learner-pilot tenant (spec Section 2). Matches the seed in migration 0003.
+PILOT_TENANT_ID = "00000000-0000-0000-0000-0000000000e1"
+
+
+def tenant_of(user) -> str:
+    """Resolve a user's tenant for cost attribution (defaults to the pilot tenant)."""
+    tid = getattr(user, "tenant_id", None)
+    return str(tid) if tid else PILOT_TENANT_ID
+
+
+async def log_usage_event(
+    user_id: str | None,
+    event_type: str,
+    *,
+    ai_provider: str | None = None,
+    tokens: int | None = None,
+    cost_estimate: float | None = None,
+    tenant_id: str | None = None,
+    metadata: dict | None = None,
+) -> None:
+    """Record one billable/product event into public.usage_events (best-effort).
+
+    Per-tenant cost attribution is a Phase-1 deliverable (spec Section 2/7): every
+    AI call, resume created, and download is logged with tenant_id + a cost estimate.
+    Never breaks the calling feature.
+    """
+    try:
+        import json
+        from sqlalchemy import text
+        from database import AsyncSessionLocal
+        async with AsyncSessionLocal() as s:
+            await s.execute(
+                text(
+                    "insert into public.usage_events "
+                    "(tenant_id, user_id, event_type, ai_provider, tokens, cost_estimate, metadata) "
+                    "values (:tenant_id, :user_id, :event_type, :ai_provider, :tokens, :cost_estimate, "
+                    "cast(:metadata as jsonb))"
+                ),
+                {
+                    "tenant_id": tenant_id or PILOT_TENANT_ID,
+                    "user_id": _as_uuid(user_id),
+                    "event_type": event_type,
+                    "ai_provider": ai_provider,
+                    "tokens": int(tokens) if tokens else None,
+                    "cost_estimate": cost_estimate,
+                    "metadata": json.dumps(metadata or {}),
+                },
+            )
+            await s.commit()
+    except Exception as exc:
+        logger.debug("usage_event skipped: %s", exc)
+
+
 async def record_usage(model: str, input_tokens: int, output_tokens: int) -> None:
     """Persist one AI call's token usage (best-effort)."""
     try:

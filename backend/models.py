@@ -28,6 +28,7 @@ class Profile(Base):
     __tablename__ = "profiles"
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    tenant_id = Column(UUID(as_uuid=True), nullable=True)  # multi-tenant (spec Section 2); DB defaults to the pilot tenant
     email = Column(String(255), unique=True, nullable=False, index=True)
     full_name = Column(String(255), nullable=True)
     avatar_url = Column(Text, nullable=True)

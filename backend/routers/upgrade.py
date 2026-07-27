@@ -11,10 +11,9 @@ from pydantic import BaseModel
 
 from models import User
 from services.deps import get_current_user
-from services.parsing import extract_text, quick_contact
+from services.parsing import extract_text, quick_contact, validate_upload, InvalidUpload
 from services.ai import parse_resume_to_content, enhance_resume, _normalize_content
 from services.ats import analyze_resume
-from services.storage import upload_bytes
 from services.usage import set_usage_context
 
 router = APIRouter(prefix="/api/upgrade", tags=["AI Upgrade"])
@@ -38,6 +37,12 @@ async def parse(file: UploadFile = File(...), user: User = Depends(get_current_u
     if not data:
         raise HTTPException(status_code=400, detail="The file appears to be empty.")
 
+    # Verify the bytes really match the claimed type before extracting / calling AI / storing.
+    try:
+        validate_upload(file.filename, data)
+    except InvalidUpload as exc:
+        raise HTTPException(status_code=400, detail=str(exc))
+
     text = extract_text(file.filename, data)
     if len(text.strip()) < 30:
         raise HTTPException(status_code=422, detail="Couldn't read text from this file. If it's a scanned image, try a text-based PDF or DOCX.")
@@ -48,13 +53,12 @@ async def parse(file: UploadFile = File(...), user: User = Depends(get_current_u
         # AI unavailable → minimal heuristic parse so the flow still works
         content = _normalize_content({"personalInfo": quick_contact(text), "summary": text[:400]})
 
-    # Best-effort: archive the original upload to Supabase Storage
-    stored_path = upload_bytes(
-        str(user.id), "original", file.filename or "resume", data,
-        file.content_type or "application/octet-stream",
-    )
+    # Privacy non-negotiable (spec Section 6): the uploaded CV is processed in
+    # memory and NEVER retained. We keep only the structured content the user sees;
+    # the raw bytes are discarded when this request ends.
+    del data
 
-    return {"content": content, "chars": len(text), "stored_path": stored_path}
+    return {"content": content, "chars": len(text), "retained": False}
 
 
 @router.post("/analyze")
