@@ -122,7 +122,7 @@ export default function AdminPage() {
     <>
       <div className="flex-1">
         <h1 className="text-sm font-semibold text-gray-800 flex items-center gap-2">🛡️ Admin Panel</h1>
-        <p className="text-xs text-gray-400">Manage users, roles, and platform data</p>
+        <p className="text-xs text-gray-500">Manage users, roles, and platform data</p>
       </div>
       <button onClick={load} className="text-xs text-indigo-600 bg-indigo-50 hover:bg-indigo-100 px-3 py-1.5 rounded-lg transition">
         ↻ Refresh
@@ -182,7 +182,7 @@ export default function AdminPage() {
               <div className="panel-premium p-5">
                 <h3 className="font-semibold text-gray-800 mb-3 text-sm">Tokens by feature</h3>
                 {analytics.ai.per_feature.length === 0 ? (
-                  <p className="text-xs text-gray-400 py-4">No AI usage recorded yet — it populates as AI features are used.</p>
+                  <p className="text-xs text-gray-500 py-4">No AI usage recorded yet — it populates as AI features are used.</p>
                 ) : (
                   <div className="space-y-2.5">
                     {(() => {
@@ -205,18 +205,18 @@ export default function AdminPage() {
               <div className="panel-premium p-5">
                 <h3 className="font-semibold text-gray-800 mb-3 text-sm">Top users by AI usage</h3>
                 {analytics.ai.top_users.length === 0 ? (
-                  <p className="text-xs text-gray-400 py-4">No per-user usage yet.</p>
+                  <p className="text-xs text-gray-500 py-4">No per-user usage yet.</p>
                 ) : (
                   <div className="divide-y divide-gray-100">
                     {analytics.ai.top_users.map((u, i) => (
                       <div key={u.email} className="flex items-center justify-between py-2">
                         <div className="flex items-center gap-2 min-w-0">
-                          <span className="text-xs text-gray-400 w-4">{i + 1}</span>
+                          <span className="text-xs text-gray-500 w-4">{i + 1}</span>
                           <span className="text-sm text-gray-700 truncate">{u.email}</span>
                         </div>
                         <div className="text-right flex-shrink-0">
                           <div className="text-xs font-semibold text-gray-800">{u.tokens.toLocaleString()} tok</div>
-                          <div className="text-[11px] text-gray-400">${u.cost.toFixed(4)}</div>
+                          <div className="text-[11px] text-gray-500">${u.cost.toFixed(4)}</div>
                         </div>
                       </div>
                     ))}
@@ -235,7 +235,7 @@ export default function AdminPage() {
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="text-left text-xs text-gray-400 border-b border-gray-100">
+                <tr className="text-left text-xs text-gray-500 border-b border-gray-100">
                   <th className="px-5 py-3 font-medium">User</th>
                   <th className="px-5 py-3 font-medium">Role</th>
                   <th className="px-5 py-3 font-medium">Plan</th>
@@ -256,7 +256,7 @@ export default function AdminPage() {
                           </div>
                           <div>
                             <div className="font-medium text-gray-800">{u.full_name || '—'} {isSelf && <span className="text-xs text-indigo-500">(you)</span>}</div>
-                            <div className="text-xs text-gray-400">{u.email}</div>
+                            <div className="text-xs text-gray-500">{u.email}</div>
                           </div>
                         </div>
                       </td>
@@ -271,7 +271,7 @@ export default function AdminPage() {
                           {u.is_active ? 'Active' : 'Disabled'}
                         </span>
                       </td>
-                      <td className="px-5 py-3 text-xs text-gray-400">
+                      <td className="px-5 py-3 text-xs text-gray-500">
                         {u.last_login ? new Date(u.last_login).toLocaleDateString() : 'Never'}
                       </td>
                       <td className="px-5 py-3">
@@ -309,10 +309,10 @@ export default function AdminPage() {
         <div className="panel-premium overflow-hidden mt-8">
           <div className="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
             <h2 className="font-semibold text-gray-800">Audit Log</h2>
-            <span className="text-xs text-gray-400">{audit.length} recent events</span>
+            <span className="text-xs text-gray-500">{audit.length} recent events</span>
           </div>
           {audit.length === 0 ? (
-            <p className="text-sm text-gray-400 text-center py-8">No audit events yet.</p>
+            <p className="text-sm text-gray-500 text-center py-8">No audit events yet.</p>
           ) : (
             <div className="divide-y divide-gray-50 max-h-[420px] overflow-y-auto">
               {audit.map(a => (
@@ -321,10 +321,10 @@ export default function AdminPage() {
                   <div className="flex-1 min-w-0">
                     <span className="text-sm text-gray-700">{a.actor_email || 'system'}</span>
                     {a.entity_type && (
-                      <span className="text-xs text-gray-400"> · {a.entity_type}{a.meta?.title ? ` “${String(a.meta.title)}”` : a.meta?.email ? ` (${String(a.meta.email)})` : ''}</span>
+                      <span className="text-xs text-gray-500"> · {a.entity_type}{a.meta?.title ? ` “${String(a.meta.title)}”` : a.meta?.email ? ` (${String(a.meta.email)})` : ''}</span>
                     )}
                   </div>
-                  <span className="text-xs text-gray-400 whitespace-nowrap flex-shrink-0">
+                  <span className="text-xs text-gray-500 whitespace-nowrap flex-shrink-0">
                     {a.created_at ? new Date(a.created_at).toLocaleString() : ''}
                   </span>
                 </div>

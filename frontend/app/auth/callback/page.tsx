@@ -60,7 +60,7 @@ export default function AuthCallbackPage() {
           <>
             <div className="text-red-500 text-4xl">⚠️</div>
             <p className="text-gray-700 text-sm font-medium">Could not sign you in</p>
-            <p className="text-gray-400 text-xs">{error}</p>
+            <p className="text-gray-500 text-xs">{error}</p>
             <button
               onClick={() => router.replace('/auth/login')}
               className="mt-2 bg-indigo-600 text-white text-sm px-4 py-2 rounded-lg hover:bg-indigo-700 transition"

@@ -118,7 +118,7 @@ export default function JobMatchPage() {
   const topBar = (
     <div className="flex-1">
       <h1 className="text-sm font-semibold text-gray-800 flex items-center gap-2">🧲 Job Match</h1>
-      <p className="text-xs text-gray-400">Match a saved resume against a job description</p>
+      <p className="text-xs text-gray-500">Match a saved resume against a job description</p>
     </div>
   )
 
@@ -159,7 +159,7 @@ export default function JobMatchPage() {
           {/* Result */}
           <div className="panel-premium p-5">
             {!result && !analyzing && (
-              <div className="h-full flex flex-col items-center justify-center text-center text-gray-400 py-16">
+              <div className="h-full flex flex-col items-center justify-center text-center text-gray-500 py-16">
                 <div className="text-4xl mb-2">🧲</div>
                 <p className="text-sm">Your match report appears here.</p>
               </div>

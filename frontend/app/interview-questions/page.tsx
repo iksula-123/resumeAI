@@ -110,7 +110,7 @@ export default function InterviewQuestionsPage() {
     <>
       <div className="flex-1">
         <h1 className="text-sm font-semibold text-gray-800">Interview Questions</h1>
-        <p className="text-xs text-gray-400">AI-generated questions to ace your interview</p>
+        <p className="text-xs text-gray-500">AI-generated questions to ace your interview</p>
       </div>
       <div className="flex items-center gap-2 text-xs text-orange-600 bg-orange-50 px-3 py-1.5 rounded-full">
         <span>💬</span> Interview Prep
@@ -124,7 +124,7 @@ export default function InterviewQuestionsPage() {
         {/* Generator */}
         <div className="panel-premium p-5 mb-6">
           <h2 className="font-semibold text-gray-800 mb-1">Generate Interview Questions</h2>
-          <p className="text-xs text-gray-400 mb-4">Pick a role from your resumes or type any job title — questions update automatically.</p>
+          <p className="text-xs text-gray-500 mb-4">Pick a role from your resumes or type any job title — questions update automatically.</p>
 
           {roles.length > 0 && (
             <div className="mb-3">
@@ -157,7 +157,7 @@ export default function InterviewQuestionsPage() {
             <div className="mt-3 text-xs text-green-700">✓ Showing AI questions tailored for <span className="font-semibold">{jobTitle}</span></div>
           )}
           {!isAiSet && !loading && (
-            <div className="mt-3 text-xs text-gray-400">Showing sample questions — select a role above to tailor them.</div>
+            <div className="mt-3 text-xs text-gray-500">Showing sample questions — select a role above to tailor them.</div>
           )}
         </div>
 
@@ -170,7 +170,7 @@ export default function InterviewQuestionsPage() {
               </div>
               <div>
                 <div className="text-xl font-bold text-gray-800">{counts[type]}</div>
-                <div className="text-xs text-gray-400">{type} Questions</div>
+                <div className="text-xs text-gray-500">{type} Questions</div>
               </div>
             </div>
           ))}

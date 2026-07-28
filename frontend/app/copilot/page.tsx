@@ -125,7 +125,7 @@ export default function CopilotPage() {
               }`}>
                 {m.content}
                 {m.role === 'assistant' && m.ai === false && (
-                  <span className="block mt-2 text-[11px] text-gray-400">Offline guidance — AI is at capacity right now.</span>
+                  <span className="block mt-2 text-[11px] text-gray-500">Offline guidance — AI is at capacity right now.</span>
                 )}
               </div>
             </div>
@@ -164,7 +164,7 @@ export default function CopilotPage() {
               Send
             </button>
           </form>
-          <p className="text-[11px] text-gray-400 text-center mt-2">Copilot can make mistakes — verify important details.</p>
+          <p className="text-[11px] text-gray-500 text-center mt-2">Copilot can make mistakes — verify important details.</p>
         </div>
       </div>
     </AppShell>

@@ -40,7 +40,7 @@ export default function AtsCheckerPage() {
     <>
       <div className="flex-1">
         <h1 className="text-sm font-semibold text-gray-800">ATS Checker</h1>
-        <p className="text-xs text-gray-400">Score your resume against job descriptions</p>
+        <p className="text-xs text-gray-500">Score your resume against job descriptions</p>
       </div>
       <div className="flex items-center gap-2 text-xs text-green-600 bg-green-50 px-3 py-1.5 rounded-full">
         <span>🎯</span> ATS Optimized
@@ -85,7 +85,7 @@ export default function AtsCheckerPage() {
             <div className="panel-premium p-6 flex flex-col items-center">
               <CircularScore score={result.score} size={120} color={scoreColor(result.score)} />
               <div className="font-bold text-lg mt-3" style={{ color: scoreColor(result.score) }}>{scoreLabel(result.score)}</div>
-              <p className="text-xs text-gray-400 text-center mt-1">
+              <p className="text-xs text-gray-500 text-center mt-1">
                 {result.score >= 80 ? 'Great match! This resume will likely pass ATS.' : 'Add missing keywords to improve your score.'}
               </p>
 

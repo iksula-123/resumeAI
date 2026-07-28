@@ -134,7 +134,7 @@ export default function DashboardPage() {
     <>
       <div className="flex-1">
         <div className="relative w-64">
-          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">🔍</span>
+          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-sm">🔍</span>
           <input placeholder="Search resumes..." className="w-full pl-9 pr-4 py-2 bg-white/70 border border-white/60 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300/60 backdrop-blur" />
         </div>
       </div>
@@ -237,13 +237,13 @@ export default function DashboardPage() {
                       {resume.ats_score != null && (
                         <div className="absolute top-3 right-3 bg-white rounded-full w-10 h-10 flex flex-col items-center justify-center shadow-sm">
                           <div className="text-xs font-bold" style={{ color: scoreColor(resume.ats_score) }}>{resume.ats_score}</div>
-                          <div className="text-gray-400" style={{ fontSize: 8 }}>ATS</div>
+                          <div className="text-gray-500" style={{ fontSize: 8 }}>ATS</div>
                         </div>
                       )}
                     </div>
                     <div className="p-4">
                       <h3 className="font-semibold text-gray-800 mb-1 truncate">{resume.title}</h3>
-                      <p className="text-xs text-gray-400 mb-4">Updated {relTime(resume.updated_at)}</p>
+                      <p className="text-xs text-gray-500 mb-4">Updated {relTime(resume.updated_at)}</p>
                       <div className="flex gap-2">
                         <button onClick={() => router.push(`/resumes/${resume.id}/edit`)}
                           className="flex-1 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-xs font-medium py-2 rounded-lg transition">Edit</button>
@@ -278,7 +278,7 @@ export default function DashboardPage() {
               {loading ? (
                 <div className="space-y-3">{[0, 1, 2, 3].map(i => <div key={i} className="h-10 rounded-lg bg-gray-100 shimmer" />)}</div>
               ) : activity.length === 0 ? (
-                <div className="text-center py-10 text-gray-400 text-sm">
+                <div className="text-center py-10 text-gray-500 text-sm">
                   <div className="text-3xl mb-2">🗂️</div>
                   Nothing yet — your recent edits and applications will show here.
                 </div>
@@ -294,7 +294,7 @@ export default function DashboardPage() {
                           <span className="text-base">{a.icon}</span>
                           <div className="min-w-0 flex-1">
                             <div className="text-xs font-medium text-gray-800 truncate group-hover:text-indigo-700 transition">{a.label}</div>
-                            <div className="text-[11px] text-gray-400 capitalize">{('sub' in a && a.sub) ? `${a.sub} · ` : ''}{relTime(a.time)}</div>
+                            <div className="text-[11px] text-gray-500 capitalize">{('sub' in a && a.sub) ? `${a.sub} · ` : ''}{relTime(a.time)}</div>
                           </div>
                         </div>
                       </button>
@@ -319,7 +319,7 @@ export default function DashboardPage() {
                 {item.icon}
               </div>
               <div className="font-semibold text-sm text-gray-800">{item.title}</div>
-              <div className="text-xs text-gray-400 mt-0.5">{item.desc}</div>
+              <div className="text-xs text-gray-500 mt-0.5">{item.desc}</div>
             </button>
           ))}
         </div>

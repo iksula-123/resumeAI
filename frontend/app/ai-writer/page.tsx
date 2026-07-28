@@ -44,7 +44,7 @@ export default function AiWriterPage() {
     <>
       <div className="flex-1">
         <h1 className="text-sm font-semibold text-gray-800">AI Writer</h1>
-        <p className="text-xs text-gray-400">Let AI craft your perfect resume content</p>
+        <p className="text-xs text-gray-500">Let AI craft your perfect resume content</p>
       </div>
       <div className="flex items-center gap-2 text-xs text-purple-600 bg-purple-50 px-3 py-1.5 rounded-full">
         <span>✨</span> AI Powered
@@ -148,7 +148,7 @@ export default function AiWriterPage() {
                       Copy
                     </button>
                     <button onClick={() => setOutput('')}
-                      className="text-xs text-gray-400 hover:text-gray-600 px-3 py-1.5 rounded-lg hover:bg-gray-50 transition">
+                      className="text-xs text-gray-500 hover:text-gray-600 px-3 py-1.5 rounded-lg hover:bg-gray-50 transition">
                       Clear
                     </button>
                   </div>

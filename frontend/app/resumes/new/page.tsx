@@ -41,7 +41,7 @@ export default function NewResumePage() {
           <>
             <div className="text-red-500 text-4xl">⚠️</div>
             <p className="text-gray-700 text-sm font-medium">Could not create resume</p>
-            <p className="text-gray-400 text-xs">{error}</p>
+            <p className="text-gray-500 text-xs">{error}</p>
             <div className="flex gap-2 mt-2">
               <button onClick={() => { started.current = false; setError(''); location.reload() }}
                 className="bg-indigo-600 text-white text-sm px-4 py-2 rounded-lg hover:bg-indigo-700 transition">

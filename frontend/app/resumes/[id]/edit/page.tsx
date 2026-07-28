@@ -383,7 +383,7 @@ function SkillsEditor({ data, onChange, jobTitle }: { data: Skill[], onChange: (
             ))}
           </div>
         ) : (
-          <p className="text-xs text-gray-400">All suggestions added — type to search for more.</p>
+          <p className="text-xs text-gray-500">All suggestions added — type to search for more.</p>
         )}
       </div>
 
@@ -400,7 +400,7 @@ function SkillsEditor({ data, onChange, jobTitle }: { data: Skill[], onChange: (
                 <input type="range" min="20" max="100" step="10" value={s.level}
                   onChange={e => updLevel(i, +e.target.value)}
                   className="flex-1 accent-indigo-600" />
-                <span className="text-xs text-gray-400 w-6">{s.level}%</span>
+                <span className="text-xs text-gray-500 w-6">{s.level}%</span>
               </div>
             </div>
           </div>
@@ -866,14 +866,14 @@ export default function EditResumePage() {
 
   const topBar = (
     <>
-      <button onClick={() => router.push('/dashboard')} className="text-gray-400 hover:text-gray-700 text-sm flex items-center gap-1">
+      <button onClick={() => router.push('/dashboard')} className="text-gray-500 hover:text-gray-700 text-sm flex items-center gap-1">
         ← Dashboard
       </button>
       <div className="flex-1 flex items-center gap-2 ml-4">
         <input value={title} onChange={e => setTitle(e.target.value)}
           className="font-semibold text-gray-800 bg-transparent border-b border-transparent hover:border-gray-300 focus:border-indigo-400 focus:outline-none px-1 py-0.5 text-sm w-64"
         />
-        <span className="text-xs text-gray-400">
+        <span className="text-xs text-gray-500">
           {saving ? 'Saving…' : saved ? '✓ Saved' : 'Unsaved'}
         </span>
       </div>
@@ -947,7 +947,7 @@ export default function EditResumePage() {
                   <div className="flex-1 min-w-0">
                     <div className="font-medium truncate">{sec.label}</div>
                     {!sectionComplete(sec.key) && (
-                      <div className="text-xs text-gray-400">Add your {sec.label.toLowerCase()}</div>
+                      <div className="text-xs text-gray-500">Add your {sec.label.toLowerCase()}</div>
                     )}
                   </div>
                   {sectionComplete(sec.key) && (
@@ -1051,7 +1051,7 @@ export default function EditResumePage() {
             ] as const).map(([t, label]) => (
               <button key={t} onClick={() => setRightTab(t)}
                 className={`flex-1 py-3 text-xs font-medium transition ${
-                  rightTab === t ? 'text-indigo-700 border-b-2 border-indigo-600' : 'text-gray-400 hover:text-gray-600'
+                  rightTab === t ? 'text-indigo-700 border-b-2 border-indigo-600' : 'text-gray-500 hover:text-gray-600'
                 }`}>
                 {label}
               </button>
@@ -1064,14 +1064,14 @@ export default function EditResumePage() {
               <div className="px-4 py-4 border-b border-gray-100">
                 <div className="flex items-center justify-between mb-3">
                   <span className="text-sm font-semibold text-gray-800">ATS Score</span>
-                  <button className="text-xs text-gray-400">▲</button>
+                  <button className="text-xs text-gray-500">▲</button>
                 </div>
                 <div className="flex flex-col items-center py-2">
                   <CircularScore score={atsScore} max={100} size={100} color={atsScore >= 80 ? '#22c55e' : atsScore >= 60 ? '#f59e0b' : '#ef4444'} />
                   <div className={`text-xs font-medium mt-2 ${atsScore >= 80 ? 'text-green-600' : atsScore >= 60 ? 'text-yellow-600' : 'text-red-600'}`}>
                     {atsScore >= 80 ? 'Excellent' : atsScore >= 60 ? 'Good' : 'Needs Work'}
                   </div>
-                  <p className="text-xs text-gray-400 text-center mt-1">
+                  <p className="text-xs text-gray-500 text-center mt-1">
                     {atsScore >= 80 ? 'This resume is highly likely to pass ATS.' : 'Add more keywords to improve your score.'}
                   </p>
                 </div>
@@ -1146,7 +1146,7 @@ export default function EditResumePage() {
                       <div key={h.id} className="flex items-center justify-between text-xs bg-gray-50 rounded-lg px-3 py-2">
                         <div className="min-w-0">
                           <div className="text-gray-700 truncate">{h.job_title || 'Untitled scan'}</div>
-                          <div className="text-gray-400" style={{ fontSize: 10 }}>
+                          <div className="text-gray-500" style={{ fontSize: 10 }}>
                             {h.created_at ? new Date(h.created_at).toLocaleString() : ''}
                           </div>
                         </div>
@@ -1232,13 +1232,13 @@ export default function EditResumePage() {
                     {aiGenerating === 'translate' ? '🌐 Translating…' : 'Translate & Save'}
                   </button>
                 </div>
-                <p className="text-[11px] text-gray-400 mt-1.5">Saves a translated copy as a new resume.</p>
+                <p className="text-[11px] text-gray-500 mt-1.5">Saves a translated copy as a new resume.</p>
               </div>
 
               <div>
                 <div className="text-xs font-semibold text-gray-700 mb-2">Work Experience Bullets</div>
                 {content.experience.length === 0 ? (
-                  <p className="text-xs text-gray-400">Add work experience first</p>
+                  <p className="text-xs text-gray-500">Add work experience first</p>
                 ) : (
                   content.experience.map((exp, i) => (
                     <button key={exp.id} onClick={() => generateBullets(i)} disabled={aiGenerating === 'bullets'}
@@ -1270,7 +1270,7 @@ export default function EditResumePage() {
             <div className="flex-1 overflow-y-auto p-4 space-y-4">
               <div>
                 <div className="text-xs font-semibold text-gray-800 mb-1">Target role or job description</div>
-                <p className="text-[11px] text-gray-400 mb-2">See which required skills you have vs. are missing.</p>
+                <p className="text-[11px] text-gray-500 mb-2">See which required skills you have vs. are missing.</p>
                 <textarea
                   value={gapTarget}
                   onChange={e => setGapTarget(e.target.value)}
@@ -1297,7 +1297,7 @@ export default function EditResumePage() {
                     <div className="text-xs font-semibold text-gray-800 mb-2">Skill Match</div>
                     <CircularScore score={gap.match_score} size={96}
                       color={gap.match_score >= 80 ? '#22c55e' : gap.match_score >= 50 ? '#f59e0b' : '#ef4444'} />
-                    <div className="text-xs text-gray-400 mt-2 text-center">
+                    <div className="text-xs text-gray-500 mt-2 text-center">
                       {gap.matched.length} of {gap.required.length} key skills present
                     </div>
                   </div>

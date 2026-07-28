@@ -20,7 +20,7 @@ const NAV = [
   { href: '/settings', icon: '⚙️', label: 'Settings' },
 ]
 
-export default function Sidebar() {
+export default function Sidebar({ open = true, onClose }: { open?: boolean; onClose?: () => void }) {
   const pathname = usePathname()
   const router = useRouter()
   const { logout, user } = useAuthStore()
@@ -38,9 +38,12 @@ export default function Sidebar() {
   const isActive = (href: string) => href === activeHref
 
   return (
-    <aside className="glass fixed top-0 left-0 h-screen w-56 border-r border-white/40 flex flex-col z-40 shadow-glass">
-      {/* Logo */}
+    <aside className={`glass fixed top-0 left-0 h-screen w-56 border-r border-white/40 flex flex-col z-50 shadow-glass
+                       transform transition-transform duration-200 ${open ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0`}>
+      {/* Logo + mobile close */}
       <div className="px-4 py-5 border-b border-white/40">
+        <button onClick={onClose} aria-label="Close menu"
+          className="md:hidden absolute top-4 right-3 text-gray-500 hover:text-gray-800 text-lg">✕</button>
         <div className="flex items-center gap-2.5">
           <div className="w-9 h-9 bg-brand-gradient rounded-xl flex items-center justify-center text-white font-bold shadow-glow">
             S
@@ -55,14 +58,14 @@ export default function Sidebar() {
       {/* Create buttons */}
       <div className="px-3 py-3 space-y-2">
         <button
-          onClick={() => router.push('/resumes/build')}
+          onClick={() => { onClose?.(); router.push('/resumes/build') }}
           className="btn-primary w-full text-sm py-2.5"
         >
           <span className="text-base leading-none">✨</span>
           Build from Role
         </button>
         <button
-          onClick={() => router.push('/resumes/new')}
+          onClick={() => { onClose?.(); router.push('/resumes/new') }}
           className="w-full text-sm py-2 rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50 transition"
         >
           Blank resume
@@ -77,6 +80,7 @@ export default function Sidebar() {
             <Link
               key={item.href}
               href={item.href}
+              onClick={onClose}
               className={`group relative flex items-center gap-3 px-3 py-2.5 rounded-xl mb-1 text-sm transition-all duration-200 ${
                 active
                   ? 'text-white font-semibold shadow-glow'
@@ -112,7 +116,7 @@ export default function Sidebar() {
           </div>
           <button
             onClick={() => { logout(); router.push('/auth/login') }}
-            className="text-gray-400 hover:text-red-500 transition text-sm ml-1 flex-shrink-0"
+            className="text-gray-500 hover:text-red-500 transition text-sm ml-1 flex-shrink-0"
             title="Logout"
           >
             ⏻

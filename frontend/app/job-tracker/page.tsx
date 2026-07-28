@@ -121,7 +121,7 @@ export default function JobTrackerPage() {
     <>
       <div className="flex-1">
         <h1 className="text-sm font-semibold text-gray-800">Job Tracker</h1>
-        <p className="text-xs text-gray-400">Track every application through your pipeline</p>
+        <p className="text-xs text-gray-500">Track every application through your pipeline</p>
       </div>
       <button onClick={openAdd} className="btn-primary text-xs !py-2 !px-4">+ Add Application</button>
     </>
@@ -142,7 +142,7 @@ export default function JobTrackerPage() {
             <div key={s.label} className="card-premium p-4">
               <div className={`w-9 h-9 ${s.color} rounded-xl flex items-center justify-center text-lg mb-2`}>{s.icon}</div>
               <div className="text-xl font-bold text-gray-800 font-display">{s.value}</div>
-              <div className="text-xs text-gray-400">{s.label}</div>
+              <div className="text-xs text-gray-500">{s.label}</div>
             </div>
           ))}
         </div>
@@ -167,7 +167,7 @@ export default function JobTrackerPage() {
                   <div className="flex items-center gap-2 mb-2 px-1">
                     <span className={`w-2 h-2 rounded-full ${col.dot}`} />
                     <span className="text-xs font-semibold text-gray-700">{col.label}</span>
-                    <span className="text-xs text-gray-400">{items.length}</span>
+                    <span className="text-xs text-gray-500">{items.length}</span>
                   </div>
                   <div className="flex-1 space-y-2.5 rounded-2xl bg-gray-50/60 p-2 min-h-[120px]">
                     {items.map(a => {
@@ -182,8 +182,8 @@ export default function JobTrackerPage() {
                             <button onClick={() => remove(a)} disabled={busy === a.id}
                               className="opacity-0 group-hover:opacity-100 text-gray-300 hover:text-red-400 text-sm transition">×</button>
                           </div>
-                          {a.location && <div className="text-[11px] text-gray-400 mt-1">📍 {a.location}</div>}
-                          {a.salary && <div className="text-[11px] text-gray-400">💰 {a.salary}</div>}
+                          {a.location && <div className="text-[11px] text-gray-500 mt-1">📍 {a.location}</div>}
+                          {a.salary && <div className="text-[11px] text-gray-500">💰 {a.salary}</div>}
                           {a.next_action && (
                             <div className={`text-[11px] mt-1.5 px-2 py-0.5 rounded-full inline-block ${
                               isOverdue(a.next_action) ? 'bg-red-100 text-red-600'
@@ -200,7 +200,7 @@ export default function JobTrackerPage() {
                           )}
                           {a.status !== 'rejected' && a.status !== 'joined' && (
                             <button onClick={() => move(a, 'rejected')} disabled={busy === a.id}
-                              className="mt-1 w-full text-[11px] text-gray-400 hover:text-red-500 py-0.5 transition">
+                              className="mt-1 w-full text-[11px] text-gray-500 hover:text-red-500 py-0.5 transition">
                               Mark rejected
                             </button>
                           )}

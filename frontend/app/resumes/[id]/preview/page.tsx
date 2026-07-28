@@ -63,7 +63,7 @@ export default function PreviewPage() {
 
   const topBar = (
     <>
-      <button onClick={() => router.push(`/resumes/${id}/edit`)} className="text-gray-400 hover:text-gray-700 text-sm flex items-center gap-1">
+      <button onClick={() => router.push(`/resumes/${id}/edit`)} className="text-gray-500 hover:text-gray-700 text-sm flex items-center gap-1">
         ← Edit
       </button>
       <span className="font-semibold text-gray-800 text-sm ml-4">{resume?.title}</span>
@@ -106,7 +106,7 @@ export default function PreviewPage() {
             <div className="bg-white rounded-2xl shadow-sm p-5 flex flex-col items-center">
               <div className="text-sm font-semibold text-gray-800 mb-3">ATS Score</div>
               <CircularScore score={resume.ats_score} size={90} color={resume.ats_score >= 80 ? '#22c55e' : '#f59e0b'} />
-              <div className="text-xs text-gray-400 mt-2 text-center">
+              <div className="text-xs text-gray-500 mt-2 text-center">
                 {resume.ats_score >= 80 ? 'Excellent — ready to apply!' : 'Good — a few improvements can help'}
               </div>
             </div>
@@ -125,7 +125,7 @@ export default function PreviewPage() {
                   <span className="text-xl">{opt.icon}</span>
                   <div>
                     <div className="text-xs font-medium text-gray-800">{opt.label}</div>
-                    <div className="text-xs text-gray-400">{opt.desc}</div>
+                    <div className="text-xs text-gray-500">{opt.desc}</div>
                   </div>
                   <span className="ml-auto text-gray-300">→</span>
                 </button>

@@ -40,7 +40,7 @@ export default function PublicResumePage() {
         <div className="rounded-xl border border-gray-200 bg-white overflow-hidden shadow-sm">
           <ResumePreview content={data.content} template={data.template_id || 'modern'} />
         </div>
-        <p className="text-center text-xs text-gray-400 mt-4">Made with SahiCareer · My Resume</p>
+        <p className="text-center text-xs text-gray-500 mt-4">Made with SahiCareer · My Resume</p>
       </div>
     </div>
   )

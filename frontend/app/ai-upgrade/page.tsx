@@ -165,7 +165,7 @@ export default function AiUpgradePage() {
     <>
       <div className="flex-1">
         <h1 className="text-sm font-semibold text-gray-800 flex items-center gap-2">🚀 AI Resume Upgrade</h1>
-        <p className="text-xs text-gray-400">Upload, analyze, and supercharge your resume with AI</p>
+        <p className="text-xs text-gray-500">Upload, analyze, and supercharge your resume with AI</p>
       </div>
       {step > 1 && (
         <button onClick={reset} className="btn-ghost text-xs !py-1.5 !px-3">↺ Start over</button>
@@ -186,11 +186,11 @@ export default function AiUpgradePage() {
               <div key={label} className="flex items-center">
                 <div className="flex items-center gap-2">
                   <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all ${
-                    done ? 'bg-green-500 text-white' : active ? 'bg-brand-gradient text-white shadow-glow' : 'bg-gray-100 text-gray-400'
+                    done ? 'bg-green-500 text-white' : active ? 'bg-brand-gradient text-white shadow-glow' : 'bg-gray-100 text-gray-500'
                   }`}>
                     {done ? '✓' : n}
                   </div>
-                  <span className={`text-xs font-medium hidden sm:block ${active ? 'text-indigo-700' : done ? 'text-gray-600' : 'text-gray-400'}`}>{label}</span>
+                  <span className={`text-xs font-medium hidden sm:block ${active ? 'text-indigo-700' : done ? 'text-gray-600' : 'text-gray-500'}`}>{label}</span>
                 </div>
                 {n < STEPS.length && <div className={`w-6 sm:w-10 h-0.5 mx-1 sm:mx-2 rounded ${done ? 'bg-green-400' : 'bg-gray-200'}`} />}
               </div>
@@ -232,7 +232,7 @@ export default function AiUpgradePage() {
                 <div key={x.t} className="card-premium p-4 text-center">
                   <div className="text-2xl mb-1">{x.icon}</div>
                   <div className="text-sm font-semibold text-gray-800">{x.t}</div>
-                  <div className="text-xs text-gray-400 mt-0.5">{x.d}</div>
+                  <div className="text-xs text-gray-500 mt-0.5">{x.d}</div>
                 </div>
               ))}
             </div>
@@ -246,7 +246,7 @@ export default function AiUpgradePage() {
               <div className="text-center mb-6">
                 <div className="w-14 h-14 mx-auto bg-brand-gradient rounded-2xl flex items-center justify-center text-white text-2xl mb-3 shadow-glow animate-pulse-glow">✨</div>
                 <h2 className="text-lg font-bold text-gray-900 font-display">Upgrading your resume</h2>
-                <p className="text-xs text-gray-400 truncate">{fileName}</p>
+                <p className="text-xs text-gray-500 truncate">{fileName}</p>
               </div>
               <div className="space-y-3">
                 {STAGES.map((s, i) => {
@@ -261,7 +261,7 @@ export default function AiUpgradePage() {
                       }`}>
                         {done ? '✓' : active ? <span className="animate-spin">⟳</span> : s.icon}
                       </div>
-                      <span className={`text-sm ${done ? 'text-gray-700' : active ? 'text-indigo-700 font-medium' : 'text-gray-400'}`}>{s.label}</span>
+                      <span className={`text-sm ${done ? 'text-gray-700' : active ? 'text-indigo-700 font-medium' : 'text-gray-500'}`}>{s.label}</span>
                     </div>
                   )
                 })}

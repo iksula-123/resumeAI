@@ -70,7 +70,7 @@ export default function OAuthButtons() {
 
       <div className="flex items-center gap-3 py-1">
         <div className="flex-1 h-px bg-gray-200" />
-        <span className="text-xs text-gray-400">or continue with email</span>
+        <span className="text-xs text-gray-500">or continue with email</span>
         <div className="flex-1 h-px bg-gray-200" />
       </div>
     </div>

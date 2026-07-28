@@ -44,7 +44,7 @@ export default function TemplatesPage() {
     <>
       <div className="flex-1">
         <h1 className="text-sm font-semibold text-gray-800">Resume Templates</h1>
-        <p className="text-xs text-gray-400">Choose a professional template to get started</p>
+        <p className="text-xs text-gray-500">Choose a professional template to get started</p>
       </div>
     </>
   )
@@ -98,7 +98,7 @@ export default function TemplatesPage() {
                 </div>
                 <div className="p-2.5 bg-white">
                   <div className="font-semibold text-sm text-gray-800">{template.name}</div>
-                  <div className="text-xs text-gray-400">{template.description}</div>
+                  <div className="text-xs text-gray-500">{template.description}</div>
                 </div>
               </div>
             ))}

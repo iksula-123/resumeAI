@@ -30,7 +30,7 @@ function relTime(iso: string | null): string {
 }
 
 const scoreColor = (s: number | null) =>
-  s == null ? 'text-gray-400' : s >= 80 ? 'text-green-600' : s >= 60 ? 'text-amber-600' : 'text-red-500'
+  s == null ? 'text-gray-500' : s >= 80 ? 'text-green-600' : s >= 60 ? 'text-amber-600' : 'text-red-500'
 
 interface Props {
   resumeId: string
@@ -112,7 +112,7 @@ export default function VersionHistory({ resumeId, open, onClose, onRestored }: 
               {[0, 1, 2, 3].map(i => <div key={i} className="h-20 rounded-2xl bg-gray-100 shimmer" />)}
             </div>
           ) : versions.length === 0 ? (
-            <div className="text-center py-16 text-gray-400 text-sm">
+            <div className="text-center py-16 text-gray-500 text-sm">
               <div className="text-4xl mb-2">🕘</div>
               No versions yet — they appear as you edit.
             </div>
@@ -134,13 +134,13 @@ export default function VersionHistory({ resumeId, open, onClose, onRestored }: 
                             <span className={`text-[11px] font-medium px-2 py-0.5 rounded-full ${badge.cls}`}>{badge.icon} {badge.label}</span>
                             {isLatest && <span className="text-[11px] font-medium px-2 py-0.5 rounded-full bg-green-100 text-green-700">Current</span>}
                           </div>
-                          <span className="text-[11px] text-gray-400 whitespace-nowrap">{relTime(v.created_at)}</span>
+                          <span className="text-[11px] text-gray-500 whitespace-nowrap">{relTime(v.created_at)}</span>
                         </div>
                         <div className="flex items-center justify-between gap-2">
                           <div className="min-w-0">
                             <div className="text-sm font-medium text-gray-800 truncate">{v.title || 'Untitled'}</div>
                             {v.ats_score != null && (
-                              <div className="text-xs text-gray-400">ATS <span className={`font-semibold ${scoreColor(v.ats_score)}`}>{v.ats_score}</span></div>
+                              <div className="text-xs text-gray-500">ATS <span className={`font-semibold ${scoreColor(v.ats_score)}`}>{v.ats_score}</span></div>
                             )}
                           </div>
                           {!isLatest && (
@@ -162,7 +162,7 @@ export default function VersionHistory({ resumeId, open, onClose, onRestored }: 
           )}
         </div>
 
-        <div className="px-5 py-3 border-t border-white/50 text-[11px] text-gray-400">
+        <div className="px-5 py-3 border-t border-white/50 text-[11px] text-gray-500">
           Snapshots are kept automatically (up to 25 most recent).
         </div>
       </aside>

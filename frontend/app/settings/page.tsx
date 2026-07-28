@@ -165,7 +165,7 @@ export default function SettingsPage() {
   const topBar = (
     <div className="flex-1">
       <h1 className="text-sm font-semibold text-gray-800">Settings</h1>
-      <p className="text-xs text-gray-400">Manage your account preferences</p>
+      <p className="text-xs text-gray-500">Manage your account preferences</p>
     </div>
   )
 
@@ -187,7 +187,7 @@ export default function SettingsPage() {
               )}
               <div>
                 <div className="font-semibold text-gray-800">{user?.full_name || 'User'}</div>
-                <div className="text-xs text-gray-400 capitalize">{user?.role} · {user?.subscription_tier} plan</div>
+                <div className="text-xs text-gray-500 capitalize">{user?.role} · {user?.subscription_tier} plan</div>
               </div>
             </div>
             <div>
@@ -197,7 +197,7 @@ export default function SettingsPage() {
             <div>
               <label className="text-xs text-gray-500 mb-1 block">Email</label>
               <input value={user?.email || ''} disabled
-                className="w-full border border-gray-100 rounded-xl px-4 py-2.5 text-sm bg-gray-50 text-gray-400 cursor-not-allowed" />
+                className="w-full border border-gray-100 rounded-xl px-4 py-2.5 text-sm bg-gray-50 text-gray-500 cursor-not-allowed" />
             </div>
             <button onClick={() => { setSaved(true); setTimeout(() => setSaved(false), 3000) }} className="btn-primary text-sm">
               {saved ? '✓ Saved' : 'Save Changes'}
@@ -227,7 +227,7 @@ export default function SettingsPage() {
             <div className="text-center py-6">
               <div className="text-3xl mb-2">🧾</div>
               <p className="text-sm text-gray-500">No payments yet.</p>
-              <p className="text-xs text-gray-400 mt-1">Your invoices will appear here after you upgrade.</p>
+              <p className="text-xs text-gray-500 mt-1">Your invoices will appear here after you upgrade.</p>
             </div>
           ) : (
             <div className="divide-y divide-gray-100">
@@ -237,7 +237,7 @@ export default function SettingsPage() {
                     <div className="text-sm font-medium text-gray-800 capitalize">
                       {p.plan || 'Payment'} {p.plan ? 'plan' : ''}
                     </div>
-                    <div className="text-xs text-gray-400">
+                    <div className="text-xs text-gray-500">
                       {p.created_at ? new Date(p.created_at).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' }) : ''}
                     </div>
                   </div>
@@ -254,14 +254,14 @@ export default function SettingsPage() {
         {/* Files (Supabase Storage) */}
         <div className="panel-premium p-6">
           <h2 className="font-semibold text-gray-800 mb-1">Your Files</h2>
-          <p className="text-xs text-gray-400 mb-4">Uploaded resumes and generated exports, stored securely.</p>
+          <p className="text-xs text-gray-500 mb-4">Uploaded resumes and generated exports, stored securely.</p>
           {loadingFiles ? (
             <div className="space-y-2">{[0, 1].map(i => <div key={i} className="h-12 rounded-xl bg-gray-100 shimmer" />)}</div>
           ) : files.length === 0 ? (
             <div className="text-center py-6">
               <div className="text-3xl mb-2">🗂️</div>
               <p className="text-sm text-gray-500">No files yet.</p>
-              <p className="text-xs text-gray-400 mt-1">Upload a resume in AI Upgrade or export one — it'll appear here.</p>
+              <p className="text-xs text-gray-500 mt-1">Upload a resume in AI Upgrade or export one — it'll appear here.</p>
             </div>
           ) : (
             <div className="divide-y divide-gray-100">
@@ -271,7 +271,7 @@ export default function SettingsPage() {
                     <span className="text-lg">{f.category === 'generated' ? '📤' : '📄'}</span>
                     <div className="min-w-0">
                       <div className="text-sm font-medium text-gray-800 truncate">{f.name.replace(/^[a-f0-9]{8}_/, '')}</div>
-                      <div className="text-[11px] text-gray-400">
+                      <div className="text-[11px] text-gray-500">
                         <span className={`px-1.5 py-0.5 rounded-full ${catBadge(f.category)}`}>{f.category}</span>
                         {f.size ? ` · ${fmtSize(f.size)}` : ''}
                       </div>
@@ -298,7 +298,7 @@ export default function SettingsPage() {
             <h2 className="font-semibold text-gray-800">API Keys</h2>
             <a href="http://localhost:8000/docs" target="_blank" rel="noreferrer" className="text-xs text-indigo-600 hover:underline">API docs ↗</a>
           </div>
-          <p className="text-xs text-gray-400 mb-4">Programmatic access to the public <code className="bg-gray-100 px-1 rounded">/api/v1</code> endpoints (rate-limited to 60/min).</p>
+          <p className="text-xs text-gray-500 mb-4">Programmatic access to the public <code className="bg-gray-100 px-1 rounded">/api/v1</code> endpoints (rate-limited to 60/min).</p>
 
           {revealedKey && (
             <div className="mb-4 bg-amber-50 border border-amber-200 rounded-xl p-3">
@@ -307,7 +307,7 @@ export default function SettingsPage() {
                 <code className="flex-1 text-xs bg-white border border-amber-200 rounded-lg px-3 py-2 break-all">{revealedKey}</code>
                 <button onClick={() => { navigator.clipboard.writeText(revealedKey) }}
                   className="text-xs bg-amber-600 text-white px-3 py-2 rounded-lg hover:bg-amber-700 transition">Copy</button>
-                <button onClick={() => setRevealedKey('')} className="text-xs text-gray-400 hover:text-gray-600 px-2">Done</button>
+                <button onClick={() => setRevealedKey('')} className="text-xs text-gray-500 hover:text-gray-600 px-2">Done</button>
               </div>
             </div>
           )}
@@ -322,7 +322,7 @@ export default function SettingsPage() {
           {loadingKeys ? (
             <div className="space-y-2">{[0, 1].map(i => <div key={i} className="h-12 rounded-xl bg-gray-100 shimmer" />)}</div>
           ) : keys.length === 0 ? (
-            <p className="text-xs text-gray-400 text-center py-4">No API keys yet.</p>
+            <p className="text-xs text-gray-500 text-center py-4">No API keys yet.</p>
           ) : (
             <div className="divide-y divide-gray-100">
               {keys.map(k => (
@@ -331,7 +331,7 @@ export default function SettingsPage() {
                     <div className="text-sm font-medium text-gray-800 truncate">
                       {k.name} {k.revoked && <span className="text-[11px] text-red-500">(revoked)</span>}
                     </div>
-                    <div className="text-[11px] text-gray-400">
+                    <div className="text-[11px] text-gray-500">
                       <code>{k.key_prefix}…</code> · created {k.created_at ? new Date(k.created_at).toLocaleDateString() : ''}
                       {k.last_used ? ` · last used ${new Date(k.last_used).toLocaleDateString()}` : ' · never used'}
                     </div>
@@ -349,7 +349,7 @@ export default function SettingsPage() {
         {/* Webhooks */}
         <div className="panel-premium p-6">
           <h2 className="font-semibold text-gray-800 mb-1">Webhooks</h2>
-          <p className="text-xs text-gray-400 mb-4">Get notified at your URL when events happen (HMAC-signed, retried 3×).</p>
+          <p className="text-xs text-gray-500 mb-4">Get notified at your URL when events happen (HMAC-signed, retried 3×).</p>
 
           {revealedSecret && (
             <div className="mb-4 bg-amber-50 border border-amber-200 rounded-xl p-3">
@@ -357,7 +357,7 @@ export default function SettingsPage() {
               <div className="flex items-center gap-2">
                 <code className="flex-1 text-xs bg-white border border-amber-200 rounded-lg px-3 py-2 break-all">{revealedSecret}</code>
                 <button onClick={() => navigator.clipboard.writeText(revealedSecret)} className="text-xs bg-amber-600 text-white px-3 py-2 rounded-lg hover:bg-amber-700 transition">Copy</button>
-                <button onClick={() => setRevealedSecret('')} className="text-xs text-gray-400 hover:text-gray-600 px-2">Done</button>
+                <button onClick={() => setRevealedSecret('')} className="text-xs text-gray-500 hover:text-gray-600 px-2">Done</button>
               </div>
             </div>
           )}
@@ -385,7 +385,7 @@ export default function SettingsPage() {
           {loadingHooks ? (
             <div className="space-y-2">{[0, 1].map(i => <div key={i} className="h-14 rounded-xl bg-gray-100 shimmer" />)}</div>
           ) : webhooks.length === 0 ? (
-            <p className="text-xs text-gray-400 text-center py-4">No webhooks yet.</p>
+            <p className="text-xs text-gray-500 text-center py-4">No webhooks yet.</p>
           ) : (
             <div className="space-y-2">
               {webhooks.map(w => (
@@ -393,7 +393,7 @@ export default function SettingsPage() {
                   <div className="flex items-center justify-between gap-2">
                     <div className="min-w-0">
                       <div className="text-sm font-medium text-gray-800 truncate">{w.url}</div>
-                      <div className="text-[11px] text-gray-400">{(w.events || []).length} event{(w.events || []).length === 1 ? '' : 's'} · <code>{w.secret_hint}</code></div>
+                      <div className="text-[11px] text-gray-500">{(w.events || []).length} event{(w.events || []).length === 1 ? '' : 's'} · <code>{w.secret_hint}</code></div>
                     </div>
                     <div className="flex items-center gap-2 flex-shrink-0">
                       <span className={`text-[11px] px-2 py-0.5 rounded-full ${w.active ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'}`}>{w.active ? 'Active' : 'Paused'}</span>
@@ -403,7 +403,7 @@ export default function SettingsPage() {
                     </div>
                   </div>
                   {testResult[w.id] && (
-                    <div className={`text-[11px] mt-2 ${testResult[w.id].startsWith('✓') ? 'text-green-600' : testResult[w.id] === 'sending' ? 'text-gray-400' : 'text-red-500'}`}>
+                    <div className={`text-[11px] mt-2 ${testResult[w.id].startsWith('✓') ? 'text-green-600' : testResult[w.id] === 'sending' ? 'text-gray-500' : 'text-red-500'}`}>
                       {testResult[w.id] === 'sending' ? 'Sending test…' : testResult[w.id]}
                     </div>
                   )}

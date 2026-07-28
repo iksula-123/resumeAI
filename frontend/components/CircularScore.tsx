@@ -51,7 +51,7 @@ export default function CircularScore({
           {score}
         </span>
         {max !== 1 && (
-          <span className="text-gray-400 leading-none" style={{ fontSize: size * 0.11 }}>
+          <span className="text-gray-500 leading-none" style={{ fontSize: size * 0.11 }}>
             /{max}
           </span>
         )}

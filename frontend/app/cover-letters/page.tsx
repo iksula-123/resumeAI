@@ -149,9 +149,9 @@ export default function CoverLettersPage() {
         <div className="w-72 shrink-0">
           <h2 className="text-sm font-semibold text-gray-500 uppercase mb-3">Your Letters</h2>
           {loading ? (
-            <p className="text-gray-400 text-sm">Loading…</p>
+            <p className="text-gray-500 text-sm">Loading…</p>
           ) : letters.length === 0 ? (
-            <p className="text-gray-400 text-sm">No cover letters yet. Generate your first one!</p>
+            <p className="text-gray-500 text-sm">No cover letters yet. Generate your first one!</p>
           ) : (
             <div className="space-y-2">
               {letters.map((l) => (
@@ -161,7 +161,7 @@ export default function CoverLettersPage() {
                   className={`w-full text-left p-3 rounded-lg border transition ${selected?.id === l.id ? 'border-blue-500 bg-blue-50' : 'border-gray-200 bg-white hover:border-gray-300'}`}
                 >
                   <div className="font-medium text-sm truncate">{l.title}</div>
-                  <div className="text-xs text-gray-400 mt-0.5">{new Date(l.updated_at).toLocaleDateString()}</div>
+                  <div className="text-xs text-gray-500 mt-0.5">{new Date(l.updated_at).toLocaleDateString()}</div>
                 </button>
               ))}
             </div>
@@ -211,12 +211,12 @@ export default function CoverLettersPage() {
               />
             ) : (
               <div className="prose prose-sm max-w-none text-gray-700 whitespace-pre-wrap leading-relaxed">
-                {selected.content || <span className="text-gray-400 italic">No content yet.</span>}
+                {selected.content || <span className="text-gray-500 italic">No content yet.</span>}
               </div>
             )}
           </div>
         ) : (
-          <div className="flex-1 flex items-center justify-center text-gray-400">
+          <div className="flex-1 flex items-center justify-center text-gray-500">
             Select a cover letter to view or edit
           </div>
         )}
