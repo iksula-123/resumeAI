@@ -8,6 +8,8 @@ tagged by source so the UI can colour-code them —
   blue  = AI-suggested for this role (must be confirmed)
   grey  = scaffolds the candidate personalises with their own content
 """
+import re
+
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -16,19 +18,34 @@ from services.ai import role_summary_suggestion
 
 # ── DB reads ────────────────────────────────────────────────────────────────
 async def list_roles(db: AsyncSession, search: str = "", limit: int = 30) -> list[dict]:
-    """Role picker feed: top roles by demand, optionally filtered by title search."""
+    """Role picker feed: top roles by demand, optionally filtered by title search.
+
+    Search is token-based and forgiving: a role matches if its title contains ANY
+    search word, so "frontend developer" surfaces Web/Software/Java Developer even
+    though no title is literally "Frontend Developer". Results with more matching
+    tokens rank first, then by demand.
+    """
     limit = max(1, min(int(limit or 30), 100))
     params: dict = {"limit": limit}
     where = ""
+    order = "demand_count desc"
     if search and search.strip():
-        where = "where canonical_title ilike :q"
-        params["q"] = f"%{search.strip()}%"
+        tokens = [t for t in re.split(r"\s+", search.strip().lower()) if len(t) >= 2][:6]
+        if tokens:
+            likes, score_terms = [], []
+            for i, tok in enumerate(tokens):
+                params[f"t{i}"] = f"%{tok}%"
+                likes.append(f"canonical_title ilike :t{i}")
+                score_terms.append(f"(case when canonical_title ilike :t{i} then 1 else 0 end)")
+            where = "where " + " or ".join(likes)
+            # rank by how many tokens matched, then demand
+            order = f"({' + '.join(score_terms)}) desc, demand_count desc"
     rows = (await db.execute(text(
         f"""select slug, canonical_title, industry, salary_min, salary_max,
                    demand_count, skills
             from public.role_profiles
             {where}
-            order by demand_count desc
+            order by {order}
             limit :limit"""
     ), params)).mappings().all()
     return [

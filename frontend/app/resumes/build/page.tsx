@@ -77,6 +77,7 @@ export default function BuildFromRolePage() {
   const [step, setStep] = useState<'pick' | 'build'>('pick')
   const [search, setSearch] = useState('')
   const [roles, setRoles] = useState<RoleListItem[]>([])
+  const [topRoles, setTopRoles] = useState<RoleListItem[]>([])
   const [loadingRoles, setLoadingRoles] = useState(false)
   const [error, setError] = useState('')
 
@@ -128,6 +129,12 @@ export default function BuildFromRolePage() {
     const t = setTimeout(() => loadRoles(search), 250)
     return () => clearTimeout(t)
   }, [search, step, loadRoles])
+
+  // popular-roles fallback (shown when a search has no exact match)
+  useEffect(() => {
+    api.get<{ roles: RoleListItem[] }>('/api/roles?limit=12')
+      .then((r) => setTopRoles(r.roles)).catch(() => {})
+  }, [])
 
   /* ── select role → prefill ───────────────────────────────── */
   const pickRole = async (slug: string) => {
@@ -332,29 +339,42 @@ export default function BuildFromRolePage() {
                          focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 outline-none"
             />
             {loadingPrefill && <p className="mt-3 text-sm text-indigo-600">Building from your role… <span className="text-gray-500">(the server may take up to ~30s to wake on the first visit)</span></p>}
-            <div className="mt-4 grid gap-3 sm:grid-cols-2">
-              {loadingRoles && !roles.length && <p className="text-sm text-gray-500">Loading roles… <span className="text-gray-400">(the server may take up to ~30s to wake on the first visit)</span></p>}
-              {roles.map((r) => (
-                <button key={r.slug} onClick={() => pickRole(r.slug)} disabled={loadingPrefill}
-                  className="text-left rounded-xl border border-gray-200 bg-white p-4 shadow-sm
-                             hover:border-indigo-400 hover:shadow transition disabled:opacity-50">
-                  <div className="flex items-center justify-between gap-2">
-                    <span className="font-semibold text-gray-900">{r.canonical_title}</span>
-                    {r.industry && <span className="text-[11px] rounded-full bg-indigo-50 text-indigo-700 px-2 py-0.5">{r.industry}</span>}
-                  </div>
-                  <div className="mt-1 text-xs text-gray-500">
-                    {r.demand_count.toLocaleString('en-IN')} hiring records
-                    {money(r.salary_min) && money(r.salary_max) && ` · ${money(r.salary_min)}–${money(r.salary_max)}/yr`}
-                  </div>
-                  <div className="mt-2 flex flex-wrap gap-1">
-                    {r.top_skills.slice(0, 3).map((s) => (
-                      <span key={s} className="text-[11px] rounded bg-gray-100 text-gray-600 px-1.5 py-0.5">{s}</span>
+            {(() => {
+              const noMatch = !loadingRoles && roles.length === 0 && search.trim() !== ''
+              const showPopular = noMatch && topRoles.length > 0
+              const list = roles.length ? roles : (showPopular ? topRoles : [])
+              return (
+                <>
+                  {showPopular && (
+                    <p className="mt-4 text-sm text-gray-600">
+                      No exact match for “{search}”. Here are the most in-demand roles — pick the closest, or try a broader word (e.g. “developer”, “sales”, “operator”).
+                    </p>
+                  )}
+                  <div className="mt-4 grid gap-3 sm:grid-cols-2">
+                    {loadingRoles && !roles.length && <p className="text-sm text-gray-500">Loading roles… <span className="text-gray-400">(the server may take up to ~30s to wake on the first visit)</span></p>}
+                    {list.map((r) => (
+                      <button key={r.slug} onClick={() => pickRole(r.slug)} disabled={loadingPrefill}
+                        className="text-left rounded-xl border border-gray-200 bg-white p-4 shadow-sm
+                                   hover:border-indigo-400 hover:shadow transition disabled:opacity-50">
+                        <div className="flex items-center justify-between gap-2">
+                          <span className="font-semibold text-gray-900">{r.canonical_title}</span>
+                          {r.industry && <span className="text-[11px] rounded-full bg-indigo-50 text-indigo-700 px-2 py-0.5">{r.industry}</span>}
+                        </div>
+                        <div className="mt-1 text-xs text-gray-500">
+                          {r.demand_count.toLocaleString('en-IN')} hiring records
+                          {money(r.salary_min) && money(r.salary_max) && ` · ${money(r.salary_min)}–${money(r.salary_max)}/yr`}
+                        </div>
+                        <div className="mt-2 flex flex-wrap gap-1">
+                          {r.top_skills.slice(0, 3).map((s) => (
+                            <span key={s} className="text-[11px] rounded bg-gray-100 text-gray-600 px-1.5 py-0.5">{s}</span>
+                          ))}
+                        </div>
+                      </button>
                     ))}
                   </div>
-                </button>
-              ))}
-              {!loadingRoles && !roles.length && <p className="text-sm text-gray-500">No roles match “{search}”.</p>}
-            </div>
+                </>
+              )
+            })()}
           </div>
         )}
 
