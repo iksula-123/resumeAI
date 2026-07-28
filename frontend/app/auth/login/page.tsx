@@ -29,8 +29,8 @@ export default function LoginPage() {
       <div className="w-full max-w-md glass-card p-8 animate-fade-up">
         {/* Logo */}
         <div className="flex items-center justify-center gap-2 mb-6">
-          <div className="w-9 h-9 bg-gradient-to-br from-indigo-600 to-purple-600 rounded-xl flex items-center justify-center text-white font-bold">R</div>
-          <span className="font-bold text-gray-900">ResumeAI Pro</span>
+          <div className="w-9 h-9 bg-gradient-to-br from-indigo-600 to-purple-600 rounded-xl flex items-center justify-center text-white font-bold">S</div>
+          <span className="font-bold text-gray-900">SahiCareer <span className="font-normal text-gray-400">· My Resume</span></span>
         </div>
 
         <h1 className="text-xl font-bold text-center text-gray-900 mb-1">Welcome back</h1>

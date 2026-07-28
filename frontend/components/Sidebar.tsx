@@ -43,11 +43,11 @@ export default function Sidebar() {
       <div className="px-4 py-5 border-b border-white/40">
         <div className="flex items-center gap-2.5">
           <div className="w-9 h-9 bg-brand-gradient rounded-xl flex items-center justify-center text-white font-bold shadow-glow">
-            R
+            S
           </div>
           <div>
-            <div className="text-sm font-bold text-gray-900 leading-tight font-display">ResumeAI Pro</div>
-            <div className="text-[11px] text-gray-500">AI Resume Builder</div>
+            <div className="text-sm font-bold text-gray-900 leading-tight font-display">SahiCareer</div>
+            <div className="text-[11px] text-gray-500">My Resume</div>
           </div>
         </div>
       </div>

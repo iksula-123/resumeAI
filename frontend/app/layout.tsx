@@ -17,8 +17,8 @@ const jakarta = Plus_Jakarta_Sans({
 })
 
 export const metadata: Metadata = {
-  title: 'ResumeAI Pro — AI Resume Builder',
-  description: 'Build ATS-ready resumes with AI. Premium templates, instant scoring, and one-click export.',
+  title: 'SahiCareer — My Resume',
+  description: 'Pick your job. We build your resume — from real Indian jobs, in your language, in two minutes. Free.',
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

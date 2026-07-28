@@ -40,8 +40,8 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(
-    title="ResumeAI Pro API",
-    description="AI-powered resume builder SaaS",
+    title="SahiCareer — My Resume API",
+    description="EduBridge SahiCareer — AI resume builder that starts from your career, not a blank page.",
     version="1.0.0",
     lifespan=lifespan,
 )
@@ -75,7 +75,7 @@ async def health_check():
 
 @app.get("/")
 async def root():
-    return {"message": "ResumeAI Pro API", "docs": "/docs"}
+    return {"message": "SahiCareer — My Resume API", "docs": "/docs"}
 
 
 def _try_include(module_name: str):
@@ -106,6 +106,7 @@ _try_include("roles")
 _try_include("career_record")
 _try_include("voice")
 _try_include("writing")
+_try_include("metrics")
 
 if __name__ == "__main__":
     import uvicorn

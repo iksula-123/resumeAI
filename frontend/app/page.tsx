@@ -18,8 +18,8 @@ export default function HomePage() {
       {/* Navbar */}
       <nav className="flex items-center justify-between px-8 py-5">
         <div className="flex items-center gap-2">
-          <div className="w-9 h-9 bg-gradient-to-br from-indigo-600 to-purple-600 rounded-xl flex items-center justify-center text-white font-bold">R</div>
-          <span className="font-bold text-gray-900">ResumeAI Pro</span>
+          <div className="w-9 h-9 bg-gradient-to-br from-indigo-600 to-purple-600 rounded-xl flex items-center justify-center text-white font-bold">S</div>
+          <span className="font-bold text-gray-900">SahiCareer <span className="font-normal text-gray-400">· My Resume</span></span>
         </div>
         <div className="flex gap-3">
           <Link href="/auth/login" className="text-gray-600 hover:text-gray-900 px-4 py-2 rounded-lg text-sm font-medium transition">Login</Link>
