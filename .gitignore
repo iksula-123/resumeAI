@@ -21,6 +21,13 @@ build/
 htmlcov/
 .coverage
 
+# Next.js app-route directories named build/dist are SOURCE, not build output —
+# don't let the generic dist/build rules above ignore them.
+!frontend/app/**/build/
+!frontend/app/**/build/**
+!frontend/app/**/dist/
+!frontend/app/**/dist/**
+
 # Node
 node_modules/
 .next/

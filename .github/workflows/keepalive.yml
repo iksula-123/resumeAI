@@ -1,0 +1,26 @@
+name: Keep backend awake
+
+# Render's free tier sleeps after ~15 min idle, causing a ~40s cold start that
+# makes the first request (e.g. "Build from Role") look broken. This pings the
+# backend health endpoint every 10 minutes to keep it warm.
+#
+# NOTE: GitHub free-tier scheduled runs can be delayed and are disabled after 60
+# days of repo inactivity. For a launch, an external uptime monitor (UptimeRobot /
+# cron-job.org, free) or Render's paid tier (no sleep) is more reliable.
+
+on:
+  schedule:
+    - cron: "*/10 * * * *"   # every 10 minutes
+  workflow_dispatch: {}        # allow manual runs
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping backend /health
+        run: |
+          URL="${BACKEND_URL:-https://resumeai-pro-api.onrender.com}/health"
+          echo "Pinging $URL"
+          curl -sS -m 60 -o /dev/null -w "HTTP %{http_code} in %{time_total}s\n" "$URL" || echo "ping failed (backend may be waking)"
+        env:
+          BACKEND_URL: ${{ vars.BACKEND_URL }}
