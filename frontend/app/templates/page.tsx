@@ -62,7 +62,7 @@ export default function TemplatesPage() {
                 <button key={cat} onClick={() => setActiveCategory(cat)}
                   className={`px-3 py-1 rounded-full text-xs font-medium transition ${
                     activeCategory === cat
-                      ? 'bg-indigo-600 text-white'
+                      ? 'bg-navy-600 text-white'
                       : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                   }`}>
                   {cat.replace(' Templates', '')}
@@ -77,7 +77,7 @@ export default function TemplatesPage() {
               <div key={template.id}
                 onClick={() => setSelected(template.id)}
                 className={`rounded-xl overflow-hidden cursor-pointer border-2 transition-all hover:shadow-md ${
-                  selected === template.id ? 'border-indigo-500 shadow-md' : 'border-transparent hover:border-gray-200'
+                  selected === template.id ? 'border-royal-500 shadow-md' : 'border-transparent hover:border-gray-200'
                 }`}>
                 {/* Mini preview */}
                 <div className="relative h-36 bg-gray-50 overflow-hidden">
@@ -88,11 +88,11 @@ export default function TemplatesPage() {
                     <div className="absolute top-2 right-2 bg-green-500 text-white text-[9px] px-1.5 py-0.5 rounded-full">Popular</div>
                   )}
                   {template.pro && (
-                    <div className="absolute top-2 right-2 bg-purple-500 text-white text-[9px] px-1.5 py-0.5 rounded-full">Pro</div>
+                    <div className="absolute top-2 right-2 bg-teal-500 text-white text-[9px] px-1.5 py-0.5 rounded-full">Pro</div>
                   )}
                   {selected === template.id && (
-                    <div className="absolute inset-0 bg-indigo-500/10 flex items-center justify-center">
-                      <div className="w-7 h-7 bg-indigo-600 rounded-full flex items-center justify-center text-white text-sm">✓</div>
+                    <div className="absolute inset-0 bg-royal-500/10 flex items-center justify-center">
+                      <div className="w-7 h-7 bg-navy-600 rounded-full flex items-center justify-center text-white text-sm">✓</div>
                     </div>
                   )}
                 </div>
@@ -109,7 +109,7 @@ export default function TemplatesPage() {
             <button
               onClick={() => useTemplate(selected)}
               disabled={creating}
-              className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-2.5 rounded-xl text-sm font-medium hover:opacity-90 transition disabled:opacity-50 flex items-center justify-center gap-2">
+              className="btn-primary w-full py-2.5 text-sm flex items-center justify-center gap-2">
               {creating ? (
                 <><span className="animate-spin">⟳</span> Creating…</>
               ) : (
@@ -136,7 +136,7 @@ export default function TemplatesPage() {
                 {TEMPLATE_LIST.map(t => (
                   <button key={t.id} onClick={() => setSelected(t.id)}
                     title={t.name}
-                    className={`w-6 h-6 rounded-full border-2 transition ${selected === t.id ? 'border-indigo-500 scale-110' : 'border-gray-300 hover:border-gray-400'}`}
+                    className={`w-6 h-6 rounded-full border-2 transition ${selected === t.id ? 'border-royal-500 scale-110' : 'border-gray-300 hover:border-gray-400'}`}
                     style={{ background: t.accent }} />
                 ))}
               </div>
@@ -150,7 +150,7 @@ export default function TemplatesPage() {
             {/* CTA */}
             <div className="mt-6 flex gap-3 justify-center">
               <button onClick={() => useTemplate(selected)} disabled={creating}
-                className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-8 py-3 rounded-xl font-medium hover:opacity-90 transition shadow-lg shadow-indigo-200 disabled:opacity-50">
+                className="btn-primary px-8 py-3 font-medium">
                 {creating ? 'Creating…' : `Start with ${selectedTemplate?.name} →`}
               </button>
             </div>

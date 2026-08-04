@@ -14,7 +14,7 @@ interface Version {
 const SOURCE_BADGE: Record<string, { label: string; cls: string; icon: string }> = {
   initial:    { label: 'Created',    cls: 'bg-blue-100 text-blue-700',     icon: '✦' },
   edit:       { label: 'Edit',       cls: 'bg-gray-100 text-gray-600',     icon: '✎' },
-  ai_upgrade: { label: 'AI Upgrade', cls: 'bg-purple-100 text-purple-700', icon: '✨' },
+  ai_upgrade: { label: 'AI Upgrade', cls: 'bg-royal-100 text-royal-700', icon: '✨' },
   rollback:   { label: 'Rolled back',cls: 'bg-amber-100 text-amber-700',   icon: '↺' },
 }
 
@@ -119,7 +119,7 @@ export default function VersionHistory({ resumeId, open, onClose, onRestored }: 
           ) : (
             <div className="relative pl-4">
               {/* timeline line */}
-              <div className="absolute left-[7px] top-2 bottom-2 w-px bg-indigo-100" />
+              <div className="absolute left-[7px] top-2 bottom-2 w-px bg-royal-100" />
               <div className="space-y-3">
                 {versions.map((v, i) => {
                   const badge = SOURCE_BADGE[v.source] || SOURCE_BADGE.edit
@@ -127,8 +127,8 @@ export default function VersionHistory({ resumeId, open, onClose, onRestored }: 
                   return (
                     <div key={v.id} className="relative animate-fade-up" style={{ animationDelay: `${i * 40}ms` }}>
                       {/* dot */}
-                      <div className={`absolute -left-4 top-4 w-3 h-3 rounded-full border-2 border-white ${isLatest ? 'bg-indigo-500' : 'bg-gray-300'}`} />
-                      <div className={`card-premium p-3.5 ${isLatest ? 'ring-1 ring-indigo-200' : ''}`}>
+                      <div className={`absolute -left-4 top-4 w-3 h-3 rounded-full border-2 border-white ${isLatest ? 'bg-royal-500' : 'bg-gray-300'}`} />
+                      <div className={`card-premium p-3.5 ${isLatest ? 'ring-1 ring-royal-200' : ''}`}>
                         <div className="flex items-center justify-between gap-2 mb-1.5">
                           <div className="flex items-center gap-2 flex-wrap">
                             <span className={`text-[11px] font-medium px-2 py-0.5 rounded-full ${badge.cls}`}>{badge.icon} {badge.label}</span>

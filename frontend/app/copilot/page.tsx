@@ -105,7 +105,7 @@ export default function CopilotPage() {
               <div className="grid sm:grid-cols-2 gap-2">
                 {prompts.map((p, i) => (
                   <button key={i} onClick={() => send(p)}
-                    className="text-left text-sm text-gray-700 border border-gray-200 rounded-xl px-3 py-2.5 hover:border-indigo-300 hover:bg-indigo-50/50 transition">
+                    className="text-left text-sm text-gray-700 border border-gray-200 rounded-xl px-3 py-2.5 hover:border-royal-300 hover:bg-royal-50/50 transition">
                     {p}
                   </button>
                 ))}
@@ -136,9 +136,9 @@ export default function CopilotPage() {
               <div className="w-8 h-8 bg-brand-gradient rounded-xl flex items-center justify-center text-sm shadow-soft mr-2 flex-shrink-0">🤖</div>
               <div className="bg-white border border-gray-100 rounded-2xl px-4 py-3 shadow-soft">
                 <span className="inline-flex gap-1">
-                  <span className="w-2 h-2 bg-indigo-300 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
-                  <span className="w-2 h-2 bg-indigo-300 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
-                  <span className="w-2 h-2 bg-indigo-300 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+                  <span className="w-2 h-2 bg-royal-300 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+                  <span className="w-2 h-2 bg-royal-300 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+                  <span className="w-2 h-2 bg-royal-300 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
                 </span>
               </div>
             </div>
@@ -149,7 +149,7 @@ export default function CopilotPage() {
         <div className="mt-4">
           <form
             onSubmit={e => { e.preventDefault(); send(input) }}
-            className="flex items-end gap-2 bg-white border border-gray-200 rounded-2xl p-2 shadow-soft focus-within:ring-2 focus-within:ring-indigo-300"
+            className="flex items-end gap-2 bg-white border border-gray-200 rounded-2xl p-2 shadow-soft focus-within:ring-2 focus-within:ring-royal-300"
           >
             <textarea
               value={input}

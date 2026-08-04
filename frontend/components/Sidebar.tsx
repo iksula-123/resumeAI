@@ -86,7 +86,7 @@ export default function Sidebar({ open = true, onClose }: { open?: boolean; onCl
                   ? 'text-white font-semibold shadow-glow'
                   : 'text-gray-600 hover:bg-white/60 hover:text-gray-900'
               }`}
-              style={active ? { backgroundImage: 'linear-gradient(135deg, #6366f1, #7c3aed)' } : undefined}
+              style={active ? { backgroundImage: 'linear-gradient(135deg, #17325C, #2E6FB7)' } : undefined}
             >
               <span className={`text-base w-5 text-center transition-transform duration-200 ${active ? '' : 'group-hover:scale-110'}`}>
                 {item.icon}

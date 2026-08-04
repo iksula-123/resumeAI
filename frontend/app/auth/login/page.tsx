@@ -25,11 +25,11 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-indigo-50 via-white to-purple-50 p-4">
+    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-royal-50 via-white to-teal-50 p-4">
       <div className="w-full max-w-md glass-card p-8 animate-fade-up">
         {/* Logo */}
         <div className="flex items-center justify-center gap-2 mb-6">
-          <div className="w-9 h-9 bg-gradient-to-br from-indigo-600 to-purple-600 rounded-xl flex items-center justify-center text-white font-bold">S</div>
+          <div className="w-9 h-9 bg-gradient-to-br from-navy-600 to-royal-600 rounded-xl flex items-center justify-center text-white font-bold">S</div>
           <span className="font-bold text-gray-900">SahiCareer <span className="font-normal text-gray-500">· My Resume</span></span>
         </div>
 
@@ -48,7 +48,7 @@ export default function LoginPage() {
             <input
               type="email" value={email} onChange={(e) => setEmail(e.target.value)}
               placeholder="you@example.com" required
-              className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300"
+              className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-royal-300"
             />
           </div>
 
@@ -57,7 +57,7 @@ export default function LoginPage() {
             <input
               type="password" value={password} onChange={(e) => setPassword(e.target.value)}
               placeholder="••••••••" required
-              className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300"
+              className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-royal-300"
             />
           </div>
 
@@ -68,7 +68,7 @@ export default function LoginPage() {
 
         <p className="mt-6 text-center text-sm text-gray-500">
           Don&apos;t have an account?{' '}
-          <Link href="/auth/signup" className="text-indigo-600 hover:underline font-medium">Sign up</Link>
+          <Link href="/auth/signup" className="text-navy-600 hover:underline font-medium">Sign up</Link>
         </p>
       </div>
     </div>

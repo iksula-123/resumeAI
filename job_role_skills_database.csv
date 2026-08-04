@@ -1,0 +1,463 @@
+Job Role,Skill Category,Skill Name,Proficiency Level
+Software Developer,Software Developer,Python,Beginner
+Software Developer,Software Developer,Python,Intermediate
+Software Developer,Software Developer,Python,Advanced
+Software Developer,Software Developer,PHP,Beginner
+Software Developer,Software Developer,PHP,Intermediate
+Software Developer,Software Developer,PHP,Advanced
+Software Developer,Software Developer,Java,Beginner
+Software Developer,Software Developer,Java,Intermediate
+Software Developer,Software Developer,Java,Advanced
+Software Developer,Software Developer,JavaScript,Beginner
+Software Developer,Software Developer,JavaScript,Intermediate
+Software Developer,Software Developer,JavaScript,Advanced
+Software Developer,Software Developer,SQL,Beginner
+Software Developer,Software Developer,SQL,Intermediate
+Software Developer,Software Developer,SQL,Advanced
+Software Developer,Software Developer,Git,Beginner
+Software Developer,Software Developer,Git,Intermediate
+Software Developer,Software Developer,Git,Advanced
+Software Developer,Software Developer,REST API,Beginner
+Software Developer,Software Developer,REST API,Intermediate
+Software Developer,Software Developer,REST API,Advanced
+Software Developer,Software Developer,OOP,Beginner
+Software Developer,Software Developer,OOP,Intermediate
+Software Developer,Software Developer,OOP,Advanced
+Software Developer,Software Developer,Debugging,Beginner
+Software Developer,Software Developer,Debugging,Intermediate
+Software Developer,Software Developer,Debugging,Advanced
+Software Developer,Software Developer,Microservices,Beginner
+Software Developer,Software Developer,Microservices,Intermediate
+Software Developer,Software Developer,Microservices,Advanced
+Full Stack Developer,Full Stack Developer,HTML,Beginner
+Full Stack Developer,Full Stack Developer,HTML,Intermediate
+Full Stack Developer,Full Stack Developer,HTML,Advanced
+Full Stack Developer,Full Stack Developer,CSS,Beginner
+Full Stack Developer,Full Stack Developer,CSS,Intermediate
+Full Stack Developer,Full Stack Developer,CSS,Advanced
+Full Stack Developer,Full Stack Developer,JavaScript,Beginner
+Full Stack Developer,Full Stack Developer,JavaScript,Intermediate
+Full Stack Developer,Full Stack Developer,JavaScript,Advanced
+Full Stack Developer,Full Stack Developer,React,Beginner
+Full Stack Developer,Full Stack Developer,React,Intermediate
+Full Stack Developer,Full Stack Developer,React,Advanced
+Full Stack Developer,Full Stack Developer,Node.js,Beginner
+Full Stack Developer,Full Stack Developer,Node.js,Intermediate
+Full Stack Developer,Full Stack Developer,Node.js,Advanced
+Full Stack Developer,Full Stack Developer,Python,Beginner
+Full Stack Developer,Full Stack Developer,Python,Intermediate
+Full Stack Developer,Full Stack Developer,Python,Advanced
+Full Stack Developer,Full Stack Developer,SQL,Beginner
+Full Stack Developer,Full Stack Developer,SQL,Intermediate
+Full Stack Developer,Full Stack Developer,SQL,Advanced
+Full Stack Developer,Full Stack Developer,API Integration,Beginner
+Full Stack Developer,Full Stack Developer,API Integration,Intermediate
+Full Stack Developer,Full Stack Developer,API Integration,Advanced
+Full Stack Developer,Full Stack Developer,Git,Beginner
+Full Stack Developer,Full Stack Developer,Git,Intermediate
+Full Stack Developer,Full Stack Developer,Git,Advanced
+Full Stack Developer,Full Stack Developer,Docker,Beginner
+Full Stack Developer,Full Stack Developer,Docker,Intermediate
+Full Stack Developer,Full Stack Developer,Docker,Advanced
+AI Engineer,AI Engineer,Machine Learning,Beginner
+AI Engineer,AI Engineer,Machine Learning,Intermediate
+AI Engineer,AI Engineer,Machine Learning,Advanced
+AI Engineer,AI Engineer,Deep Learning,Beginner
+AI Engineer,AI Engineer,Deep Learning,Intermediate
+AI Engineer,AI Engineer,Deep Learning,Advanced
+AI Engineer,AI Engineer,Python,Beginner
+AI Engineer,AI Engineer,Python,Intermediate
+AI Engineer,AI Engineer,Python,Advanced
+AI Engineer,AI Engineer,LLM,Beginner
+AI Engineer,AI Engineer,LLM,Intermediate
+AI Engineer,AI Engineer,LLM,Advanced
+AI Engineer,AI Engineer,Prompt Engineering,Beginner
+AI Engineer,AI Engineer,Prompt Engineering,Intermediate
+AI Engineer,AI Engineer,Prompt Engineering,Advanced
+AI Engineer,AI Engineer,TensorFlow,Beginner
+AI Engineer,AI Engineer,TensorFlow,Intermediate
+AI Engineer,AI Engineer,TensorFlow,Advanced
+AI Engineer,AI Engineer,PyTorch,Beginner
+AI Engineer,AI Engineer,PyTorch,Intermediate
+AI Engineer,AI Engineer,PyTorch,Advanced
+AI Engineer,AI Engineer,MLOps,Beginner
+AI Engineer,AI Engineer,MLOps,Intermediate
+AI Engineer,AI Engineer,MLOps,Advanced
+AI Engineer,AI Engineer,NLP,Beginner
+AI Engineer,AI Engineer,NLP,Intermediate
+AI Engineer,AI Engineer,NLP,Advanced
+AI Engineer,AI Engineer,Vector Databases,Beginner
+AI Engineer,AI Engineer,Vector Databases,Intermediate
+AI Engineer,AI Engineer,Vector Databases,Advanced
+ML Engineer,ML Engineer,Python,Beginner
+ML Engineer,ML Engineer,Python,Intermediate
+ML Engineer,ML Engineer,Python,Advanced
+ML Engineer,ML Engineer,Machine Learning,Beginner
+ML Engineer,ML Engineer,Machine Learning,Intermediate
+ML Engineer,ML Engineer,Machine Learning,Advanced
+ML Engineer,ML Engineer,Feature Engineering,Beginner
+ML Engineer,ML Engineer,Feature Engineering,Intermediate
+ML Engineer,ML Engineer,Feature Engineering,Advanced
+ML Engineer,ML Engineer,Model Deployment,Beginner
+ML Engineer,ML Engineer,Model Deployment,Intermediate
+ML Engineer,ML Engineer,Model Deployment,Advanced
+ML Engineer,ML Engineer,MLOps,Beginner
+ML Engineer,ML Engineer,MLOps,Intermediate
+ML Engineer,ML Engineer,MLOps,Advanced
+ML Engineer,ML Engineer,TensorFlow,Beginner
+ML Engineer,ML Engineer,TensorFlow,Intermediate
+ML Engineer,ML Engineer,TensorFlow,Advanced
+ML Engineer,ML Engineer,PyTorch,Beginner
+ML Engineer,ML Engineer,PyTorch,Intermediate
+ML Engineer,ML Engineer,PyTorch,Advanced
+ML Engineer,ML Engineer,Statistics,Beginner
+ML Engineer,ML Engineer,Statistics,Intermediate
+ML Engineer,ML Engineer,Statistics,Advanced
+ML Engineer,ML Engineer,SQL,Beginner
+ML Engineer,ML Engineer,SQL,Intermediate
+ML Engineer,ML Engineer,SQL,Advanced
+ML Engineer,ML Engineer,Cloud AI,Beginner
+ML Engineer,ML Engineer,Cloud AI,Intermediate
+ML Engineer,ML Engineer,Cloud AI,Advanced
+Data Scientist,Data Scientist,Python,Beginner
+Data Scientist,Data Scientist,Python,Intermediate
+Data Scientist,Data Scientist,Python,Advanced
+Data Scientist,Data Scientist,R,Beginner
+Data Scientist,Data Scientist,R,Intermediate
+Data Scientist,Data Scientist,R,Advanced
+Data Scientist,Data Scientist,Statistics,Beginner
+Data Scientist,Data Scientist,Statistics,Intermediate
+Data Scientist,Data Scientist,Statistics,Advanced
+Data Scientist,Data Scientist,Machine Learning,Beginner
+Data Scientist,Data Scientist,Machine Learning,Intermediate
+Data Scientist,Data Scientist,Machine Learning,Advanced
+Data Scientist,Data Scientist,Data Visualization,Beginner
+Data Scientist,Data Scientist,Data Visualization,Intermediate
+Data Scientist,Data Scientist,Data Visualization,Advanced
+Data Scientist,Data Scientist,SQL,Beginner
+Data Scientist,Data Scientist,SQL,Intermediate
+Data Scientist,Data Scientist,SQL,Advanced
+Data Scientist,Data Scientist,Pandas,Beginner
+Data Scientist,Data Scientist,Pandas,Intermediate
+Data Scientist,Data Scientist,Pandas,Advanced
+Data Scientist,Data Scientist,NumPy,Beginner
+Data Scientist,Data Scientist,NumPy,Intermediate
+Data Scientist,Data Scientist,NumPy,Advanced
+Data Scientist,Data Scientist,Tableau,Beginner
+Data Scientist,Data Scientist,Tableau,Intermediate
+Data Scientist,Data Scientist,Tableau,Advanced
+Data Scientist,Data Scientist,Power BI,Beginner
+Data Scientist,Data Scientist,Power BI,Intermediate
+Data Scientist,Data Scientist,Power BI,Advanced
+Data Analyst,Data Analyst,Excel,Beginner
+Data Analyst,Data Analyst,Excel,Intermediate
+Data Analyst,Data Analyst,Excel,Advanced
+Data Analyst,Data Analyst,SQL,Beginner
+Data Analyst,Data Analyst,SQL,Intermediate
+Data Analyst,Data Analyst,SQL,Advanced
+Data Analyst,Data Analyst,Power BI,Beginner
+Data Analyst,Data Analyst,Power BI,Intermediate
+Data Analyst,Data Analyst,Power BI,Advanced
+Data Analyst,Data Analyst,Tableau,Beginner
+Data Analyst,Data Analyst,Tableau,Intermediate
+Data Analyst,Data Analyst,Tableau,Advanced
+Data Analyst,Data Analyst,Reporting,Beginner
+Data Analyst,Data Analyst,Reporting,Intermediate
+Data Analyst,Data Analyst,Reporting,Advanced
+Data Analyst,Data Analyst,Data Cleaning,Beginner
+Data Analyst,Data Analyst,Data Cleaning,Intermediate
+Data Analyst,Data Analyst,Data Cleaning,Advanced
+Data Analyst,Data Analyst,Dashboarding,Beginner
+Data Analyst,Data Analyst,Dashboarding,Intermediate
+Data Analyst,Data Analyst,Dashboarding,Advanced
+Data Analyst,Data Analyst,Statistics,Beginner
+Data Analyst,Data Analyst,Statistics,Intermediate
+Data Analyst,Data Analyst,Statistics,Advanced
+MIS Executive,MIS Executive,Advanced Excel,Beginner
+MIS Executive,MIS Executive,Advanced Excel,Intermediate
+MIS Executive,MIS Executive,Advanced Excel,Advanced
+MIS Executive,MIS Executive,VLOOKUP,Beginner
+MIS Executive,MIS Executive,VLOOKUP,Intermediate
+MIS Executive,MIS Executive,VLOOKUP,Advanced
+MIS Executive,MIS Executive,Pivot Tables,Beginner
+MIS Executive,MIS Executive,Pivot Tables,Intermediate
+MIS Executive,MIS Executive,Pivot Tables,Advanced
+MIS Executive,MIS Executive,Power BI,Beginner
+MIS Executive,MIS Executive,Power BI,Intermediate
+MIS Executive,MIS Executive,Power BI,Advanced
+MIS Executive,MIS Executive,MIS Reporting,Beginner
+MIS Executive,MIS Executive,MIS Reporting,Intermediate
+MIS Executive,MIS Executive,MIS Reporting,Advanced
+MIS Executive,MIS Executive,Dashboard Development,Beginner
+MIS Executive,MIS Executive,Dashboard Development,Intermediate
+MIS Executive,MIS Executive,Dashboard Development,Advanced
+MIS Executive,MIS Executive,SQL,Beginner
+MIS Executive,MIS Executive,SQL,Intermediate
+MIS Executive,MIS Executive,SQL,Advanced
+MIS Executive,MIS Executive,Excel VBA,Beginner
+MIS Executive,MIS Executive,Excel VBA,Intermediate
+MIS Executive,MIS Executive,Excel VBA,Advanced
+Project Manager,Project Manager,Project Planning,Beginner
+Project Manager,Project Manager,Project Planning,Intermediate
+Project Manager,Project Manager,Project Planning,Advanced
+Project Manager,Project Manager,Risk Management,Beginner
+Project Manager,Project Manager,Risk Management,Intermediate
+Project Manager,Project Manager,Risk Management,Advanced
+Project Manager,Project Manager,Agile,Beginner
+Project Manager,Project Manager,Agile,Intermediate
+Project Manager,Project Manager,Agile,Advanced
+Project Manager,Project Manager,Scrum,Beginner
+Project Manager,Project Manager,Scrum,Intermediate
+Project Manager,Project Manager,Scrum,Advanced
+Project Manager,Project Manager,Stakeholder Management,Beginner
+Project Manager,Project Manager,Stakeholder Management,Intermediate
+Project Manager,Project Manager,Stakeholder Management,Advanced
+Project Manager,Project Manager,Budgeting,Beginner
+Project Manager,Project Manager,Budgeting,Intermediate
+Project Manager,Project Manager,Budgeting,Advanced
+Project Manager,Project Manager,Leadership,Beginner
+Project Manager,Project Manager,Leadership,Intermediate
+Project Manager,Project Manager,Leadership,Advanced
+Project Manager,Project Manager,Communication,Beginner
+Project Manager,Project Manager,Communication,Intermediate
+Project Manager,Project Manager,Communication,Advanced
+Business Analyst,Business Analyst,Requirements Gathering,Beginner
+Business Analyst,Business Analyst,Requirements Gathering,Intermediate
+Business Analyst,Business Analyst,Requirements Gathering,Advanced
+Business Analyst,Business Analyst,BRD,Beginner
+Business Analyst,Business Analyst,BRD,Intermediate
+Business Analyst,Business Analyst,BRD,Advanced
+Business Analyst,Business Analyst,FRD,Beginner
+Business Analyst,Business Analyst,FRD,Intermediate
+Business Analyst,Business Analyst,FRD,Advanced
+Business Analyst,Business Analyst,SQL,Beginner
+Business Analyst,Business Analyst,SQL,Intermediate
+Business Analyst,Business Analyst,SQL,Advanced
+Business Analyst,Business Analyst,Agile,Beginner
+Business Analyst,Business Analyst,Agile,Intermediate
+Business Analyst,Business Analyst,Agile,Advanced
+Business Analyst,Business Analyst,Process Mapping,Beginner
+Business Analyst,Business Analyst,Process Mapping,Intermediate
+Business Analyst,Business Analyst,Process Mapping,Advanced
+Business Analyst,Business Analyst,UAT,Beginner
+Business Analyst,Business Analyst,UAT,Intermediate
+Business Analyst,Business Analyst,UAT,Advanced
+Business Analyst,Business Analyst,Documentation,Beginner
+Business Analyst,Business Analyst,Documentation,Intermediate
+Business Analyst,Business Analyst,Documentation,Advanced
+DevOps Engineer,DevOps Engineer,Docker,Beginner
+DevOps Engineer,DevOps Engineer,Docker,Intermediate
+DevOps Engineer,DevOps Engineer,Docker,Advanced
+DevOps Engineer,DevOps Engineer,Kubernetes,Beginner
+DevOps Engineer,DevOps Engineer,Kubernetes,Intermediate
+DevOps Engineer,DevOps Engineer,Kubernetes,Advanced
+DevOps Engineer,DevOps Engineer,Jenkins,Beginner
+DevOps Engineer,DevOps Engineer,Jenkins,Intermediate
+DevOps Engineer,DevOps Engineer,Jenkins,Advanced
+DevOps Engineer,DevOps Engineer,Terraform,Beginner
+DevOps Engineer,DevOps Engineer,Terraform,Intermediate
+DevOps Engineer,DevOps Engineer,Terraform,Advanced
+DevOps Engineer,DevOps Engineer,Linux,Beginner
+DevOps Engineer,DevOps Engineer,Linux,Intermediate
+DevOps Engineer,DevOps Engineer,Linux,Advanced
+DevOps Engineer,DevOps Engineer,AWS,Beginner
+DevOps Engineer,DevOps Engineer,AWS,Intermediate
+DevOps Engineer,DevOps Engineer,AWS,Advanced
+DevOps Engineer,DevOps Engineer,CI/CD,Beginner
+DevOps Engineer,DevOps Engineer,CI/CD,Intermediate
+DevOps Engineer,DevOps Engineer,CI/CD,Advanced
+DevOps Engineer,DevOps Engineer,Monitoring,Beginner
+DevOps Engineer,DevOps Engineer,Monitoring,Intermediate
+DevOps Engineer,DevOps Engineer,Monitoring,Advanced
+DevOps Engineer,DevOps Engineer,Ansible,Beginner
+DevOps Engineer,DevOps Engineer,Ansible,Intermediate
+DevOps Engineer,DevOps Engineer,Ansible,Advanced
+DevOps Engineer,DevOps Engineer,Git,Beginner
+DevOps Engineer,DevOps Engineer,Git,Intermediate
+DevOps Engineer,DevOps Engineer,Git,Advanced
+Cloud Engineer,Cloud Engineer,AWS,Beginner
+Cloud Engineer,Cloud Engineer,AWS,Intermediate
+Cloud Engineer,Cloud Engineer,AWS,Advanced
+Cloud Engineer,Cloud Engineer,Azure,Beginner
+Cloud Engineer,Cloud Engineer,Azure,Intermediate
+Cloud Engineer,Cloud Engineer,Azure,Advanced
+Cloud Engineer,Cloud Engineer,Google Cloud,Beginner
+Cloud Engineer,Cloud Engineer,Google Cloud,Intermediate
+Cloud Engineer,Cloud Engineer,Google Cloud,Advanced
+Cloud Engineer,Cloud Engineer,Networking,Beginner
+Cloud Engineer,Cloud Engineer,Networking,Intermediate
+Cloud Engineer,Cloud Engineer,Networking,Advanced
+Cloud Engineer,Cloud Engineer,Terraform,Beginner
+Cloud Engineer,Cloud Engineer,Terraform,Intermediate
+Cloud Engineer,Cloud Engineer,Terraform,Advanced
+Cloud Engineer,Cloud Engineer,Linux,Beginner
+Cloud Engineer,Cloud Engineer,Linux,Intermediate
+Cloud Engineer,Cloud Engineer,Linux,Advanced
+Cloud Engineer,Cloud Engineer,Security,Beginner
+Cloud Engineer,Cloud Engineer,Security,Intermediate
+Cloud Engineer,Cloud Engineer,Security,Advanced
+Cloud Engineer,Cloud Engineer,Containers,Beginner
+Cloud Engineer,Cloud Engineer,Containers,Intermediate
+Cloud Engineer,Cloud Engineer,Containers,Advanced
+Cyber Security Analyst,Cyber Security Analyst,Network Security,Beginner
+Cyber Security Analyst,Cyber Security Analyst,Network Security,Intermediate
+Cyber Security Analyst,Cyber Security Analyst,Network Security,Advanced
+Cyber Security Analyst,Cyber Security Analyst,SIEM,Beginner
+Cyber Security Analyst,Cyber Security Analyst,SIEM,Intermediate
+Cyber Security Analyst,Cyber Security Analyst,SIEM,Advanced
+Cyber Security Analyst,Cyber Security Analyst,SOC,Beginner
+Cyber Security Analyst,Cyber Security Analyst,SOC,Intermediate
+Cyber Security Analyst,Cyber Security Analyst,SOC,Advanced
+Cyber Security Analyst,Cyber Security Analyst,Incident Response,Beginner
+Cyber Security Analyst,Cyber Security Analyst,Incident Response,Intermediate
+Cyber Security Analyst,Cyber Security Analyst,Incident Response,Advanced
+Cyber Security Analyst,Cyber Security Analyst,Penetration Testing,Beginner
+Cyber Security Analyst,Cyber Security Analyst,Penetration Testing,Intermediate
+Cyber Security Analyst,Cyber Security Analyst,Penetration Testing,Advanced
+Cyber Security Analyst,Cyber Security Analyst,Risk Assessment,Beginner
+Cyber Security Analyst,Cyber Security Analyst,Risk Assessment,Intermediate
+Cyber Security Analyst,Cyber Security Analyst,Risk Assessment,Advanced
+Cyber Security Analyst,Cyber Security Analyst,Security Monitoring,Beginner
+Cyber Security Analyst,Cyber Security Analyst,Security Monitoring,Intermediate
+Cyber Security Analyst,Cyber Security Analyst,Security Monitoring,Advanced
+QA Engineer,QA Engineer,Manual Testing,Beginner
+QA Engineer,QA Engineer,Manual Testing,Intermediate
+QA Engineer,QA Engineer,Manual Testing,Advanced
+QA Engineer,QA Engineer,Automation Testing,Beginner
+QA Engineer,QA Engineer,Automation Testing,Intermediate
+QA Engineer,QA Engineer,Automation Testing,Advanced
+QA Engineer,QA Engineer,Selenium,Beginner
+QA Engineer,QA Engineer,Selenium,Intermediate
+QA Engineer,QA Engineer,Selenium,Advanced
+QA Engineer,QA Engineer,API Testing,Beginner
+QA Engineer,QA Engineer,API Testing,Intermediate
+QA Engineer,QA Engineer,API Testing,Advanced
+QA Engineer,QA Engineer,Performance Testing,Beginner
+QA Engineer,QA Engineer,Performance Testing,Intermediate
+QA Engineer,QA Engineer,Performance Testing,Advanced
+QA Engineer,QA Engineer,Test Cases,Beginner
+QA Engineer,QA Engineer,Test Cases,Intermediate
+QA Engineer,QA Engineer,Test Cases,Advanced
+QA Engineer,QA Engineer,Bug Tracking,Beginner
+QA Engineer,QA Engineer,Bug Tracking,Intermediate
+QA Engineer,QA Engineer,Bug Tracking,Advanced
+Banking Professional,Banking Professional,Retail Banking,Beginner
+Banking Professional,Banking Professional,Retail Banking,Intermediate
+Banking Professional,Banking Professional,Retail Banking,Advanced
+Banking Professional,Banking Professional,Credit Analysis,Beginner
+Banking Professional,Banking Professional,Credit Analysis,Intermediate
+Banking Professional,Banking Professional,Credit Analysis,Advanced
+Banking Professional,Banking Professional,KYC,Beginner
+Banking Professional,Banking Professional,KYC,Intermediate
+Banking Professional,Banking Professional,KYC,Advanced
+Banking Professional,Banking Professional,AML,Beginner
+Banking Professional,Banking Professional,AML,Intermediate
+Banking Professional,Banking Professional,AML,Advanced
+Banking Professional,Banking Professional,Customer Service,Beginner
+Banking Professional,Banking Professional,Customer Service,Intermediate
+Banking Professional,Banking Professional,Customer Service,Advanced
+Banking Professional,Banking Professional,Risk Management,Beginner
+Banking Professional,Banking Professional,Risk Management,Intermediate
+Banking Professional,Banking Professional,Risk Management,Advanced
+Banking Professional,Banking Professional,Financial Products,Beginner
+Banking Professional,Banking Professional,Financial Products,Intermediate
+Banking Professional,Banking Professional,Financial Products,Advanced
+Finance Analyst,Finance Analyst,Financial Modeling,Beginner
+Finance Analyst,Finance Analyst,Financial Modeling,Intermediate
+Finance Analyst,Finance Analyst,Financial Modeling,Advanced
+Finance Analyst,Finance Analyst,Excel,Beginner
+Finance Analyst,Finance Analyst,Excel,Intermediate
+Finance Analyst,Finance Analyst,Excel,Advanced
+Finance Analyst,Finance Analyst,Budgeting,Beginner
+Finance Analyst,Finance Analyst,Budgeting,Intermediate
+Finance Analyst,Finance Analyst,Budgeting,Advanced
+Finance Analyst,Finance Analyst,Forecasting,Beginner
+Finance Analyst,Finance Analyst,Forecasting,Intermediate
+Finance Analyst,Finance Analyst,Forecasting,Advanced
+Finance Analyst,Finance Analyst,Accounting,Beginner
+Finance Analyst,Finance Analyst,Accounting,Intermediate
+Finance Analyst,Finance Analyst,Accounting,Advanced
+Finance Analyst,Finance Analyst,Valuation,Beginner
+Finance Analyst,Finance Analyst,Valuation,Intermediate
+Finance Analyst,Finance Analyst,Valuation,Advanced
+Finance Analyst,Finance Analyst,Power BI,Beginner
+Finance Analyst,Finance Analyst,Power BI,Intermediate
+Finance Analyst,Finance Analyst,Power BI,Advanced
+HR Executive,HR Executive,Recruitment,Beginner
+HR Executive,HR Executive,Recruitment,Intermediate
+HR Executive,HR Executive,Recruitment,Advanced
+HR Executive,HR Executive,Payroll,Beginner
+HR Executive,HR Executive,Payroll,Intermediate
+HR Executive,HR Executive,Payroll,Advanced
+HR Executive,HR Executive,HRMS,Beginner
+HR Executive,HR Executive,HRMS,Intermediate
+HR Executive,HR Executive,HRMS,Advanced
+HR Executive,HR Executive,Employee Relations,Beginner
+HR Executive,HR Executive,Employee Relations,Intermediate
+HR Executive,HR Executive,Employee Relations,Advanced
+HR Executive,HR Executive,Performance Management,Beginner
+HR Executive,HR Executive,Performance Management,Intermediate
+HR Executive,HR Executive,Performance Management,Advanced
+HR Executive,HR Executive,HR Analytics,Beginner
+HR Executive,HR Executive,HR Analytics,Intermediate
+HR Executive,HR Executive,HR Analytics,Advanced
+Digital Marketing Executive,Digital Marketing Executive,SEO,Beginner
+Digital Marketing Executive,Digital Marketing Executive,SEO,Intermediate
+Digital Marketing Executive,Digital Marketing Executive,SEO,Advanced
+Digital Marketing Executive,Digital Marketing Executive,Google Ads,Beginner
+Digital Marketing Executive,Digital Marketing Executive,Google Ads,Intermediate
+Digital Marketing Executive,Digital Marketing Executive,Google Ads,Advanced
+Digital Marketing Executive,Digital Marketing Executive,Google Analytics,Beginner
+Digital Marketing Executive,Digital Marketing Executive,Google Analytics,Intermediate
+Digital Marketing Executive,Digital Marketing Executive,Google Analytics,Advanced
+Digital Marketing Executive,Digital Marketing Executive,Content Marketing,Beginner
+Digital Marketing Executive,Digital Marketing Executive,Content Marketing,Intermediate
+Digital Marketing Executive,Digital Marketing Executive,Content Marketing,Advanced
+Digital Marketing Executive,Digital Marketing Executive,Email Marketing,Beginner
+Digital Marketing Executive,Digital Marketing Executive,Email Marketing,Intermediate
+Digital Marketing Executive,Digital Marketing Executive,Email Marketing,Advanced
+Digital Marketing Executive,Digital Marketing Executive,Social Media Marketing,Beginner
+Digital Marketing Executive,Digital Marketing Executive,Social Media Marketing,Intermediate
+Digital Marketing Executive,Digital Marketing Executive,Social Media Marketing,Advanced
+Network Engineer,Network Engineer,CCNA,Beginner
+Network Engineer,Network Engineer,CCNA,Intermediate
+Network Engineer,Network Engineer,CCNA,Advanced
+Network Engineer,Network Engineer,Routing,Beginner
+Network Engineer,Network Engineer,Routing,Intermediate
+Network Engineer,Network Engineer,Routing,Advanced
+Network Engineer,Network Engineer,Switching,Beginner
+Network Engineer,Network Engineer,Switching,Intermediate
+Network Engineer,Network Engineer,Switching,Advanced
+Network Engineer,Network Engineer,TCP/IP,Beginner
+Network Engineer,Network Engineer,TCP/IP,Intermediate
+Network Engineer,Network Engineer,TCP/IP,Advanced
+Network Engineer,Network Engineer,Firewall,Beginner
+Network Engineer,Network Engineer,Firewall,Intermediate
+Network Engineer,Network Engineer,Firewall,Advanced
+Network Engineer,Network Engineer,Network Monitoring,Beginner
+Network Engineer,Network Engineer,Network Monitoring,Intermediate
+Network Engineer,Network Engineer,Network Monitoring,Advanced
+Network Engineer,Network Engineer,Troubleshooting,Beginner
+Network Engineer,Network Engineer,Troubleshooting,Intermediate
+Network Engineer,Network Engineer,Troubleshooting,Advanced
+ERP Consultant,ERP Consultant,SAP,Beginner
+ERP Consultant,ERP Consultant,SAP,Intermediate
+ERP Consultant,ERP Consultant,SAP,Advanced
+ERP Consultant,ERP Consultant,Oracle ERP,Beginner
+ERP Consultant,ERP Consultant,Oracle ERP,Intermediate
+ERP Consultant,ERP Consultant,Oracle ERP,Advanced
+ERP Consultant,ERP Consultant,Business Processes,Beginner
+ERP Consultant,ERP Consultant,Business Processes,Intermediate
+ERP Consultant,ERP Consultant,Business Processes,Advanced
+ERP Consultant,ERP Consultant,Configuration,Beginner
+ERP Consultant,ERP Consultant,Configuration,Intermediate
+ERP Consultant,ERP Consultant,Configuration,Advanced
+ERP Consultant,ERP Consultant,Training,Beginner
+ERP Consultant,ERP Consultant,Training,Intermediate
+ERP Consultant,ERP Consultant,Training,Advanced
+ERP Consultant,ERP Consultant,Documentation,Beginner
+ERP Consultant,ERP Consultant,Documentation,Intermediate
+ERP Consultant,ERP Consultant,Documentation,Advanced
+ERP Consultant,ERP Consultant,Testing,Beginner
+ERP Consultant,ERP Consultant,Testing,Intermediate
+ERP Consultant,ERP Consultant,Testing,Advanced

@@ -10,7 +10,7 @@ import CircularScore from '@/components/CircularScore'
 interface Resume { id: string; title: string; content: any; ats_score?: number | null }
 interface MatchResult { score: number; matched: string[]; missing: string[]; suggestions: string[] }
 
-const scoreColor = (s: number) => (s >= 80 ? '#22c55e' : s >= 60 ? '#f59e0b' : '#ef4444')
+const scoreColor = (s: number) => (s >= 80 ? '#1E7A46' : s >= 60 ? '#F5A623' : '#c0392b')
 
 export default function JobMatchPage() {
   const { user } = useAuthStore()
@@ -137,7 +137,7 @@ export default function JobMatchPage() {
                 <div className="h-10 rounded-xl bg-gray-100 shimmer" />
               ) : resumes.length === 0 ? (
                 <div className="text-sm text-gray-500">
-                  No resumes yet. <button onClick={() => router.push('/resumes/new')} className="text-indigo-600 hover:underline">Create one</button>.
+                  No resumes yet. <button onClick={() => router.push('/resumes/new')} className="text-navy-600 hover:underline">Create one</button>.
                 </div>
               ) : (
                 <select value={resumeId} onChange={e => { setResumeId(e.target.value); setResult(null) }} className="input-premium">
@@ -200,7 +200,7 @@ export default function JobMatchPage() {
                         <button key={k} onClick={() => togglePick(k)}
                           className={`text-xs px-2.5 py-1 rounded-full border transition ${
                             pickedMissing.has(k)
-                              ? 'bg-indigo-600 text-white border-indigo-600'
+                              ? 'bg-navy-600 text-white border-navy-600'
                               : 'bg-red-50/60 text-red-600 border-red-200 hover:bg-red-100'
                           }`}>
                           {pickedMissing.has(k) ? '✓ ' : '+ '}{k}

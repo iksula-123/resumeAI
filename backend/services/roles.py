@@ -66,13 +66,14 @@ async def get_role(db: AsyncSession, slug: str) -> dict | None:
     r = (await db.execute(text(
         """select slug, canonical_title, skills, skills_detail, education,
                   selection_process, salary_min, salary_max, industry, sub_sector,
-                  category, demand_count
+                  category, demand_count, recommended_certifications
            from public.role_profiles where slug = :slug"""
     ), {"slug": slug})).mappings().first()
     if not r:
         return None
     d = dict(r)
     d["skills"] = list(d["skills"]) if d["skills"] else []
+    d["recommended_certifications"] = list(d["recommended_certifications"] or [])
     return d
 
 
@@ -155,6 +156,10 @@ async def build_prefill(db: AsyncSession, role: dict, career: dict | None) -> di
     blue = {
         "summary": summary,                                    # editable, confirm
         "skills_checklist": [{"skill": s, "checked": False} for s in skills],  # tick to confirm
+        "certifications_checklist": [
+            {"name": c["name"], "category": c.get("category"), "checked": False}
+            for c in (role.get("recommended_certifications") or [])
+        ],  # suggested for this role — tick to add as your own (self-reported, like skills)
     }
 
     # grey — scaffolds the candidate fills with their own content

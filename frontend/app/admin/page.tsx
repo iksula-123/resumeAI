@@ -124,7 +124,7 @@ export default function AdminPage() {
         <h1 className="text-sm font-semibold text-gray-800 flex items-center gap-2">🛡️ Admin Panel</h1>
         <p className="text-xs text-gray-500">Manage users, roles, and platform data</p>
       </div>
-      <button onClick={load} className="text-xs text-indigo-600 bg-indigo-50 hover:bg-indigo-100 px-3 py-1.5 rounded-lg transition">
+      <button onClick={load} className="text-xs text-navy-600 bg-royal-50 hover:bg-royal-100 px-3 py-1.5 rounded-lg transition">
         ↻ Refresh
       </button>
     </>
@@ -132,7 +132,7 @@ export default function AdminPage() {
 
   const statCards = stats ? [
     { label: 'Total Users', value: stats.total_users, icon: '👥', color: 'bg-blue-50 text-blue-700' },
-    { label: 'Admins', value: stats.total_admins, icon: '🛡️', color: 'bg-purple-50 text-purple-700' },
+    { label: 'Admins', value: stats.total_admins, icon: '🛡️', color: 'bg-teal-50 text-royal-700' },
     { label: 'Pro Users', value: stats.pro_users, icon: '⭐', color: 'bg-yellow-50 text-yellow-700' },
     { label: 'Resumes', value: stats.total_resumes, icon: '📄', color: 'bg-green-50 text-green-700' },
     { label: 'Cover Letters', value: stats.total_cover_letters, icon: '✉️', color: 'bg-orange-50 text-orange-700' },
@@ -164,7 +164,7 @@ export default function AdminPage() {
             <h2 className="font-bold text-gray-900 font-display mb-3">AI Usage & Cost</h2>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
               {[
-                { label: 'AI Requests', value: analytics.ai.requests.toLocaleString(), icon: '⚡', color: 'bg-indigo-50 text-indigo-700' },
+                { label: 'AI Requests', value: analytics.ai.requests.toLocaleString(), icon: '⚡', color: 'bg-royal-50 text-navy-700' },
                 { label: 'Total Tokens', value: analytics.ai.total_tokens.toLocaleString(), icon: '🔢', color: 'bg-blue-50 text-blue-700' },
                 { label: 'Est. Cost', value: `$${analytics.ai.est_cost.toFixed(4)}`, icon: '💰', color: 'bg-green-50 text-green-700' },
                 { label: 'Avg ATS Score', value: analytics.totals.avg_ats || '—', icon: '🎯', color: 'bg-orange-50 text-orange-700' },
@@ -191,7 +191,7 @@ export default function AdminPage() {
                         <div key={f.feature} className="flex items-center gap-2">
                           <span className="text-xs text-gray-600 w-28 truncate capitalize">{f.feature.replace(/-/g, ' ')}</span>
                           <div className="flex-1 h-2 bg-gray-100 rounded-full overflow-hidden">
-                            <div className="h-full bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full" style={{ width: `${(f.tokens / max) * 100}%` }} />
+                            <div className="h-full bg-gradient-to-r from-royal-500 to-teal-500 rounded-full" style={{ width: `${(f.tokens / max) * 100}%` }} />
                           </div>
                           <span className="text-xs font-medium text-gray-700 w-16 text-right">{f.tokens.toLocaleString()}</span>
                         </div>
@@ -251,17 +251,17 @@ export default function AdminPage() {
                     <tr key={u.id} className="border-b border-gray-50 hover:bg-gray-50/50">
                       <td className="px-5 py-3">
                         <div className="flex items-center gap-3">
-                          <div className="w-8 h-8 bg-indigo-100 rounded-full flex items-center justify-center text-indigo-700 text-xs font-bold">
+                          <div className="w-8 h-8 bg-royal-100 rounded-full flex items-center justify-center text-navy-700 text-xs font-bold">
                             {(u.full_name || u.email)[0]?.toUpperCase()}
                           </div>
                           <div>
-                            <div className="font-medium text-gray-800">{u.full_name || '—'} {isSelf && <span className="text-xs text-indigo-500">(you)</span>}</div>
+                            <div className="font-medium text-gray-800">{u.full_name || '—'} {isSelf && <span className="text-xs text-royal-500">(you)</span>}</div>
                             <div className="text-xs text-gray-500">{u.email}</div>
                           </div>
                         </div>
                       </td>
                       <td className="px-5 py-3">
-                        <span className={`text-xs px-2 py-1 rounded-full font-medium ${u.role === 'admin' ? 'bg-purple-100 text-purple-700' : 'bg-gray-100 text-gray-600'}`}>
+                        <span className={`text-xs px-2 py-1 rounded-full font-medium ${u.role === 'admin' ? 'bg-royal-100 text-royal-700' : 'bg-gray-100 text-gray-600'}`}>
                           {u.role}
                         </span>
                       </td>
@@ -283,7 +283,7 @@ export default function AdminPage() {
                             </button>
                           ) : (
                             <button disabled={busy === u.id} onClick={() => setRole(u, 'admin')}
-                              className="text-xs px-2.5 py-1 rounded-lg bg-purple-50 hover:bg-purple-100 text-purple-700 transition disabled:opacity-40">
+                              className="text-xs px-2.5 py-1 rounded-lg bg-teal-50 hover:bg-royal-100 text-royal-700 transition disabled:opacity-40">
                               Make Admin
                             </button>
                           )}
@@ -317,7 +317,7 @@ export default function AdminPage() {
             <div className="divide-y divide-gray-50 max-h-[420px] overflow-y-auto">
               {audit.map(a => (
                 <div key={a.id} className="flex items-center gap-3 px-5 py-2.5 hover:bg-gray-50/50">
-                  <span className="text-xs font-mono px-2 py-0.5 rounded bg-indigo-50 text-indigo-700 flex-shrink-0">{a.action}</span>
+                  <span className="text-xs font-mono px-2 py-0.5 rounded bg-royal-50 text-navy-700 flex-shrink-0">{a.action}</span>
                   <div className="flex-1 min-w-0">
                     <span className="text-sm text-gray-700">{a.actor_email || 'system'}</span>
                     {a.entity_type && (

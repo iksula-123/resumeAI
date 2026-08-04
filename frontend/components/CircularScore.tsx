@@ -13,7 +13,7 @@ export default function CircularScore({
   max = 100,
   size = 100,
   strokeWidth = 8,
-  color = '#22c55e',
+  color = '#1E7A46',
   label,
   sublabel,
 }: Props) {
@@ -34,7 +34,7 @@ export default function CircularScore({
       >
         <circle
           cx={cx} cy={cy} r={r}
-          fill="none" stroke="#e5e7eb"
+          fill="none" stroke="#E3E8EF"
           strokeWidth={strokeWidth}
         />
         <circle

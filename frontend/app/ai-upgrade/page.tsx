@@ -30,7 +30,7 @@ const STAGES = [
   { icon: '🎁', label: 'Finalizing your upgrade' },
 ]
 
-const scoreColor = (s: number) => (s >= 80 ? '#22c55e' : s >= 60 ? '#f59e0b' : '#ef4444')
+const scoreColor = (s: number) => (s >= 80 ? '#1E7A46' : s >= 60 ? '#F5A623' : '#c0392b')
 
 export default function AiUpgradePage() {
   const router = useRouter()
@@ -190,7 +190,7 @@ export default function AiUpgradePage() {
                   }`}>
                     {done ? '✓' : n}
                   </div>
-                  <span className={`text-xs font-medium hidden sm:block ${active ? 'text-indigo-700' : done ? 'text-gray-600' : 'text-gray-500'}`}>{label}</span>
+                  <span className={`text-xs font-medium hidden sm:block ${active ? 'text-navy-700' : done ? 'text-gray-600' : 'text-gray-500'}`}>{label}</span>
                 </div>
                 {n < STEPS.length && <div className={`w-6 sm:w-10 h-0.5 mx-1 sm:mx-2 rounded ${done ? 'bg-green-400' : 'bg-gray-200'}`} />}
               </div>
@@ -211,7 +211,7 @@ export default function AiUpgradePage() {
               onDrop={onDrop}
               onClick={() => fileInput.current?.click()}
               className={`panel-premium cursor-pointer border-2 border-dashed transition-all p-12 text-center ${
-                dragging ? 'border-indigo-500 bg-indigo-50/60 scale-[1.01]' : 'border-indigo-200 hover:border-indigo-400'
+                dragging ? 'border-royal-500 bg-royal-50/60 scale-[1.01]' : 'border-royal-200 hover:border-royal-400'
               }`}
             >
               <div className="w-16 h-16 mx-auto bg-brand-gradient rounded-2xl flex items-center justify-center text-white text-3xl mb-4 shadow-glow">
@@ -254,14 +254,14 @@ export default function AiUpgradePage() {
                   const active = i === stageIdx && !done
                   return (
                     <div key={s.label} className={`flex items-center gap-3 rounded-xl px-3 py-2.5 transition-all ${
-                      active ? 'bg-indigo-50' : done ? '' : 'opacity-40'
+                      active ? 'bg-royal-50' : done ? '' : 'opacity-40'
                     }`}>
                       <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm flex-shrink-0 ${
-                        done ? 'bg-green-100' : active ? 'bg-indigo-100' : 'bg-gray-100'
+                        done ? 'bg-green-100' : active ? 'bg-royal-100' : 'bg-gray-100'
                       }`}>
                         {done ? '✓' : active ? <span className="animate-spin">⟳</span> : s.icon}
                       </div>
-                      <span className={`text-sm ${done ? 'text-gray-700' : active ? 'text-indigo-700 font-medium' : 'text-gray-500'}`}>{s.label}</span>
+                      <span className={`text-sm ${done ? 'text-gray-700' : active ? 'text-navy-700 font-medium' : 'text-gray-500'}`}>{s.label}</span>
                     </div>
                   )
                 })}
@@ -299,19 +299,19 @@ export default function AiUpgradePage() {
             <div className="card-premium p-6 md:col-span-2">
               <div className="flex items-center justify-between mb-4">
                 <h2 className="font-bold text-gray-900 font-display">Recommendations</h2>
-                <span className="text-xs bg-indigo-50 text-indigo-700 px-3 py-1 rounded-full">
+                <span className="text-xs bg-royal-50 text-navy-700 px-3 py-1 rounded-full">
                   AI will fix these ✨
                 </span>
               </div>
               <div className="space-y-2.5">
                 {result.ats_before.recommendations.map((r, i) => (
                   <div key={i} className="flex gap-3 bg-gray-50 rounded-xl px-4 py-3">
-                    <span className="text-indigo-500 flex-shrink-0">💡</span>
+                    <span className="text-royal-500 flex-shrink-0">💡</span>
                     <p className="text-sm text-gray-700">{r}</p>
                   </div>
                 ))}
               </div>
-              <div className="mt-6 flex items-center justify-between bg-gradient-to-r from-indigo-50 to-purple-50 rounded-xl p-4">
+              <div className="mt-6 flex items-center justify-between bg-gradient-to-r from-royal-50 to-teal-50 rounded-xl p-4">
                 <div>
                   <div className="text-sm font-semibold text-gray-800">AI has already enhanced your resume</div>
                   <div className="text-xs text-gray-500">Projected new score: <span className="font-bold text-green-600">{result.ats_after.score}</span> (+{result.ats_after.score - result.ats_before.score})</div>
@@ -331,7 +331,7 @@ export default function AiUpgradePage() {
                 <CircularScore score={result.ats_before.score} size={64} color={scoreColor(result.ats_before.score)} />
                 <div className="text-xs text-gray-500">Before</div>
               </div>
-              <div className="text-2xl text-indigo-400">→</div>
+              <div className="text-2xl text-royal-400">→</div>
               <div className="flex items-center gap-3">
                 <CircularScore score={result.ats_after.score} size={72} color={scoreColor(result.ats_after.score)} />
                 <div className="text-xs font-semibold text-green-600">After (+{result.ats_after.score - result.ats_before.score})</div>
@@ -365,7 +365,7 @@ export default function AiUpgradePage() {
                   <span className="text-xs font-semibold gradient-text uppercase tracking-wide">AI Enhanced ✨</span>
                   <span className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full">ATS {result.ats_after.score}</span>
                 </div>
-                <div className="panel-premium overflow-hidden ring-2 ring-indigo-300">
+                <div className="panel-premium overflow-hidden ring-2 ring-royal-300">
                   <div className="max-h-[520px] overflow-y-auto">
                     <ResumeTemplates content={result.enhanced} template="modern" />
                   </div>
@@ -409,7 +409,7 @@ export default function AiUpgradePage() {
                     </button>
                   </div>
                   <div className="flex gap-3">
-                    <button onClick={() => router.push(`/resumes/${savedId}/edit`)} className="flex-1 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-sm font-medium py-2.5 rounded-xl transition">Edit</button>
+                    <button onClick={() => router.push(`/resumes/${savedId}/edit`)} className="flex-1 bg-royal-50 hover:bg-royal-100 text-navy-700 text-sm font-medium py-2.5 rounded-xl transition">Edit</button>
                     <button onClick={() => router.push(`/resumes/${savedId}/preview`)} className="flex-1 bg-gray-50 hover:bg-gray-100 text-gray-700 text-sm font-medium py-2.5 rounded-xl transition">Preview</button>
                     <button onClick={() => router.push('/dashboard')} className="flex-1 bg-gray-50 hover:bg-gray-100 text-gray-700 text-sm font-medium py-2.5 rounded-xl transition">Dashboard</button>
                   </div>

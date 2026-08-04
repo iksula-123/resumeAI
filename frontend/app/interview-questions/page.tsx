@@ -21,7 +21,7 @@ const MOCK_QUESTIONS: Question[] = [
 
 const TYPE_COLORS: Record<QType, string> = {
   Technical: 'bg-blue-100 text-blue-700',
-  HR: 'bg-purple-100 text-purple-700',
+  HR: 'bg-royal-100 text-royal-700',
   Behavioral: 'bg-green-100 text-green-700',
 }
 
@@ -133,7 +133,7 @@ export default function InterviewQuestionsPage() {
                 value={roles.includes(jobTitle) ? jobTitle : ''}
                 onChange={e => { if (e.target.value) generate(e.target.value) }}
                 disabled={loading}
-                className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-indigo-300"
+                className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-royal-300"
               >
                 <option value="">— Select a role —</option>
                 {roles.map(r => <option key={r} value={r}>{r}</option>)}
@@ -145,7 +145,7 @@ export default function InterviewQuestionsPage() {
             <input value={jobTitle} onChange={e => setJobTitle(e.target.value)}
               onKeyDown={e => e.key === 'Enter' && generate()}
               placeholder="Or type a job title (e.g. Senior React Developer)"
-              className="flex-1 border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300" />
+              className="flex-1 border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-royal-300" />
             <button onClick={() => generate()} disabled={loading || !jobTitle.trim()}
               className="btn-primary text-sm !px-6 !py-2.5">
               {loading ? <><span className="animate-spin">⟳</span> Generating…</> : '💬 Generate Questions'}
@@ -182,7 +182,7 @@ export default function InterviewQuestionsPage() {
             <button key={f} onClick={() => setActiveFilter(f)}
               className={`px-4 py-1.5 rounded-full text-xs font-medium transition ${
                 activeFilter === f
-                  ? 'bg-indigo-600 text-white'
+                  ? 'bg-navy-600 text-white'
                   : 'bg-white text-gray-600 hover:bg-gray-100 shadow-sm'
               }`}>
               {f} {f !== 'All' && `(${counts[f as QType]})`}
@@ -214,11 +214,11 @@ export default function InterviewQuestionsPage() {
                     onChange={e => setUserAnswers(prev => ({ ...prev, [i]: e.target.value }))}
                     placeholder="Type your answer here to practice..."
                     rows={4}
-                    className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300 resize-none"
+                    className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-royal-300 resize-none"
                   />
                   <div className="flex gap-2 mt-2">
                     <button onClick={() => getFeedback(i)} disabled={busy !== null}
-                      className="text-xs bg-indigo-50 text-indigo-600 hover:bg-indigo-100 px-3 py-1.5 rounded-lg transition disabled:opacity-50">
+                      className="text-xs bg-royal-50 text-navy-600 hover:bg-royal-100 px-3 py-1.5 rounded-lg transition disabled:opacity-50">
                       {busy === `fb-${i}` ? '✨ Reviewing…' : '✨ Get AI Feedback'}
                     </button>
                     <button onClick={() => getSample(i)} disabled={busy !== null}
@@ -228,8 +228,8 @@ export default function InterviewQuestionsPage() {
                   </div>
 
                   {feedback[i] && (
-                    <div className="mt-3 bg-indigo-50 border border-indigo-100 rounded-xl p-3">
-                      <div className="text-xs font-semibold text-indigo-700 mb-1">✨ AI Feedback</div>
+                    <div className="mt-3 bg-royal-50 border border-royal-100 rounded-xl p-3">
+                      <div className="text-xs font-semibold text-navy-700 mb-1">✨ AI Feedback</div>
                       <p className="text-xs text-gray-700 leading-relaxed whitespace-pre-wrap">{feedback[i]}</p>
                     </div>
                   )}

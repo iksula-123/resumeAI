@@ -1,0 +1,481 @@
+Category,SubCategory,Certification Name,Level,Job Role
+AI & ML,AI & ML,Machine Learning Certification,Foundation,Software Developer
+AI & ML,AI & ML,Machine Learning Certification,Associate,Senior Developer
+AI & ML,AI & ML,Machine Learning Certification,Professional,Tech Lead
+AI & ML,AI & ML,Machine Learning Certification,Advanced,AI Engineer
+AI & ML,AI & ML,Deep Learning Certification,Foundation,ML Engineer
+AI & ML,AI & ML,Deep Learning Certification,Associate,Data Scientist
+AI & ML,AI & ML,Deep Learning Certification,Professional,Data Analyst
+AI & ML,AI & ML,Deep Learning Certification,Advanced,MIS Executive
+AI & ML,AI & ML,Generative AI Certification,Foundation,Project Manager
+AI & ML,AI & ML,Generative AI Certification,Associate,Business Analyst
+AI & ML,AI & ML,Generative AI Certification,Professional,DevOps Engineer
+AI & ML,AI & ML,Generative AI Certification,Advanced,Cloud Engineer
+AI & ML,AI & ML,NLP Certification,Foundation,Security Analyst
+AI & ML,AI & ML,NLP Certification,Associate,QA Engineer
+AI & ML,AI & ML,NLP Certification,Professional,Banking Professional
+AI & ML,AI & ML,NLP Certification,Advanced,Finance Analyst
+AI & ML,AI & ML,Computer Vision Certification,Foundation,HR Executive
+AI & ML,AI & ML,Computer Vision Certification,Associate,Digital Marketing Executive
+AI & ML,AI & ML,Computer Vision Certification,Professional,Network Engineer
+AI & ML,AI & ML,Computer Vision Certification,Advanced,ERP Consultant
+AI & ML,AI & ML,MLOps Certification,Foundation,Software Developer
+AI & ML,AI & ML,MLOps Certification,Associate,Senior Developer
+AI & ML,AI & ML,MLOps Certification,Professional,Tech Lead
+AI & ML,AI & ML,MLOps Certification,Advanced,AI Engineer
+AI & ML,AI & ML,Prompt Engineering Certification,Foundation,ML Engineer
+AI & ML,AI & ML,Prompt Engineering Certification,Associate,Data Scientist
+AI & ML,AI & ML,Prompt Engineering Certification,Professional,Data Analyst
+AI & ML,AI & ML,Prompt Engineering Certification,Advanced,MIS Executive
+AI & ML,AI & ML,AI Agent Development Certification,Foundation,Project Manager
+AI & ML,AI & ML,AI Agent Development Certification,Associate,Business Analyst
+AI & ML,AI & ML,AI Agent Development Certification,Professional,DevOps Engineer
+AI & ML,AI & ML,AI Agent Development Certification,Advanced,Cloud Engineer
+AI & ML,AI & ML,TensorFlow Certification,Foundation,Security Analyst
+AI & ML,AI & ML,TensorFlow Certification,Associate,QA Engineer
+AI & ML,AI & ML,TensorFlow Certification,Professional,Banking Professional
+AI & ML,AI & ML,TensorFlow Certification,Advanced,Finance Analyst
+AI & ML,AI & ML,PyTorch Certification,Foundation,HR Executive
+AI & ML,AI & ML,PyTorch Certification,Associate,Digital Marketing Executive
+AI & ML,AI & ML,PyTorch Certification,Professional,Network Engineer
+AI & ML,AI & ML,PyTorch Certification,Advanced,ERP Consultant
+AI & ML,AI & ML,Responsible AI Certification,Foundation,Software Developer
+AI & ML,AI & ML,Responsible AI Certification,Associate,Senior Developer
+AI & ML,AI & ML,Responsible AI Certification,Professional,Tech Lead
+AI & ML,AI & ML,Responsible AI Certification,Advanced,AI Engineer
+AI & ML,AI & ML,LLM Engineering Certification,Foundation,ML Engineer
+AI & ML,AI & ML,LLM Engineering Certification,Associate,Data Scientist
+AI & ML,AI & ML,LLM Engineering Certification,Professional,Data Analyst
+AI & ML,AI & ML,LLM Engineering Certification,Advanced,MIS Executive
+Data Science,Data Science,Data Science Certification,Foundation,Project Manager
+Data Science,Data Science,Data Science Certification,Associate,Business Analyst
+Data Science,Data Science,Data Science Certification,Professional,DevOps Engineer
+Data Science,Data Science,Data Science Certification,Advanced,Cloud Engineer
+Data Science,Data Science,Data Analytics Certification,Foundation,Security Analyst
+Data Science,Data Science,Data Analytics Certification,Associate,QA Engineer
+Data Science,Data Science,Data Analytics Certification,Professional,Banking Professional
+Data Science,Data Science,Data Analytics Certification,Advanced,Finance Analyst
+Data Science,Data Science,Business Analytics Certification,Foundation,HR Executive
+Data Science,Data Science,Business Analytics Certification,Associate,Digital Marketing Executive
+Data Science,Data Science,Business Analytics Certification,Professional,Network Engineer
+Data Science,Data Science,Business Analytics Certification,Advanced,ERP Consultant
+Data Science,Data Science,Statistics Certification,Foundation,Software Developer
+Data Science,Data Science,Statistics Certification,Associate,Senior Developer
+Data Science,Data Science,Statistics Certification,Professional,Tech Lead
+Data Science,Data Science,Statistics Certification,Advanced,AI Engineer
+Data Science,Data Science,Data Engineering Certification,Foundation,ML Engineer
+Data Science,Data Science,Data Engineering Certification,Associate,Data Scientist
+Data Science,Data Science,Data Engineering Certification,Professional,Data Analyst
+Data Science,Data Science,Data Engineering Certification,Advanced,MIS Executive
+Data Science,Data Science,Big Data Certification,Foundation,Project Manager
+Data Science,Data Science,Big Data Certification,Associate,Business Analyst
+Data Science,Data Science,Big Data Certification,Professional,DevOps Engineer
+Data Science,Data Science,Big Data Certification,Advanced,Cloud Engineer
+Data Science,Data Science,Power BI Certification,Foundation,Security Analyst
+Data Science,Data Science,Power BI Certification,Associate,QA Engineer
+Data Science,Data Science,Power BI Certification,Professional,Banking Professional
+Data Science,Data Science,Power BI Certification,Advanced,Finance Analyst
+Data Science,Data Science,Tableau Certification,Foundation,HR Executive
+Data Science,Data Science,Tableau Certification,Associate,Digital Marketing Executive
+Data Science,Data Science,Tableau Certification,Professional,Network Engineer
+Data Science,Data Science,Tableau Certification,Advanced,ERP Consultant
+Data Science,Data Science,SQL Certification,Foundation,Software Developer
+Data Science,Data Science,SQL Certification,Associate,Senior Developer
+Data Science,Data Science,SQL Certification,Professional,Tech Lead
+Data Science,Data Science,SQL Certification,Advanced,AI Engineer
+Data Science,Data Science,Data Visualization Certification,Foundation,ML Engineer
+Data Science,Data Science,Data Visualization Certification,Associate,Data Scientist
+Data Science,Data Science,Data Visualization Certification,Professional,Data Analyst
+Data Science,Data Science,Data Visualization Certification,Advanced,MIS Executive
+Data Science,Data Science,Data Mining Certification,Foundation,Project Manager
+Data Science,Data Science,Data Mining Certification,Associate,Business Analyst
+Data Science,Data Science,Data Mining Certification,Professional,DevOps Engineer
+Data Science,Data Science,Data Mining Certification,Advanced,Cloud Engineer
+Data Science,Data Science,Predictive Analytics Certification,Foundation,Security Analyst
+Data Science,Data Science,Predictive Analytics Certification,Associate,QA Engineer
+Data Science,Data Science,Predictive Analytics Certification,Professional,Banking Professional
+Data Science,Data Science,Predictive Analytics Certification,Advanced,Finance Analyst
+Programming,Programming,Python Certification,Foundation,HR Executive
+Programming,Programming,Python Certification,Associate,Digital Marketing Executive
+Programming,Programming,Python Certification,Professional,Network Engineer
+Programming,Programming,Python Certification,Advanced,ERP Consultant
+Programming,Programming,Java Certification,Foundation,Software Developer
+Programming,Programming,Java Certification,Associate,Senior Developer
+Programming,Programming,Java Certification,Professional,Tech Lead
+Programming,Programming,Java Certification,Advanced,AI Engineer
+Programming,Programming,PHP Certification,Foundation,ML Engineer
+Programming,Programming,PHP Certification,Associate,Data Scientist
+Programming,Programming,PHP Certification,Professional,Data Analyst
+Programming,Programming,PHP Certification,Advanced,MIS Executive
+Programming,Programming,JavaScript Certification,Foundation,Project Manager
+Programming,Programming,JavaScript Certification,Associate,Business Analyst
+Programming,Programming,JavaScript Certification,Professional,DevOps Engineer
+Programming,Programming,JavaScript Certification,Advanced,Cloud Engineer
+Programming,Programming,TypeScript Certification,Foundation,Security Analyst
+Programming,Programming,TypeScript Certification,Associate,QA Engineer
+Programming,Programming,TypeScript Certification,Professional,Banking Professional
+Programming,Programming,TypeScript Certification,Advanced,Finance Analyst
+Programming,Programming,C Certification,Foundation,HR Executive
+Programming,Programming,C Certification,Associate,Digital Marketing Executive
+Programming,Programming,C Certification,Professional,Network Engineer
+Programming,Programming,C Certification,Advanced,ERP Consultant
+Programming,Programming,C++ Certification,Foundation,Software Developer
+Programming,Programming,C++ Certification,Associate,Senior Developer
+Programming,Programming,C++ Certification,Professional,Tech Lead
+Programming,Programming,C++ Certification,Advanced,AI Engineer
+Programming,Programming,C# Certification,Foundation,ML Engineer
+Programming,Programming,C# Certification,Associate,Data Scientist
+Programming,Programming,C# Certification,Professional,Data Analyst
+Programming,Programming,C# Certification,Advanced,MIS Executive
+Programming,Programming,.NET Certification,Foundation,Project Manager
+Programming,Programming,.NET Certification,Associate,Business Analyst
+Programming,Programming,.NET Certification,Professional,DevOps Engineer
+Programming,Programming,.NET Certification,Advanced,Cloud Engineer
+Programming,Programming,Go Certification,Foundation,Security Analyst
+Programming,Programming,Go Certification,Associate,QA Engineer
+Programming,Programming,Go Certification,Professional,Banking Professional
+Programming,Programming,Go Certification,Advanced,Finance Analyst
+Programming,Programming,Rust Certification,Foundation,HR Executive
+Programming,Programming,Rust Certification,Associate,Digital Marketing Executive
+Programming,Programming,Rust Certification,Professional,Network Engineer
+Programming,Programming,Rust Certification,Advanced,ERP Consultant
+Programming,Programming,Node.js Certification,Foundation,Software Developer
+Programming,Programming,Node.js Certification,Associate,Senior Developer
+Programming,Programming,Node.js Certification,Professional,Tech Lead
+Programming,Programming,Node.js Certification,Advanced,AI Engineer
+Programming,Programming,React Certification,Foundation,ML Engineer
+Programming,Programming,React Certification,Associate,Data Scientist
+Programming,Programming,React Certification,Professional,Data Analyst
+Programming,Programming,React Certification,Advanced,MIS Executive
+Programming,Programming,Angular Certification,Foundation,Project Manager
+Programming,Programming,Angular Certification,Associate,Business Analyst
+Programming,Programming,Angular Certification,Professional,DevOps Engineer
+Programming,Programming,Angular Certification,Advanced,Cloud Engineer
+Programming,Programming,Vue Certification,Foundation,Security Analyst
+Programming,Programming,Vue Certification,Associate,QA Engineer
+Programming,Programming,Vue Certification,Professional,Banking Professional
+Programming,Programming,Vue Certification,Advanced,Finance Analyst
+Programming,Programming,Django Certification,Foundation,HR Executive
+Programming,Programming,Django Certification,Associate,Digital Marketing Executive
+Programming,Programming,Django Certification,Professional,Network Engineer
+Programming,Programming,Django Certification,Advanced,ERP Consultant
+Programming,Programming,FastAPI Certification,Foundation,Software Developer
+Programming,Programming,FastAPI Certification,Associate,Senior Developer
+Programming,Programming,FastAPI Certification,Professional,Tech Lead
+Programming,Programming,FastAPI Certification,Advanced,AI Engineer
+Programming,Programming,Laravel Certification,Foundation,ML Engineer
+Programming,Programming,Laravel Certification,Associate,Data Scientist
+Programming,Programming,Laravel Certification,Professional,Data Analyst
+Programming,Programming,Laravel Certification,Advanced,MIS Executive
+Programming,Programming,Spring Boot Certification,Foundation,Project Manager
+Programming,Programming,Spring Boot Certification,Associate,Business Analyst
+Programming,Programming,Spring Boot Certification,Professional,DevOps Engineer
+Programming,Programming,Spring Boot Certification,Advanced,Cloud Engineer
+Cloud,Cloud,AWS Certification,Foundation,Security Analyst
+Cloud,Cloud,AWS Certification,Associate,QA Engineer
+Cloud,Cloud,AWS Certification,Professional,Banking Professional
+Cloud,Cloud,AWS Certification,Advanced,Finance Analyst
+Cloud,Cloud,Azure Certification,Foundation,HR Executive
+Cloud,Cloud,Azure Certification,Associate,Digital Marketing Executive
+Cloud,Cloud,Azure Certification,Professional,Network Engineer
+Cloud,Cloud,Azure Certification,Advanced,ERP Consultant
+Cloud,Cloud,Google Cloud Certification,Foundation,Software Developer
+Cloud,Cloud,Google Cloud Certification,Associate,Senior Developer
+Cloud,Cloud,Google Cloud Certification,Professional,Tech Lead
+Cloud,Cloud,Google Cloud Certification,Advanced,AI Engineer
+Cloud,Cloud,Cloud Architecture Certification,Foundation,ML Engineer
+Cloud,Cloud,Cloud Architecture Certification,Associate,Data Scientist
+Cloud,Cloud,Cloud Architecture Certification,Professional,Data Analyst
+Cloud,Cloud,Cloud Architecture Certification,Advanced,MIS Executive
+Cloud,Cloud,Cloud Security Certification,Foundation,Project Manager
+Cloud,Cloud,Cloud Security Certification,Associate,Business Analyst
+Cloud,Cloud,Cloud Security Certification,Professional,DevOps Engineer
+Cloud,Cloud,Cloud Security Certification,Advanced,Cloud Engineer
+Cloud,Cloud,Cloud DevOps Certification,Foundation,Security Analyst
+Cloud,Cloud,Cloud DevOps Certification,Associate,QA Engineer
+Cloud,Cloud,Cloud DevOps Certification,Professional,Banking Professional
+Cloud,Cloud,Cloud DevOps Certification,Advanced,Finance Analyst
+DevOps,DevOps,Docker Certification,Foundation,HR Executive
+DevOps,DevOps,Docker Certification,Associate,Digital Marketing Executive
+DevOps,DevOps,Docker Certification,Professional,Network Engineer
+DevOps,DevOps,Docker Certification,Advanced,ERP Consultant
+DevOps,DevOps,Kubernetes Certification,Foundation,Software Developer
+DevOps,DevOps,Kubernetes Certification,Associate,Senior Developer
+DevOps,DevOps,Kubernetes Certification,Professional,Tech Lead
+DevOps,DevOps,Kubernetes Certification,Advanced,AI Engineer
+DevOps,DevOps,Terraform Certification,Foundation,ML Engineer
+DevOps,DevOps,Terraform Certification,Associate,Data Scientist
+DevOps,DevOps,Terraform Certification,Professional,Data Analyst
+DevOps,DevOps,Terraform Certification,Advanced,MIS Executive
+DevOps,DevOps,Ansible Certification,Foundation,Project Manager
+DevOps,DevOps,Ansible Certification,Associate,Business Analyst
+DevOps,DevOps,Ansible Certification,Professional,DevOps Engineer
+DevOps,DevOps,Ansible Certification,Advanced,Cloud Engineer
+DevOps,DevOps,Jenkins Certification,Foundation,Security Analyst
+DevOps,DevOps,Jenkins Certification,Associate,QA Engineer
+DevOps,DevOps,Jenkins Certification,Professional,Banking Professional
+DevOps,DevOps,Jenkins Certification,Advanced,Finance Analyst
+DevOps,DevOps,CI/CD Certification,Foundation,HR Executive
+DevOps,DevOps,CI/CD Certification,Associate,Digital Marketing Executive
+DevOps,DevOps,CI/CD Certification,Professional,Network Engineer
+DevOps,DevOps,CI/CD Certification,Advanced,ERP Consultant
+DevOps,DevOps,Linux Certification,Foundation,Software Developer
+DevOps,DevOps,Linux Certification,Associate,Senior Developer
+DevOps,DevOps,Linux Certification,Professional,Tech Lead
+DevOps,DevOps,Linux Certification,Advanced,AI Engineer
+DevOps,DevOps,SRE Certification,Foundation,ML Engineer
+DevOps,DevOps,SRE Certification,Associate,Data Scientist
+DevOps,DevOps,SRE Certification,Professional,Data Analyst
+DevOps,DevOps,SRE Certification,Advanced,MIS Executive
+Cybersecurity,Cybersecurity,CEH Certification,Foundation,Project Manager
+Cybersecurity,Cybersecurity,CEH Certification,Associate,Business Analyst
+Cybersecurity,Cybersecurity,CEH Certification,Professional,DevOps Engineer
+Cybersecurity,Cybersecurity,CEH Certification,Advanced,Cloud Engineer
+Cybersecurity,Cybersecurity,Security+ Certification,Foundation,Security Analyst
+Cybersecurity,Cybersecurity,Security+ Certification,Associate,QA Engineer
+Cybersecurity,Cybersecurity,Security+ Certification,Professional,Banking Professional
+Cybersecurity,Cybersecurity,Security+ Certification,Advanced,Finance Analyst
+Cybersecurity,Cybersecurity,CISSP Certification,Foundation,HR Executive
+Cybersecurity,Cybersecurity,CISSP Certification,Associate,Digital Marketing Executive
+Cybersecurity,Cybersecurity,CISSP Certification,Professional,Network Engineer
+Cybersecurity,Cybersecurity,CISSP Certification,Advanced,ERP Consultant
+Cybersecurity,Cybersecurity,CISM Certification,Foundation,Software Developer
+Cybersecurity,Cybersecurity,CISM Certification,Associate,Senior Developer
+Cybersecurity,Cybersecurity,CISM Certification,Professional,Tech Lead
+Cybersecurity,Cybersecurity,CISM Certification,Advanced,AI Engineer
+Cybersecurity,Cybersecurity,SOC Analyst Certification,Foundation,ML Engineer
+Cybersecurity,Cybersecurity,SOC Analyst Certification,Associate,Data Scientist
+Cybersecurity,Cybersecurity,SOC Analyst Certification,Professional,Data Analyst
+Cybersecurity,Cybersecurity,SOC Analyst Certification,Advanced,MIS Executive
+Cybersecurity,Cybersecurity,Penetration Testing Certification,Foundation,Project Manager
+Cybersecurity,Cybersecurity,Penetration Testing Certification,Associate,Business Analyst
+Cybersecurity,Cybersecurity,Penetration Testing Certification,Professional,DevOps Engineer
+Cybersecurity,Cybersecurity,Penetration Testing Certification,Advanced,Cloud Engineer
+Cybersecurity,Cybersecurity,Network Security Certification,Foundation,Security Analyst
+Cybersecurity,Cybersecurity,Network Security Certification,Associate,QA Engineer
+Cybersecurity,Cybersecurity,Network Security Certification,Professional,Banking Professional
+Cybersecurity,Cybersecurity,Network Security Certification,Advanced,Finance Analyst
+Cybersecurity,Cybersecurity,Information Security Certification,Foundation,HR Executive
+Cybersecurity,Cybersecurity,Information Security Certification,Associate,Digital Marketing Executive
+Cybersecurity,Cybersecurity,Information Security Certification,Professional,Network Engineer
+Cybersecurity,Cybersecurity,Information Security Certification,Advanced,ERP Consultant
+Project Management,Project Management,PMP Certification,Foundation,Software Developer
+Project Management,Project Management,PMP Certification,Associate,Senior Developer
+Project Management,Project Management,PMP Certification,Professional,Tech Lead
+Project Management,Project Management,PMP Certification,Advanced,AI Engineer
+Project Management,Project Management,PRINCE2 Certification,Foundation,ML Engineer
+Project Management,Project Management,PRINCE2 Certification,Associate,Data Scientist
+Project Management,Project Management,PRINCE2 Certification,Professional,Data Analyst
+Project Management,Project Management,PRINCE2 Certification,Advanced,MIS Executive
+Project Management,Project Management,Scrum Master Certification,Foundation,Project Manager
+Project Management,Project Management,Scrum Master Certification,Associate,Business Analyst
+Project Management,Project Management,Scrum Master Certification,Professional,DevOps Engineer
+Project Management,Project Management,Scrum Master Certification,Advanced,Cloud Engineer
+Project Management,Project Management,Agile Certification,Foundation,Security Analyst
+Project Management,Project Management,Agile Certification,Associate,QA Engineer
+Project Management,Project Management,Agile Certification,Professional,Banking Professional
+Project Management,Project Management,Agile Certification,Advanced,Finance Analyst
+Project Management,Project Management,SAFe Certification,Foundation,HR Executive
+Project Management,Project Management,SAFe Certification,Associate,Digital Marketing Executive
+Project Management,Project Management,SAFe Certification,Professional,Network Engineer
+Project Management,Project Management,SAFe Certification,Advanced,ERP Consultant
+Project Management,Project Management,Program Management Certification,Foundation,Software Developer
+Project Management,Project Management,Program Management Certification,Associate,Senior Developer
+Project Management,Project Management,Program Management Certification,Professional,Tech Lead
+Project Management,Project Management,Program Management Certification,Advanced,AI Engineer
+Project Management,Project Management,Portfolio Management Certification,Foundation,ML Engineer
+Project Management,Project Management,Portfolio Management Certification,Associate,Data Scientist
+Project Management,Project Management,Portfolio Management Certification,Professional,Data Analyst
+Project Management,Project Management,Portfolio Management Certification,Advanced,MIS Executive
+Banking & Finance,Banking & Finance,CFA Certification,Foundation,Project Manager
+Banking & Finance,Banking & Finance,CFA Certification,Associate,Business Analyst
+Banking & Finance,Banking & Finance,CFA Certification,Professional,DevOps Engineer
+Banking & Finance,Banking & Finance,CFA Certification,Advanced,Cloud Engineer
+Banking & Finance,Banking & Finance,FRM Certification,Foundation,Security Analyst
+Banking & Finance,Banking & Finance,FRM Certification,Associate,QA Engineer
+Banking & Finance,Banking & Finance,FRM Certification,Professional,Banking Professional
+Banking & Finance,Banking & Finance,FRM Certification,Advanced,Finance Analyst
+Banking & Finance,Banking & Finance,NISM Certification,Foundation,HR Executive
+Banking & Finance,Banking & Finance,NISM Certification,Associate,Digital Marketing Executive
+Banking & Finance,Banking & Finance,NISM Certification,Professional,Network Engineer
+Banking & Finance,Banking & Finance,NISM Certification,Advanced,ERP Consultant
+Banking & Finance,Banking & Finance,NCFM Certification,Foundation,Software Developer
+Banking & Finance,Banking & Finance,NCFM Certification,Associate,Senior Developer
+Banking & Finance,Banking & Finance,NCFM Certification,Professional,Tech Lead
+Banking & Finance,Banking & Finance,NCFM Certification,Advanced,AI Engineer
+Banking & Finance,Banking & Finance,Investment Banking Certification,Foundation,ML Engineer
+Banking & Finance,Banking & Finance,Investment Banking Certification,Associate,Data Scientist
+Banking & Finance,Banking & Finance,Investment Banking Certification,Professional,Data Analyst
+Banking & Finance,Banking & Finance,Investment Banking Certification,Advanced,MIS Executive
+Banking & Finance,Banking & Finance,Retail Banking Certification,Foundation,Project Manager
+Banking & Finance,Banking & Finance,Retail Banking Certification,Associate,Business Analyst
+Banking & Finance,Banking & Finance,Retail Banking Certification,Professional,DevOps Engineer
+Banking & Finance,Banking & Finance,Retail Banking Certification,Advanced,Cloud Engineer
+Banking & Finance,Banking & Finance,Corporate Banking Certification,Foundation,Security Analyst
+Banking & Finance,Banking & Finance,Corporate Banking Certification,Associate,QA Engineer
+Banking & Finance,Banking & Finance,Corporate Banking Certification,Professional,Banking Professional
+Banking & Finance,Banking & Finance,Corporate Banking Certification,Advanced,Finance Analyst
+Banking & Finance,Banking & Finance,Financial Modeling Certification,Foundation,HR Executive
+Banking & Finance,Banking & Finance,Financial Modeling Certification,Associate,Digital Marketing Executive
+Banking & Finance,Banking & Finance,Financial Modeling Certification,Professional,Network Engineer
+Banking & Finance,Banking & Finance,Financial Modeling Certification,Advanced,ERP Consultant
+MIS & Reporting,MIS & Reporting,Advanced Excel Certification,Foundation,Software Developer
+MIS & Reporting,MIS & Reporting,Advanced Excel Certification,Associate,Senior Developer
+MIS & Reporting,MIS & Reporting,Advanced Excel Certification,Professional,Tech Lead
+MIS & Reporting,MIS & Reporting,Advanced Excel Certification,Advanced,AI Engineer
+MIS & Reporting,MIS & Reporting,Power BI Certification,Foundation,ML Engineer
+MIS & Reporting,MIS & Reporting,Power BI Certification,Associate,Data Scientist
+MIS & Reporting,MIS & Reporting,Power BI Certification,Professional,Data Analyst
+MIS & Reporting,MIS & Reporting,Power BI Certification,Advanced,MIS Executive
+MIS & Reporting,MIS & Reporting,Tableau Certification,Foundation,Project Manager
+MIS & Reporting,MIS & Reporting,Tableau Certification,Associate,Business Analyst
+MIS & Reporting,MIS & Reporting,Tableau Certification,Professional,DevOps Engineer
+MIS & Reporting,MIS & Reporting,Tableau Certification,Advanced,Cloud Engineer
+MIS & Reporting,MIS & Reporting,Excel VBA Certification,Foundation,Security Analyst
+MIS & Reporting,MIS & Reporting,Excel VBA Certification,Associate,QA Engineer
+MIS & Reporting,MIS & Reporting,Excel VBA Certification,Professional,Banking Professional
+MIS & Reporting,MIS & Reporting,Excel VBA Certification,Advanced,Finance Analyst
+MIS & Reporting,MIS & Reporting,Business Intelligence Certification,Foundation,HR Executive
+MIS & Reporting,MIS & Reporting,Business Intelligence Certification,Associate,Digital Marketing Executive
+MIS & Reporting,MIS & Reporting,Business Intelligence Certification,Professional,Network Engineer
+MIS & Reporting,MIS & Reporting,Business Intelligence Certification,Advanced,ERP Consultant
+MIS & Reporting,MIS & Reporting,Dashboard Development Certification,Foundation,Software Developer
+MIS & Reporting,MIS & Reporting,Dashboard Development Certification,Associate,Senior Developer
+MIS & Reporting,MIS & Reporting,Dashboard Development Certification,Professional,Tech Lead
+MIS & Reporting,MIS & Reporting,Dashboard Development Certification,Advanced,AI Engineer
+HR,HR,HR Management Certification,Foundation,ML Engineer
+HR,HR,HR Management Certification,Associate,Data Scientist
+HR,HR,HR Management Certification,Professional,Data Analyst
+HR,HR,HR Management Certification,Advanced,MIS Executive
+HR,HR,Recruitment Certification,Foundation,Project Manager
+HR,HR,Recruitment Certification,Associate,Business Analyst
+HR,HR,Recruitment Certification,Professional,DevOps Engineer
+HR,HR,Recruitment Certification,Advanced,Cloud Engineer
+HR,HR,Talent Acquisition Certification,Foundation,Security Analyst
+HR,HR,Talent Acquisition Certification,Associate,QA Engineer
+HR,HR,Talent Acquisition Certification,Professional,Banking Professional
+HR,HR,Talent Acquisition Certification,Advanced,Finance Analyst
+HR,HR,Payroll Certification,Foundation,HR Executive
+HR,HR,Payroll Certification,Associate,Digital Marketing Executive
+HR,HR,Payroll Certification,Professional,Network Engineer
+HR,HR,Payroll Certification,Advanced,ERP Consultant
+HR,HR,HR Analytics Certification,Foundation,Software Developer
+HR,HR,HR Analytics Certification,Associate,Senior Developer
+HR,HR,HR Analytics Certification,Professional,Tech Lead
+HR,HR,HR Analytics Certification,Advanced,AI Engineer
+HR,HR,Learning & Development Certification,Foundation,ML Engineer
+HR,HR,Learning & Development Certification,Associate,Data Scientist
+HR,HR,Learning & Development Certification,Professional,Data Analyst
+HR,HR,Learning & Development Certification,Advanced,MIS Executive
+QA & Testing,QA & Testing,ISTQB Certification,Foundation,Project Manager
+QA & Testing,QA & Testing,ISTQB Certification,Associate,Business Analyst
+QA & Testing,QA & Testing,ISTQB Certification,Professional,DevOps Engineer
+QA & Testing,QA & Testing,ISTQB Certification,Advanced,Cloud Engineer
+QA & Testing,QA & Testing,Selenium Certification,Foundation,Security Analyst
+QA & Testing,QA & Testing,Selenium Certification,Associate,QA Engineer
+QA & Testing,QA & Testing,Selenium Certification,Professional,Banking Professional
+QA & Testing,QA & Testing,Selenium Certification,Advanced,Finance Analyst
+QA & Testing,QA & Testing,Automation Testing Certification,Foundation,HR Executive
+QA & Testing,QA & Testing,Automation Testing Certification,Associate,Digital Marketing Executive
+QA & Testing,QA & Testing,Automation Testing Certification,Professional,Network Engineer
+QA & Testing,QA & Testing,Automation Testing Certification,Advanced,ERP Consultant
+QA & Testing,QA & Testing,API Testing Certification,Foundation,Software Developer
+QA & Testing,QA & Testing,API Testing Certification,Associate,Senior Developer
+QA & Testing,QA & Testing,API Testing Certification,Professional,Tech Lead
+QA & Testing,QA & Testing,API Testing Certification,Advanced,AI Engineer
+QA & Testing,QA & Testing,Performance Testing Certification,Foundation,ML Engineer
+QA & Testing,QA & Testing,Performance Testing Certification,Associate,Data Scientist
+QA & Testing,QA & Testing,Performance Testing Certification,Professional,Data Analyst
+QA & Testing,QA & Testing,Performance Testing Certification,Advanced,MIS Executive
+QA & Testing,QA & Testing,Software Testing Certification,Foundation,Project Manager
+QA & Testing,QA & Testing,Software Testing Certification,Associate,Business Analyst
+QA & Testing,QA & Testing,Software Testing Certification,Professional,DevOps Engineer
+QA & Testing,QA & Testing,Software Testing Certification,Advanced,Cloud Engineer
+ERP,ERP,SAP FICO Certification,Foundation,Security Analyst
+ERP,ERP,SAP FICO Certification,Associate,QA Engineer
+ERP,ERP,SAP FICO Certification,Professional,Banking Professional
+ERP,ERP,SAP FICO Certification,Advanced,Finance Analyst
+ERP,ERP,SAP MM Certification,Foundation,HR Executive
+ERP,ERP,SAP MM Certification,Associate,Digital Marketing Executive
+ERP,ERP,SAP MM Certification,Professional,Network Engineer
+ERP,ERP,SAP MM Certification,Advanced,ERP Consultant
+ERP,ERP,SAP SD Certification,Foundation,Software Developer
+ERP,ERP,SAP SD Certification,Associate,Senior Developer
+ERP,ERP,SAP SD Certification,Professional,Tech Lead
+ERP,ERP,SAP SD Certification,Advanced,AI Engineer
+ERP,ERP,SAP ABAP Certification,Foundation,ML Engineer
+ERP,ERP,SAP ABAP Certification,Associate,Data Scientist
+ERP,ERP,SAP ABAP Certification,Professional,Data Analyst
+ERP,ERP,SAP ABAP Certification,Advanced,MIS Executive
+ERP,ERP,Oracle ERP Certification,Foundation,Project Manager
+ERP,ERP,Oracle ERP Certification,Associate,Business Analyst
+ERP,ERP,Oracle ERP Certification,Professional,DevOps Engineer
+ERP,ERP,Oracle ERP Certification,Advanced,Cloud Engineer
+ERP,ERP,Salesforce Administrator Certification,Foundation,Security Analyst
+ERP,ERP,Salesforce Administrator Certification,Associate,QA Engineer
+ERP,ERP,Salesforce Administrator Certification,Professional,Banking Professional
+ERP,ERP,Salesforce Administrator Certification,Advanced,Finance Analyst
+ERP,ERP,Salesforce Developer Certification,Foundation,HR Executive
+ERP,ERP,Salesforce Developer Certification,Associate,Digital Marketing Executive
+ERP,ERP,Salesforce Developer Certification,Professional,Network Engineer
+ERP,ERP,Salesforce Developer Certification,Advanced,ERP Consultant
+Digital Marketing,Digital Marketing,SEO Certification,Foundation,Software Developer
+Digital Marketing,Digital Marketing,SEO Certification,Associate,Senior Developer
+Digital Marketing,Digital Marketing,SEO Certification,Professional,Tech Lead
+Digital Marketing,Digital Marketing,SEO Certification,Advanced,AI Engineer
+Digital Marketing,Digital Marketing,Google Ads Certification,Foundation,ML Engineer
+Digital Marketing,Digital Marketing,Google Ads Certification,Associate,Data Scientist
+Digital Marketing,Digital Marketing,Google Ads Certification,Professional,Data Analyst
+Digital Marketing,Digital Marketing,Google Ads Certification,Advanced,MIS Executive
+Digital Marketing,Digital Marketing,Google Analytics Certification,Foundation,Project Manager
+Digital Marketing,Digital Marketing,Google Analytics Certification,Associate,Business Analyst
+Digital Marketing,Digital Marketing,Google Analytics Certification,Professional,DevOps Engineer
+Digital Marketing,Digital Marketing,Google Analytics Certification,Advanced,Cloud Engineer
+Digital Marketing,Digital Marketing,Content Marketing Certification,Foundation,Security Analyst
+Digital Marketing,Digital Marketing,Content Marketing Certification,Associate,QA Engineer
+Digital Marketing,Digital Marketing,Content Marketing Certification,Professional,Banking Professional
+Digital Marketing,Digital Marketing,Content Marketing Certification,Advanced,Finance Analyst
+Digital Marketing,Digital Marketing,Email Marketing Certification,Foundation,HR Executive
+Digital Marketing,Digital Marketing,Email Marketing Certification,Associate,Digital Marketing Executive
+Digital Marketing,Digital Marketing,Email Marketing Certification,Professional,Network Engineer
+Digital Marketing,Digital Marketing,Email Marketing Certification,Advanced,ERP Consultant
+Digital Marketing,Digital Marketing,Social Media Marketing Certification,Foundation,Software Developer
+Digital Marketing,Digital Marketing,Social Media Marketing Certification,Associate,Senior Developer
+Digital Marketing,Digital Marketing,Social Media Marketing Certification,Professional,Tech Lead
+Digital Marketing,Digital Marketing,Social Media Marketing Certification,Advanced,AI Engineer
+Networking,Networking,CCNA Certification,Foundation,ML Engineer
+Networking,Networking,CCNA Certification,Associate,Data Scientist
+Networking,Networking,CCNA Certification,Professional,Data Analyst
+Networking,Networking,CCNA Certification,Advanced,MIS Executive
+Networking,Networking,CCNP Certification,Foundation,Project Manager
+Networking,Networking,CCNP Certification,Associate,Business Analyst
+Networking,Networking,CCNP Certification,Professional,DevOps Engineer
+Networking,Networking,CCNP Certification,Advanced,Cloud Engineer
+Networking,Networking,Network Administration Certification,Foundation,Security Analyst
+Networking,Networking,Network Administration Certification,Associate,QA Engineer
+Networking,Networking,Network Administration Certification,Professional,Banking Professional
+Networking,Networking,Network Administration Certification,Advanced,Finance Analyst
+Networking,Networking,Wireless Networking Certification,Foundation,HR Executive
+Networking,Networking,Wireless Networking Certification,Associate,Digital Marketing Executive
+Networking,Networking,Wireless Networking Certification,Professional,Network Engineer
+Networking,Networking,Wireless Networking Certification,Advanced,ERP Consultant
+UI/UX,UI/UX,UI Design Certification,Foundation,Software Developer
+UI/UX,UI/UX,UI Design Certification,Associate,Senior Developer
+UI/UX,UI/UX,UI Design Certification,Professional,Tech Lead
+UI/UX,UI/UX,UI Design Certification,Advanced,AI Engineer
+UI/UX,UI/UX,UX Design Certification,Foundation,ML Engineer
+UI/UX,UI/UX,UX Design Certification,Associate,Data Scientist
+UI/UX,UI/UX,UX Design Certification,Professional,Data Analyst
+UI/UX,UI/UX,UX Design Certification,Advanced,MIS Executive
+UI/UX,UI/UX,Figma Certification,Foundation,Project Manager
+UI/UX,UI/UX,Figma Certification,Associate,Business Analyst
+UI/UX,UI/UX,Figma Certification,Professional,DevOps Engineer
+UI/UX,UI/UX,Figma Certification,Advanced,Cloud Engineer
+UI/UX,UI/UX,Adobe XD Certification,Foundation,Security Analyst
+UI/UX,UI/UX,Adobe XD Certification,Associate,QA Engineer
+UI/UX,UI/UX,Adobe XD Certification,Professional,Banking Professional
+UI/UX,UI/UX,Adobe XD Certification,Advanced,Finance Analyst
+UI/UX,UI/UX,User Research Certification,Foundation,HR Executive
+UI/UX,UI/UX,User Research Certification,Associate,Digital Marketing Executive
+UI/UX,UI/UX,User Research Certification,Professional,Network Engineer
+UI/UX,UI/UX,User Research Certification,Advanced,ERP Consultant

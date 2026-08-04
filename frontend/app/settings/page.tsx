@@ -208,7 +208,7 @@ export default function SettingsPage() {
         {/* Subscription */}
         <div className="panel-premium p-6">
           <h2 className="font-semibold text-gray-800 mb-4">Subscription</h2>
-          <div className="flex items-center justify-between bg-indigo-50 rounded-xl p-4">
+          <div className="flex items-center justify-between bg-royal-50 rounded-xl p-4">
             <div>
               <div className="font-medium text-gray-800 capitalize">{user?.subscription_tier || 'Free'} Plan</div>
               <div className="text-xs text-gray-500 mt-0.5">You have access to all features.</div>
@@ -281,7 +281,7 @@ export default function SettingsPage() {
                     {f.url && (
                       // eslint-disable-next-line @next/next/no-html-link-for-pages
                       <a href={f.url} target="_blank" rel="noreferrer"
-                        className="text-xs text-indigo-600 bg-indigo-50 hover:bg-indigo-100 px-3 py-1.5 rounded-lg transition">Download</a>
+                        className="text-xs text-navy-600 bg-royal-50 hover:bg-royal-100 px-3 py-1.5 rounded-lg transition">Download</a>
                     )}
                     <button onClick={() => deleteFile(f.path)}
                       className="text-xs text-red-500 bg-red-50 hover:bg-red-100 px-3 py-1.5 rounded-lg transition">Delete</button>
@@ -296,7 +296,7 @@ export default function SettingsPage() {
         <div className="panel-premium p-6">
           <div className="flex items-center justify-between mb-1">
             <h2 className="font-semibold text-gray-800">API Keys</h2>
-            <a href="http://localhost:8000/docs" target="_blank" rel="noreferrer" className="text-xs text-indigo-600 hover:underline">API docs ↗</a>
+            <a href="http://localhost:8000/docs" target="_blank" rel="noreferrer" className="text-xs text-navy-600 hover:underline">API docs ↗</a>
           </div>
           <p className="text-xs text-gray-500 mb-4">Programmatic access to the public <code className="bg-gray-100 px-1 rounded">/api/v1</code> endpoints (rate-limited to 60/min).</p>
 
@@ -370,7 +370,7 @@ export default function SettingsPage() {
                 {allEvents.map(e => (
                   <button key={e} onClick={() => toggleEvent(e)}
                     className={`text-[11px] px-2 py-1 rounded-full border transition ${
-                      hookEvents.has(e) ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-gray-50 text-gray-600 border-gray-200 hover:bg-gray-100'
+                      hookEvents.has(e) ? 'bg-navy-600 text-white border-navy-600' : 'bg-gray-50 text-gray-600 border-gray-200 hover:bg-gray-100'
                     }`}>
                     {hookEvents.has(e) ? '✓ ' : ''}{e}
                   </button>
@@ -398,7 +398,7 @@ export default function SettingsPage() {
                     <div className="flex items-center gap-2 flex-shrink-0">
                       <span className={`text-[11px] px-2 py-0.5 rounded-full ${w.active ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'}`}>{w.active ? 'Active' : 'Paused'}</span>
                       <button onClick={() => toggleWebhook(w)} className="text-xs text-gray-500 hover:text-gray-800">{w.active ? 'Pause' : 'Resume'}</button>
-                      <button onClick={() => testWebhook(w.id)} className="text-xs text-indigo-600 bg-indigo-50 hover:bg-indigo-100 px-2.5 py-1 rounded-lg transition">Test</button>
+                      <button onClick={() => testWebhook(w.id)} className="text-xs text-navy-600 bg-royal-50 hover:bg-royal-100 px-2.5 py-1 rounded-lg transition">Test</button>
                       <button onClick={() => deleteWebhook(w.id)} className="text-xs text-red-500 hover:text-red-700">Delete</button>
                     </div>
                   </div>

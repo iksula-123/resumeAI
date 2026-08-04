@@ -46,7 +46,7 @@ export default function AiWriterPage() {
         <h1 className="text-sm font-semibold text-gray-800">AI Writer</h1>
         <p className="text-xs text-gray-500">Let AI craft your perfect resume content</p>
       </div>
-      <div className="flex items-center gap-2 text-xs text-purple-600 bg-purple-50 px-3 py-1.5 rounded-full">
+      <div className="flex items-center gap-2 text-xs text-royal-600 bg-teal-50 px-3 py-1.5 rounded-full">
         <span>✨</span> AI Powered
       </div>
     </>
@@ -66,7 +66,7 @@ export default function AiWriterPage() {
                   <button key={sec} onClick={() => { setActiveSection(sec); setOutput('') }}
                     className={`w-full text-left px-3 py-2.5 rounded-xl text-sm transition ${
                       activeSection === sec
-                        ? 'bg-indigo-50 text-indigo-700 font-medium'
+                        ? 'bg-royal-50 text-navy-700 font-medium'
                         : 'text-gray-600 hover:bg-gray-50'
                     }`}>
                     {sec}
@@ -76,9 +76,9 @@ export default function AiWriterPage() {
             </div>
 
             {/* Tips */}
-            <div className="bg-gradient-to-br from-indigo-50 to-purple-50 rounded-2xl p-4 mt-4 border border-indigo-100">
-              <div className="text-xs font-semibold text-indigo-800 mb-2">💡 Pro Tips</div>
-              <ul className="text-xs text-indigo-700 space-y-1.5">
+            <div className="bg-gradient-to-br from-royal-50 to-teal-50 rounded-2xl p-4 mt-4 border border-royal-100">
+              <div className="text-xs font-semibold text-royal-800 mb-2">💡 Pro Tips</div>
+              <ul className="text-xs text-navy-700 space-y-1.5">
                 <li>• Be specific about your role and industry</li>
                 <li>• Include years of experience</li>
                 <li>• Mention key technologies or tools</li>
@@ -100,13 +100,13 @@ export default function AiWriterPage() {
                     <label className="text-xs text-gray-500 mb-1 block">Job Title</label>
                     <input value={jobTitle} onChange={e => setJobTitle(e.target.value)}
                       placeholder="Senior React Developer"
-                      className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300" />
+                      className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-royal-300" />
                   </div>
                   <div>
                     <label className="text-xs text-gray-500 mb-1 block">Company</label>
                     <input value={company} onChange={e => setCompany(e.target.value)}
                       placeholder="Google"
-                      className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300" />
+                      className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-royal-300" />
                   </div>
                 </div>
               )}
@@ -124,11 +124,11 @@ export default function AiWriterPage() {
                         : `Describe your ${activeSection.toLowerCase()} details...`
                   }
                   rows={5}
-                  className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300 resize-none" />
+                  className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-royal-300 resize-none" />
               </div>
 
               <button onClick={generate} disabled={loading}
-                className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-3 rounded-xl font-medium hover:opacity-90 transition disabled:opacity-50 flex items-center justify-center gap-2">
+                className="btn-primary w-full py-3 flex items-center justify-center gap-2">
                 {loading ? (
                   <><span className="animate-spin">⟳</span> Generating…</>
                 ) : (
@@ -144,7 +144,7 @@ export default function AiWriterPage() {
                   <span className="font-semibold text-gray-800">Generated Content</span>
                   <div className="flex gap-2">
                     <button onClick={() => navigator.clipboard.writeText(output)}
-                      className="text-xs text-indigo-600 bg-indigo-50 hover:bg-indigo-100 px-3 py-1.5 rounded-lg transition">
+                      className="text-xs text-navy-600 bg-royal-50 hover:bg-royal-100 px-3 py-1.5 rounded-lg transition">
                       Copy
                     </button>
                     <button onClick={() => setOutput('')}

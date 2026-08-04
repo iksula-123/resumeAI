@@ -97,7 +97,7 @@ function PersonalInfoEditor({ data, onChange }: { data: ResumeContent['personalI
             value={data[f.key] || ''}
             onChange={e => onChange({ ...data, [f.key]: e.target.value })}
             placeholder={f.placeholder}
-            className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300"
+            className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-royal-300"
           />
         </div>
       ))}
@@ -161,13 +161,13 @@ function ExperienceEditor({ data, onChange }: { data: Experience[], onChange: (d
             {(['position', 'company', 'location'] as const).map(f => (
               <input key={f} value={exp[f]} onChange={e => upd(i, { [f]: e.target.value })}
                 placeholder={f.charAt(0).toUpperCase() + f.slice(1)}
-                className="border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300" />
+                className="border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-royal-300" />
             ))}
             <input value={exp.startDate} onChange={e => upd(i, { startDate: e.target.value })}
-              placeholder="Jan 2021" className="border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300" />
+              placeholder="Jan 2021" className="border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-royal-300" />
             {!exp.current && (
               <input value={exp.endDate} onChange={e => upd(i, { endDate: e.target.value })}
-                placeholder="Present" className="border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300" />
+                placeholder="Present" className="border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-royal-300" />
             )}
             <label className="flex items-center gap-2 text-sm text-gray-600">
               <input type="checkbox" checked={exp.current} onChange={e => upd(i, { current: e.target.checked })} />
@@ -181,7 +181,7 @@ function ExperienceEditor({ data, onChange }: { data: Experience[], onChange: (d
                 <button
                   onClick={() => enhanceAll(i)}
                   disabled={busy !== null}
-                  className="text-xs font-medium text-indigo-600 hover:text-indigo-800 disabled:opacity-50"
+                  className="text-xs font-medium text-navy-600 hover:text-royal-800 disabled:opacity-50"
                 >
                   {busy === String(i) ? '✨ Improving…' : '✨ Improve all'}
                 </button>
@@ -191,22 +191,22 @@ function ExperienceEditor({ data, onChange }: { data: Experience[], onChange: (d
               <div key={bi} className="flex gap-1.5 mb-1 items-center">
                 <input value={b} onChange={e => updBullet(i, bi, e.target.value)}
                   placeholder="Describe your achievement..."
-                  className="flex-1 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300" />
+                  className="flex-1 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-royal-300" />
                 {b.trim() && (
                   <button onClick={() => enhanceOne(i, bi)} disabled={busy !== null}
                     title="Rewrite this bullet with AI"
-                    className="text-indigo-400 hover:text-indigo-600 disabled:opacity-40 text-sm px-1">
+                    className="text-royal-400 hover:text-navy-600 disabled:opacity-40 text-sm px-1">
                     {busy === `${i}-${bi}` ? '⟳' : '✨'}
                   </button>
                 )}
                 <button onClick={() => removeBullet(i, bi)} className="text-gray-300 hover:text-red-400 text-lg leading-none">×</button>
               </div>
             ))}
-            <button onClick={() => addBullet(i)} className="text-xs text-indigo-600 hover:text-indigo-800 mt-1">+ Add bullet</button>
+            <button onClick={() => addBullet(i)} className="text-xs text-navy-600 hover:text-royal-800 mt-1">+ Add bullet</button>
           </div>
         </div>
       ))}
-      <button onClick={add} className="w-full border-2 border-dashed border-indigo-200 text-indigo-600 hover:bg-indigo-50 py-2 rounded-xl text-sm transition">
+      <button onClick={add} className="w-full border-2 border-dashed border-royal-200 text-navy-600 hover:bg-royal-50 py-2 rounded-xl text-sm transition">
         + Add Experience
       </button>
     </div>
@@ -237,12 +237,12 @@ function EducationEditor({ data, onChange }: { data: Education[], onChange: (d: 
             ].map(f => (
               <input key={f.key} value={(edu as any)[f.key]} onChange={e => upd(i, { [f.key]: e.target.value })}
                 placeholder={f.placeholder}
-                className="border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300" />
+                className="border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-royal-300" />
             ))}
           </div>
         </div>
       ))}
-      <button onClick={add} className="w-full border-2 border-dashed border-indigo-200 text-indigo-600 hover:bg-indigo-50 py-2 rounded-xl text-sm transition">
+      <button onClick={add} className="w-full border-2 border-dashed border-royal-200 text-navy-600 hover:bg-royal-50 py-2 rounded-xl text-sm transition">
         + Add Education
       </button>
     </div>
@@ -313,7 +313,7 @@ function SkillsEditor({ data, onChange, jobTitle }: { data: Skill[], onChange: (
         <select
           value={category}
           onChange={e => { touched.current = true; setCategory(e.target.value) }}
-          className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300 bg-white"
+          className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-royal-300 bg-white"
         >
           {CATEGORY_NAMES.map(c => <option key={c} value={c}>{c}</option>)}
         </select>
@@ -329,9 +329,9 @@ function SkillsEditor({ data, onChange, jobTitle }: { data: Skill[], onChange: (
             onBlur={() => { blurTimer.current = setTimeout(() => setOpen(false), 150) }}
             onKeyDown={onKeyDown}
             placeholder="Type to search skills…"
-            className="flex-1 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300"
+            className="flex-1 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-royal-300"
           />
-          <button onClick={() => add(input)} className="bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-indigo-700">Add</button>
+          <button onClick={() => add(input)} className="bg-navy-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-navy-700">Add</button>
         </div>
 
         {open && suggestions.length > 0 && (
@@ -345,7 +345,7 @@ function SkillsEditor({ data, onChange, jobTitle }: { data: Skill[], onChange: (
                 onMouseEnter={() => setHighlight(i)}
                 onClick={() => { clearTimeout(blurTimer.current); add(s) }}
                 className={`w-full text-left px-3 py-2 text-sm flex items-center justify-between ${
-                  i === highlight ? 'bg-indigo-50 text-indigo-700' : 'text-gray-700 hover:bg-gray-50'
+                  i === highlight ? 'bg-royal-50 text-navy-700' : 'text-gray-700 hover:bg-gray-50'
                 }`}
               >
                 <span>{s}</span>
@@ -365,7 +365,7 @@ function SkillsEditor({ data, onChange, jobTitle }: { data: Skill[], onChange: (
           <button
             onClick={askAI}
             disabled={aiLoading}
-            className="text-xs font-medium text-indigo-600 hover:text-indigo-800 disabled:opacity-50 flex items-center gap-1"
+            className="text-xs font-medium text-navy-600 hover:text-royal-800 disabled:opacity-50 flex items-center gap-1"
           >
             {aiLoading ? '✨ Thinking…' : '✨ Suggest with AI'}
           </button>
@@ -376,7 +376,7 @@ function SkillsEditor({ data, onChange, jobTitle }: { data: Skill[], onChange: (
               <button
                 key={s}
                 onClick={() => add(s)}
-                className="text-xs px-2.5 py-1 rounded-full border border-indigo-200 text-indigo-700 bg-indigo-50/60 hover:bg-indigo-100 transition"
+                className="text-xs px-2.5 py-1 rounded-full border border-royal-200 text-navy-700 bg-royal-50/60 hover:bg-royal-100 transition"
               >
                 + {s}
               </button>
@@ -399,7 +399,7 @@ function SkillsEditor({ data, onChange, jobTitle }: { data: Skill[], onChange: (
               <div className="flex items-center gap-2">
                 <input type="range" min="20" max="100" step="10" value={s.level}
                   onChange={e => updLevel(i, +e.target.value)}
-                  className="flex-1 accent-indigo-600" />
+                  className="flex-1 accent-navy-600" />
                 <span className="text-xs text-gray-500 w-6">{s.level}%</span>
               </div>
             </div>
@@ -428,15 +428,15 @@ function ProjectsEditor({ data, onChange }: { data: Project[], onChange: (d: Pro
           ].map(f => (
             <input key={f.key} value={(p as any)[f.key]} onChange={e => upd(i, { [f.key]: e.target.value })}
               placeholder={f.placeholder}
-              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300" />
+              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-royal-300" />
           ))}
           <textarea value={p.description} onChange={e => upd(i, { description: e.target.value })}
             placeholder="Describe the project..."
             rows={2}
-            className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300 resize-none" />
+            className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-royal-300 resize-none" />
         </div>
       ))}
-      <button onClick={add} className="w-full border-2 border-dashed border-indigo-200 text-indigo-600 hover:bg-indigo-50 py-2 rounded-xl text-sm transition">
+      <button onClick={add} className="w-full border-2 border-dashed border-royal-200 text-navy-600 hover:bg-royal-50 py-2 rounded-xl text-sm transition">
         + Add Project
       </button>
     </div>
@@ -453,8 +453,8 @@ function ListEditor({ data, onChange, placeholder }: { data: string[], onChange:
         <input value={input} onChange={e => setInput(e.target.value)}
           onKeyDown={e => e.key === 'Enter' && add()}
           placeholder={placeholder}
-          className="flex-1 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300" />
-        <button onClick={add} className="bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-indigo-700">Add</button>
+          className="flex-1 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-royal-300" />
+        <button onClick={add} className="bg-navy-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-navy-700">Add</button>
       </div>
       <div className="space-y-1">
         {data.map((item, i) => (
@@ -482,15 +482,15 @@ function CertificationsEditor({ data, onChange }: { data: Certification[], onCha
           </div>
           <div className="grid grid-cols-2 gap-2">
             <input value={c.name} onChange={e => upd(i, { name: e.target.value })} placeholder="AWS Solutions Architect"
-              className="border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300" />
+              className="border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-royal-300" />
             <input value={c.issuer} onChange={e => upd(i, { issuer: e.target.value })} placeholder="Amazon"
-              className="border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300" />
+              className="border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-royal-300" />
             <input value={c.date} onChange={e => upd(i, { date: e.target.value })} placeholder="2023"
-              className="border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300" />
+              className="border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-royal-300" />
           </div>
         </div>
       ))}
-      <button onClick={add} className="w-full border-2 border-dashed border-indigo-200 text-indigo-600 hover:bg-indigo-50 py-2 rounded-xl text-sm transition">
+      <button onClick={add} className="w-full border-2 border-dashed border-royal-200 text-navy-600 hover:bg-royal-50 py-2 rounded-xl text-sm transition">
         + Add Certification
       </button>
     </div>
@@ -506,15 +506,15 @@ function LanguagesEditor({ data, onChange }: { data: Language[], onChange: (d: L
       {data.map((l, i) => (
         <div key={i} className="flex gap-2 items-center">
           <input value={l.name} onChange={e => upd(i, { name: e.target.value })} placeholder="English"
-            className="flex-1 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300" />
+            className="flex-1 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-royal-300" />
           <select value={l.proficiency} onChange={e => upd(i, { proficiency: e.target.value })}
-            className="border border-gray-200 rounded-lg px-2 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300">
+            className="border border-gray-200 rounded-lg px-2 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-royal-300">
             {['Native', 'Fluent', 'Advanced', 'Intermediate', 'Basic'].map(p => <option key={p}>{p}</option>)}
           </select>
           <button onClick={() => remove(i)} className="text-gray-300 hover:text-red-400 text-xl leading-none">×</button>
         </div>
       ))}
-      <button onClick={add} className="w-full border-2 border-dashed border-indigo-200 text-indigo-600 hover:bg-indigo-50 py-2 rounded-xl text-sm transition">
+      <button onClick={add} className="w-full border-2 border-dashed border-royal-200 text-navy-600 hover:bg-royal-50 py-2 rounded-xl text-sm transition">
         + Add Language
       </button>
     </div>
@@ -871,7 +871,7 @@ export default function EditResumePage() {
       </button>
       <div className="flex-1 flex items-center gap-2 ml-4">
         <input value={title} onChange={e => setTitle(e.target.value)}
-          className="font-semibold text-gray-800 bg-transparent border-b border-transparent hover:border-gray-300 focus:border-indigo-400 focus:outline-none px-1 py-0.5 text-sm w-64"
+          className="font-semibold text-gray-800 bg-transparent border-b border-transparent hover:border-gray-300 focus:border-royal-400 focus:outline-none px-1 py-0.5 text-sm w-64"
         />
         <span className="text-xs text-gray-500">
           {saving ? 'Saving…' : saved ? '✓ Saved' : 'Unsaved'}
@@ -880,7 +880,7 @@ export default function EditResumePage() {
       <div className="flex items-center gap-2 ml-auto relative">
         <div className="relative">
           <button onClick={() => setShowTemplatePicker(p => !p)}
-            className="text-xs text-gray-500 hover:text-indigo-600 px-2 py-1 rounded hover:bg-indigo-50 transition flex items-center gap-1">
+            className="text-xs text-gray-500 hover:text-navy-600 px-2 py-1 rounded hover:bg-royal-50 transition flex items-center gap-1">
             🎨 Template
           </button>
           {showTemplatePicker && (
@@ -888,7 +888,7 @@ export default function EditResumePage() {
               {TEMPLATE_LIST.map(t => (
                 <button key={t.id}
                   onClick={() => { setTemplateId(t.id); setShowTemplatePicker(false) }}
-                  className={`flex-1 min-w-[70px] py-1.5 px-2 rounded-lg text-xs transition text-center ${templateId === t.id ? 'bg-indigo-600 text-white' : 'bg-gray-50 hover:bg-gray-100 text-gray-700'}`}>
+                  className={`flex-1 min-w-[70px] py-1.5 px-2 rounded-lg text-xs transition text-center ${templateId === t.id ? 'bg-navy-600 text-white' : 'bg-gray-50 hover:bg-gray-100 text-gray-700'}`}>
                   {t.name}
                 </button>
               ))}
@@ -896,7 +896,7 @@ export default function EditResumePage() {
           )}
         </div>
         {['Color', 'Font', 'Spacing', 'Tips'].map(t => (
-          <button key={t} className="text-xs text-gray-500 hover:text-indigo-600 px-2 py-1 rounded hover:bg-indigo-50 transition">{t}</button>
+          <button key={t} className="text-xs text-gray-500 hover:text-navy-600 px-2 py-1 rounded hover:bg-royal-50 transition">{t}</button>
         ))}
         <button onClick={() => setShowHistory(true)}
           className="text-xs text-gray-600 bg-gray-50 hover:bg-gray-100 px-3 py-1.5 rounded-lg transition flex items-center gap-1"
@@ -904,11 +904,11 @@ export default function EditResumePage() {
           🕘 History
         </button>
         <button onClick={() => router.push(`/resumes/${id}/preview`)}
-          className="text-xs text-indigo-600 bg-indigo-50 hover:bg-indigo-100 px-3 py-1.5 rounded-lg transition">
+          className="text-xs text-navy-600 bg-royal-50 hover:bg-royal-100 px-3 py-1.5 rounded-lg transition">
           Preview
         </button>
         <button onClick={doSave} disabled={saving}
-          className="text-xs bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1.5 rounded-lg transition disabled:opacity-50">
+          className="text-xs bg-navy-600 hover:bg-navy-700 text-white px-3 py-1.5 rounded-lg transition disabled:opacity-50">
           {saving ? 'Saving…' : 'Save'}
         </button>
       </div>
@@ -940,7 +940,7 @@ export default function EditResumePage() {
                 <button
                   onClick={() => setActiveSection(activeSection === sec.key ? null : sec.key)}
                   className={`w-full flex items-center gap-3 px-3 py-2.5 text-left text-sm transition-colors ${
-                    activeSection === sec.key ? 'bg-indigo-50 text-indigo-700' : 'text-gray-600 hover:bg-gray-50'
+                    activeSection === sec.key ? 'bg-royal-50 text-navy-700' : 'text-gray-600 hover:bg-gray-50'
                   }`}
                 >
                   <span className="text-base w-5 text-center">{sec.icon}</span>
@@ -968,9 +968,9 @@ export default function EditResumePage() {
                           onChange={e => patch('summary', e.target.value)}
                           placeholder="Write a brief professional summary..."
                           rows={4}
-                          className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300 resize-none" />
+                          className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-royal-300 resize-none" />
                         <button onClick={generateSummary} disabled={aiGenerating === 'summary'}
-                          className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-indigo-500 to-purple-500 text-white py-2 rounded-lg text-xs hover:opacity-90 transition">
+                          className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-royal-500 to-teal-500 text-white py-2 rounded-lg text-xs hover:opacity-90 transition">
                           {aiGenerating === 'summary' ? '✨ Generating…' : '✨ Generate with AI'}
                         </button>
                       </div>
@@ -1005,7 +1005,7 @@ export default function EditResumePage() {
             ))}
           </div>
           <div className="px-3 py-3 border-t border-gray-100">
-            <button className="w-full text-xs text-indigo-600 hover:text-indigo-800 py-2 border border-dashed border-indigo-200 rounded-lg hover:bg-indigo-50 transition">
+            <button className="w-full text-xs text-navy-600 hover:text-royal-800 py-2 border border-dashed border-royal-200 rounded-lg hover:bg-royal-50 transition">
               + Add Custom Section
             </button>
           </div>
@@ -1016,9 +1016,9 @@ export default function EditResumePage() {
           onMouseDown={startResize}
           onDoubleClick={() => setSectionsWidth(240)}
           title="Drag to resize · double-click to reset"
-          className="w-1 flex-shrink-0 cursor-col-resize bg-gray-100 hover:bg-indigo-400 active:bg-indigo-500 transition-colors relative group">
+          className="w-1 flex-shrink-0 cursor-col-resize bg-gray-100 hover:bg-royal-400 active:bg-royal-500 transition-colors relative group">
           <div className="absolute inset-y-0 -left-1 -right-1" />
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-1 h-8 rounded-full bg-gray-300 group-hover:bg-indigo-500 transition-colors" />
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-1 h-8 rounded-full bg-gray-300 group-hover:bg-royal-500 transition-colors" />
         </div>
 
         {/* ── CENTER: Preview ───────────────────────────────────── */}
@@ -1027,7 +1027,7 @@ export default function EditResumePage() {
             {(['preview', 'edit'] as const).map(t => (
               <button key={t} onClick={() => setCenterTab(t)}
                 className={`px-4 py-1.5 rounded-full text-xs font-medium transition ${
-                  centerTab === t ? 'bg-indigo-600 text-white' : 'text-gray-500 hover:text-gray-700'
+                  centerTab === t ? 'bg-navy-600 text-white' : 'text-gray-500 hover:text-gray-700'
                 }`}>
                 {t.charAt(0).toUpperCase() + t.slice(1)}
               </button>
@@ -1051,7 +1051,7 @@ export default function EditResumePage() {
             ] as const).map(([t, label]) => (
               <button key={t} onClick={() => setRightTab(t)}
                 className={`flex-1 py-3 text-xs font-medium transition ${
-                  rightTab === t ? 'text-indigo-700 border-b-2 border-indigo-600' : 'text-gray-500 hover:text-gray-600'
+                  rightTab === t ? 'text-navy-700 border-b-2 border-navy-600' : 'text-gray-500 hover:text-gray-600'
                 }`}>
                 {label}
               </button>
@@ -1067,7 +1067,7 @@ export default function EditResumePage() {
                   <button className="text-xs text-gray-500">▲</button>
                 </div>
                 <div className="flex flex-col items-center py-2">
-                  <CircularScore score={atsScore} max={100} size={100} color={atsScore >= 80 ? '#22c55e' : atsScore >= 60 ? '#f59e0b' : '#ef4444'} />
+                  <CircularScore score={atsScore} max={100} size={100} color={atsScore >= 80 ? '#1E7A46' : atsScore >= 60 ? '#F5A623' : '#c0392b'} />
                   <div className={`text-xs font-medium mt-2 ${atsScore >= 80 ? 'text-green-600' : atsScore >= 60 ? 'text-yellow-600' : 'text-red-600'}`}>
                     {atsScore >= 80 ? 'Excellent' : atsScore >= 60 ? 'Good' : 'Needs Work'}
                   </div>
@@ -1088,7 +1088,7 @@ export default function EditResumePage() {
                         <span className="text-xs text-gray-500">{item.label}</span>
                         <div className="flex items-center gap-2">
                           <div className="w-24 h-1.5 bg-gray-100 rounded-full overflow-hidden">
-                            <div className="h-full bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full" style={{ width: `${score}%` }} />
+                            <div className="h-full bg-gradient-to-r from-royal-500 to-teal-500 rounded-full" style={{ width: `${score}%` }} />
                           </div>
                           <span className="text-xs font-medium text-gray-700 w-8 text-right">{score}</span>
                         </div>
@@ -1104,9 +1104,9 @@ export default function EditResumePage() {
                 <textarea value={jd} onChange={e => setJd(e.target.value)}
                   placeholder="Paste job description to analyze keyword match..."
                   rows={3}
-                  className="w-full border border-gray-200 rounded-lg px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-300 resize-none mb-2" />
+                  className="w-full border border-gray-200 rounded-lg px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-royal-300 resize-none mb-2" />
                 <button onClick={scoreAts} disabled={scoring || !jd.trim()}
-                  className="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-2 rounded-lg text-xs font-medium transition disabled:opacity-50">
+                  className="w-full bg-navy-600 hover:bg-navy-700 text-white py-2 rounded-lg text-xs font-medium transition disabled:opacity-50">
                   {scoring ? 'Analyzing…' : 'Analyze Match'}
                 </button>
                 {jd && (
@@ -1168,8 +1168,8 @@ export default function EditResumePage() {
                     'Include metrics and numbers to improve impact',
                     'Add missing keywords to increase ATS score',
                   ].map((s, i) => (
-                    <div key={i} className="flex gap-2 text-xs text-gray-600 bg-indigo-50 rounded-lg px-3 py-2">
-                      <span className="text-indigo-500 flex-shrink-0">•</span>
+                    <div key={i} className="flex gap-2 text-xs text-gray-600 bg-royal-50 rounded-lg px-3 py-2">
+                      <span className="text-royal-500 flex-shrink-0">•</span>
                       {s}
                     </div>
                   ))}
@@ -1201,7 +1201,7 @@ export default function EditResumePage() {
                 <button
                   onClick={generateDraft}
                   disabled={aiGenerating !== null}
-                  className="w-full bg-white/95 hover:bg-white text-indigo-700 text-xs font-semibold py-2 rounded-lg transition disabled:opacity-70"
+                  className="w-full bg-white/95 hover:bg-white text-navy-700 text-xs font-semibold py-2 rounded-lg transition disabled:opacity-70"
                 >
                   {aiGenerating === 'draft' ? '✨ Drafting…' : '✨ Generate Starter Draft'}
                 </button>
@@ -1211,7 +1211,7 @@ export default function EditResumePage() {
               <div>
                 <div className="text-xs font-semibold text-gray-700 mb-2">Professional Summary</div>
                 <button onClick={generateSummary} disabled={aiGenerating === 'summary'}
-                  className="w-full bg-gradient-to-r from-indigo-500 to-purple-500 text-white py-2 rounded-lg text-xs hover:opacity-90 transition">
+                  className="w-full bg-gradient-to-r from-royal-500 to-teal-500 text-white py-2 rounded-lg text-xs hover:opacity-90 transition">
                   {aiGenerating === 'summary' ? '✨ Generating…' : '✨ Generate Summary'}
                 </button>
                 {content.summary && (
@@ -1224,7 +1224,7 @@ export default function EditResumePage() {
                 <div className="text-xs font-semibold text-gray-700 mb-2">🌐 Translate resume</div>
                 <div className="flex gap-2">
                   <select value={translateLang} onChange={e => setTranslateLang(e.target.value)}
-                    className="flex-1 border border-gray-200 rounded-lg px-2 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-300">
+                    className="flex-1 border border-gray-200 rounded-lg px-2 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-royal-300">
                     {LANGS.map(([code, name]) => <option key={code} value={code}>{name}</option>)}
                   </select>
                   <button onClick={translateAndSave} disabled={aiGenerating !== null}
@@ -1242,7 +1242,7 @@ export default function EditResumePage() {
                 ) : (
                   content.experience.map((exp, i) => (
                     <button key={exp.id} onClick={() => generateBullets(i)} disabled={aiGenerating === 'bullets'}
-                      className="w-full mb-2 border border-indigo-200 text-indigo-600 hover:bg-indigo-50 py-2 rounded-lg text-xs transition">
+                      className="w-full mb-2 border border-royal-200 text-navy-600 hover:bg-royal-50 py-2 rounded-lg text-xs transition">
                       {aiGenerating === 'bullets' ? '✨ Generating…' : `Generate for ${exp.position || `Experience ${i + 1}`}`}
                     </button>
                   ))
@@ -1252,7 +1252,7 @@ export default function EditResumePage() {
               <div>
                 <div className="text-xs font-semibold text-gray-700 mb-2">Cover Letter</div>
                 <button onClick={() => router.push('/cover-letters')}
-                  className="w-full bg-gradient-to-r from-purple-500 to-pink-500 text-white py-2 rounded-lg text-xs hover:opacity-90 transition">
+                  className="w-full bg-gradient-to-r from-teal-500 to-amber-500 text-white py-2 rounded-lg text-xs hover:opacity-90 transition">
                   ✉ Generate Cover Letter
                 </button>
               </div>
@@ -1276,7 +1276,7 @@ export default function EditResumePage() {
                   onChange={e => setGapTarget(e.target.value)}
                   placeholder={content.personalInfo?.jobTitle ? `e.g. ${content.personalInfo.jobTitle}` : 'e.g. Senior React Developer, or paste a job description'}
                   rows={3}
-                  className="w-full border border-gray-200 rounded-lg px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-300 resize-none mb-2"
+                  className="w-full border border-gray-200 rounded-lg px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-royal-300 resize-none mb-2"
                 />
                 <button onClick={runSkillGap} disabled={gapLoading}
                   className="btn-primary w-full text-xs py-2 disabled:opacity-60">
@@ -1296,7 +1296,7 @@ export default function EditResumePage() {
                   <div className="card-premium p-4 flex flex-col items-center">
                     <div className="text-xs font-semibold text-gray-800 mb-2">Skill Match</div>
                     <CircularScore score={gap.match_score} size={96}
-                      color={gap.match_score >= 80 ? '#22c55e' : gap.match_score >= 50 ? '#f59e0b' : '#ef4444'} />
+                      color={gap.match_score >= 80 ? '#1E7A46' : gap.match_score >= 50 ? '#F5A623' : '#c0392b'} />
                     <div className="text-xs text-gray-500 mt-2 text-center">
                       {gap.matched.length} of {gap.required.length} key skills present
                     </div>

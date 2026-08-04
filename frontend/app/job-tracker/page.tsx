@@ -25,7 +25,7 @@ interface Application {
 type Status = 'applied' | 'interview' | 'offer' | 'rejected' | 'joined'
 
 const COLUMNS: { key: Status; label: string; accent: string; dot: string }[] = [
-  { key: 'applied', label: 'Applied', accent: 'from-blue-500 to-indigo-500', dot: 'bg-blue-500' },
+  { key: 'applied', label: 'Applied', accent: 'from-blue-500 to-royal-500', dot: 'bg-blue-500' },
   { key: 'interview', label: 'Interview', accent: 'from-amber-500 to-orange-500', dot: 'bg-amber-500' },
   { key: 'offer', label: 'Offer', accent: 'from-green-500 to-emerald-500', dot: 'bg-green-500' },
   { key: 'joined', label: 'Joined', accent: 'from-teal-500 to-cyan-500', dot: 'bg-teal-500' },
@@ -133,7 +133,7 @@ export default function JobTrackerPage() {
         {/* stats */}
         <div className="grid grid-cols-3 md:grid-cols-5 gap-4 mb-6">
           {[
-            { label: 'Total', value: total, icon: '📋', color: 'bg-indigo-50 text-indigo-700' },
+            { label: 'Total', value: total, icon: '📋', color: 'bg-royal-50 text-navy-700' },
             { label: 'Interviewing', value: interviews, icon: '🎤', color: 'bg-amber-50 text-amber-700' },
             { label: 'Offers', value: offers, icon: '🎉', color: 'bg-green-50 text-green-700' },
             { label: 'Joined', value: byStatus('joined').length, icon: '✅', color: 'bg-teal-50 text-teal-700' },
@@ -194,7 +194,7 @@ export default function JobTrackerPage() {
                           )}
                           {next && (
                             <button onClick={() => move(a, next)} disabled={busy === a.id}
-                              className="mt-2 w-full text-[11px] text-indigo-600 bg-indigo-50 hover:bg-indigo-100 py-1 rounded-lg transition disabled:opacity-50">
+                              className="mt-2 w-full text-[11px] text-navy-600 bg-royal-50 hover:bg-royal-100 py-1 rounded-lg transition disabled:opacity-50">
                               {busy === a.id ? '…' : `Move to ${COLUMNS.find(c => c.key === next)?.label} →`}
                             </button>
                           )}

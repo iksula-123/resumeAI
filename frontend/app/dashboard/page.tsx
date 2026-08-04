@@ -96,7 +96,7 @@ export default function DashboardPage() {
     }
   }
 
-  const scoreColor = (s?: number | null) => !s ? '#9ca3af' : s >= 80 ? '#22c55e' : s >= 60 ? '#f59e0b' : '#ef4444'
+  const scoreColor = (s?: number | null) => !s ? '#9ca3af' : s >= 80 ? '#1E7A46' : s >= 60 ? '#F5A623' : '#c0392b'
 
   const firstName = (user?.full_name || '').split(' ')[0] || 'there'
   const avgAts = resumes.length ? Math.round(resumes.reduce((a, r) => a + (r.ats_score || 0), 0) / resumes.length) : 0
@@ -107,7 +107,7 @@ export default function DashboardPage() {
   const nextActions: Action[] = (() => {
     const out: Action[] = []
     if (!loading && resumes.length === 0) {
-      out.push({ icon: '🚀', title: 'Create your first resume', desc: 'Build an ATS-ready resume with AI in minutes', href: '/resumes/new', cta: 'Get started', tone: 'from-indigo-500 to-purple-500' })
+      out.push({ icon: '🚀', title: 'Create your first resume', desc: 'Build an ATS-ready resume with AI in minutes', href: '/resumes/new', cta: 'Get started', tone: 'from-royal-500 to-teal-500' })
     } else {
       const weakest = [...resumes].sort((a, b) => (a.ats_score || 0) - (b.ats_score || 0))[0]
       if (weakest && (weakest.ats_score == null || weakest.ats_score < 75)) {
@@ -117,7 +117,7 @@ export default function DashboardPage() {
         out.push({ icon: '⏰', title: `Follow up: ${overdue[0].company}`, desc: 'You have an overdue application reminder', href: '/job-tracker', cta: 'View tracker', tone: 'from-amber-500 to-orange-500' })
       }
       if (apps.length === 0) {
-        out.push({ icon: '🧲', title: 'Match a resume to a job', desc: 'Paste a job description and see your match %', href: '/job-match', cta: 'Try Job Match', tone: 'from-blue-500 to-indigo-500' })
+        out.push({ icon: '🧲', title: 'Match a resume to a job', desc: 'Paste a job description and see your match %', href: '/job-match', cta: 'Try Job Match', tone: 'from-blue-500 to-royal-500' })
       }
     }
     out.push({ icon: '💬', title: 'Prepare for interviews', desc: 'Generate role-specific questions & practice answers', href: '/interview-questions', cta: 'Practice', tone: 'from-orange-400 to-red-500' })
@@ -135,7 +135,7 @@ export default function DashboardPage() {
       <div className="flex-1">
         <div className="relative w-64">
           <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-sm">🔍</span>
-          <input placeholder="Search resumes..." className="w-full pl-9 pr-4 py-2 bg-white/70 border border-white/60 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300/60 backdrop-blur" />
+          <input placeholder="Search resumes..." className="w-full pl-9 pr-4 py-2 bg-white/70 border border-white/60 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-royal-300/60 backdrop-blur" />
         </div>
       </div>
       {user?.avatar_url ? (
@@ -177,7 +177,7 @@ export default function DashboardPage() {
                     <div className="font-semibold text-sm text-gray-800 leading-tight">{a.title}</div>
                   </div>
                   <div className="text-xs text-gray-500 flex-1">{a.desc}</div>
-                  <div className="text-xs font-medium text-indigo-600 mt-2 group-hover:translate-x-0.5 transition-transform">{a.cta} →</div>
+                  <div className="text-xs font-medium text-navy-600 mt-2 group-hover:translate-x-0.5 transition-transform">{a.cta} →</div>
                 </button>
               ))}
             </div>
@@ -189,7 +189,7 @@ export default function DashboardPage() {
           {[
             { label: 'Resumes', value: resumes.length, icon: '📄', color: 'bg-blue-50 text-blue-700' },
             { label: 'Avg ATS Score', value: resumes.length ? avgAts : '—', icon: '🎯', color: 'bg-green-50 text-green-700' },
-            { label: 'Applications', value: apps.length, icon: '🧲', color: 'bg-purple-50 text-purple-700' },
+            { label: 'Applications', value: apps.length, icon: '🧲', color: 'bg-teal-50 text-royal-700' },
             { label: 'Interviewing', value: interviews, icon: '🎤', color: 'bg-orange-50 text-orange-700' },
           ].map(stat => (
             <div key={stat.label} className="card-premium p-5">
@@ -246,7 +246,7 @@ export default function DashboardPage() {
                       <p className="text-xs text-gray-500 mb-4">Updated {relTime(resume.updated_at)}</p>
                       <div className="flex gap-2">
                         <button onClick={() => router.push(`/resumes/${resume.id}/edit`)}
-                          className="flex-1 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-xs font-medium py-2 rounded-lg transition">Edit</button>
+                          className="flex-1 bg-royal-50 hover:bg-royal-100 text-navy-700 text-xs font-medium py-2 rounded-lg transition">Edit</button>
                         <button onClick={() => router.push(`/resumes/${resume.id}/preview`)}
                           className="flex-1 bg-gray-50 hover:bg-gray-100 text-gray-700 text-xs font-medium py-2 rounded-lg transition">Preview</button>
                         <button onClick={() => handleShare(resume.id)}
@@ -284,16 +284,16 @@ export default function DashboardPage() {
                 </div>
               ) : (
                 <div className="relative pl-4">
-                  <div className="absolute left-[7px] top-2 bottom-2 w-px bg-indigo-100" />
+                  <div className="absolute left-[7px] top-2 bottom-2 w-px bg-royal-100" />
                   <div className="space-y-3">
                     {activity.map((a, i) => (
                       <button key={i} onClick={() => router.push(a.href)}
                         className="relative w-full text-left group animate-fade-up" style={{ animationDelay: `${i * 40}ms` }}>
-                        <div className="absolute -left-4 top-1.5 w-3 h-3 rounded-full bg-indigo-400 border-2 border-white" />
+                        <div className="absolute -left-4 top-1.5 w-3 h-3 rounded-full bg-royal-400 border-2 border-white" />
                         <div className="flex items-center gap-2">
                           <span className="text-base">{a.icon}</span>
                           <div className="min-w-0 flex-1">
-                            <div className="text-xs font-medium text-gray-800 truncate group-hover:text-indigo-700 transition">{a.label}</div>
+                            <div className="text-xs font-medium text-gray-800 truncate group-hover:text-navy-700 transition">{a.label}</div>
                             <div className="text-[11px] text-gray-500 capitalize">{('sub' in a && a.sub) ? `${a.sub} · ` : ''}{relTime(a.time)}</div>
                           </div>
                         </div>
@@ -309,9 +309,9 @@ export default function DashboardPage() {
         {/* Quick actions */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-8">
           {[
-            { icon: '🚀', title: 'AI Resume Upgrade', desc: 'Upload & enhance', href: '/ai-upgrade', color: 'from-indigo-500 to-purple-500' },
-            { icon: '🧲', title: 'Job Match', desc: 'Match to a JD', href: '/job-match', color: 'from-blue-500 to-indigo-500' },
-            { icon: '✉️', title: 'Cover Letter', desc: 'Generate instantly', href: '/cover-letters', color: 'from-purple-500 to-pink-500' },
+            { icon: '🚀', title: 'AI Resume Upgrade', desc: 'Upload & enhance', href: '/ai-upgrade', color: 'from-royal-500 to-teal-500' },
+            { icon: '🧲', title: 'Job Match', desc: 'Match to a JD', href: '/job-match', color: 'from-blue-500 to-royal-500' },
+            { icon: '✉️', title: 'Cover Letter', desc: 'Generate instantly', href: '/cover-letters', color: 'from-teal-500 to-amber-500' },
             { icon: '📊', title: 'Job Tracker', desc: 'Track applications', href: '/job-tracker', color: 'from-teal-500 to-cyan-500' },
           ].map(item => (
             <button key={item.href} onClick={() => router.push(item.href)} className="card-premium p-5 text-left group">

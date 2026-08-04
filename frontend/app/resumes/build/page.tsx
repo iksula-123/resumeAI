@@ -32,7 +32,11 @@ interface Prefill {
     education: any[]; edubridge_training: string[]; certificates: any[]
     college?: string | null; course?: string | null; has_record: boolean
   }
-  blue: { summary: string; skills_checklist: { skill: string; checked: boolean }[] }
+  blue: {
+    summary: string
+    skills_checklist: { skill: string; checked: boolean }[]
+    certifications_checklist: { name: string; category?: string | null; checked: boolean }[]
+  }
   grey: { bullet_scaffolds: string[] }
   ats_keywords: string[]
   is_fresher: boolean
@@ -109,6 +113,7 @@ export default function BuildFromRolePage() {
   const [summary, setSummary] = useState('')
   const [summaryConfirmed, setSummaryConfirmed] = useState(false)
   const [skillChecks, setSkillChecks] = useState<{ skill: string; checked: boolean }[]>([])
+  const [certChecks, setCertChecks] = useState<{ name: string; category?: string | null; checked: boolean }[]>([])
   const [bullets, setBullets] = useState<string[]>([])
 
   useEffect(() => { if (!user) router.push('/auth/login') }, [user, router])
@@ -151,6 +156,7 @@ export default function BuildFromRolePage() {
       setSummary(p.blue.summary)
       setSummaryConfirmed(false)
       setSkillChecks(p.blue.skills_checklist)
+      setCertChecks(p.blue.certifications_checklist || [])
       setBullets(p.grey.bullet_scaffolds)
       setStep('build')
       window.scrollTo(0, 0)
@@ -175,9 +181,13 @@ export default function BuildFromRolePage() {
       education.push({ id: 'edu0', degree: green?.course || '', field: '', institution: green?.college || '',
         location: '', startDate: '', endDate: '', gpa: '' })
     }
-    const certifications = (green?.certificates || []).map((c: any, i: number) => ({
+    const verifiedCertifications = (green?.certificates || []).map((c: any, i: number) => ({
       id: `cert${i}`, name: c.name || String(c), issuer: c.issuer || 'EduBridge', date: c.date || '',
     }))
+    const confirmedCertifications = certChecks.filter((c) => c.checked).map((c, i) => ({
+      id: `cert-suggested-${i}`, name: c.name, issuer: '', date: '',
+    }))
+    const certifications = [...verifiedCertifications, ...confirmedCertifications]
     const training = (green?.edubridge_training || []).map((t: string, i: number) => ({
       id: `proj${i}`, name: t, technologies: 'EduBridge Training', description: '',
     }))
@@ -197,7 +207,7 @@ export default function BuildFromRolePage() {
       achievements: [],
       interests: [],
     }
-  }, [header, summary, summaryConfirmed, skillChecks, bullets, prefill])
+  }, [header, summary, summaryConfirmed, skillChecks, certChecks, bullets, prefill])
 
   // check whether Sarvam voice is configured (mic shown only if so)
   useEffect(() => {
@@ -336,9 +346,9 @@ export default function BuildFromRolePage() {
               autoFocus value={search} onChange={(e) => setSearch(e.target.value)}
               placeholder="Search roles… e.g. Sales Executive, Data Entry Operator"
               className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm shadow-sm
-                         focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 outline-none"
+                         focus:border-royal-500 focus:ring-2 focus:ring-royal-100 outline-none"
             />
-            {loadingPrefill && <p className="mt-3 text-sm text-indigo-600">Building from your role… <span className="text-gray-500">(the server may take up to ~30s to wake on the first visit)</span></p>}
+            {loadingPrefill && <p className="mt-3 text-sm text-navy-600">Building from your role… <span className="text-gray-500">(the server may take up to ~30s to wake on the first visit)</span></p>}
             {(() => {
               const noMatch = !loadingRoles && roles.length === 0 && search.trim() !== ''
               const showPopular = noMatch && topRoles.length > 0
@@ -355,10 +365,10 @@ export default function BuildFromRolePage() {
                     {list.map((r) => (
                       <button key={r.slug} onClick={() => pickRole(r.slug)} disabled={loadingPrefill}
                         className="text-left rounded-xl border border-gray-200 bg-white p-4 shadow-sm
-                                   hover:border-indigo-400 hover:shadow transition disabled:opacity-50">
+                                   hover:border-royal-400 hover:shadow transition disabled:opacity-50">
                         <div className="flex items-center justify-between gap-2">
                           <span className="font-semibold text-gray-900">{r.canonical_title}</span>
-                          {r.industry && <span className="text-[11px] rounded-full bg-indigo-50 text-indigo-700 px-2 py-0.5">{r.industry}</span>}
+                          {r.industry && <span className="text-[11px] rounded-full bg-royal-50 text-navy-700 px-2 py-0.5">{r.industry}</span>}
                         </div>
                         <div className="mt-1 text-xs text-gray-500">
                           {r.demand_count.toLocaleString('en-IN')} hiring records
@@ -383,7 +393,7 @@ export default function BuildFromRolePage() {
           <div className="grid gap-6 lg:grid-cols-[1fr_420px]">
             {/* left: the form */}
             <div className="space-y-5">
-              <button onClick={() => setStep('pick')} className="text-sm text-indigo-600 hover:underline">← Change role</button>
+              <button onClick={() => setStep('pick')} className="text-sm text-navy-600 hover:underline">← Change role</button>
 
               {/* legend */}
               <div className="flex flex-wrap gap-3 text-xs">
@@ -422,23 +432,23 @@ export default function BuildFromRolePage() {
               <Section tone="blue" title="Suggested professional summary">
                 {/* Hindi / English → professional English (Milestone E) */}
                 <div className="mb-2">
-                  <button onClick={() => setLangOpen((v) => !v)} className="text-xs text-indigo-600 hover:underline">
+                  <button onClick={() => setLangOpen((v) => !v)} className="text-xs text-navy-600 hover:underline">
                     🗣️ {langOpen ? 'Hide' : 'Prefer Hindi? Speak or type in Hindi/English →'}
                   </button>
                   {langOpen && (
-                    <div className="mt-2 rounded-lg border border-indigo-100 bg-indigo-50/40 p-2">
+                    <div className="mt-2 rounded-lg border border-royal-100 bg-royal-50/40 p-2">
                       <textarea value={langText} onChange={(e) => setLangText(e.target.value)} rows={3}
                         lang="hi"
                         placeholder="हिंदी या English में लिखें… जैसे: मैंने बैंक में सेल्स का काम किया, रोज़ 25 ग्राहकों से बात की।"
-                        className="w-full rounded-lg border border-indigo-200 bg-white px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-indigo-100" />
+                        className="w-full rounded-lg border border-royal-200 bg-white px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-royal-100" />
                       <div className="mt-2 flex items-center gap-2">
                         <button onClick={convertLang} disabled={langBusy || !langText.trim()}
-                          className="text-xs rounded-lg bg-indigo-600 text-white px-3 py-1.5 disabled:opacity-50">
+                          className="text-xs rounded-lg bg-navy-600 text-white px-3 py-1.5 disabled:opacity-50">
                           {langBusy ? 'Converting…' : 'Convert to professional English'}
                         </button>
                         {voiceEnabled ? (
                           <button onClick={toggleRecording} disabled={langBusy}
-                            className={`text-xs rounded-lg px-3 py-1.5 border ${recording ? 'bg-red-500 text-white border-red-500' : 'border-indigo-200 text-indigo-700'}`}>
+                            className={`text-xs rounded-lg px-3 py-1.5 border ${recording ? 'bg-red-500 text-white border-red-500' : 'border-royal-200 text-navy-700'}`}>
                             {recording ? '■ Stop' : '🎤 Speak'}
                           </button>
                         ) : (
@@ -473,6 +483,24 @@ export default function BuildFromRolePage() {
                 </div>
               </Section>
 
+              {/* blue: certifications checklist */}
+              {certChecks.length > 0 && (
+                <Section tone="blue" title="Certifications valued for this role">
+                  <p className="text-xs text-blue-700/70 mb-2">Tick any you've actually earned (or are working toward and want to note).</p>
+                  <div className="flex flex-wrap gap-2">
+                    {certChecks.map((c, i) => (
+                      <label key={c.name}
+                        className={`cursor-pointer text-sm rounded-full px-3 py-1 border transition ${
+                          c.checked ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-blue-800 border-blue-200'}`}>
+                        <input type="checkbox" className="hidden" checked={c.checked}
+                          onChange={() => setCertChecks(certChecks.map((x, j) => j === i ? { ...x, checked: !x.checked } : x))} />
+                        {c.name}
+                      </label>
+                    ))}
+                  </div>
+                </Section>
+              )}
+
               {/* grey: bullet scaffolds */}
               <Section tone="grey" title="Describe what you did (fill in the blanks)">
                 <p className="text-xs text-gray-500 mb-2">Replace the ______ with your own real experience. Empty or unfilled lines are skipped.</p>
@@ -504,8 +532,7 @@ export default function BuildFromRolePage() {
               </div>
 
               <button onClick={save} disabled={saving}
-                className="w-full rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold py-3
-                           shadow hover:opacity-95 transition disabled:opacity-50">
+                className="btn-primary w-full py-3 font-semibold">
                 {saving ? 'Creating your resume…' : 'Create my resume →'}
               </button>
             </div>
@@ -526,7 +553,7 @@ export default function BuildFromRolePage() {
                 <div className="flex items-center justify-between">
                   <p className="text-sm font-semibold text-gray-900">ATS readiness</p>
                   <button onClick={runAts} disabled={atsLoading}
-                    className="text-xs rounded-lg border border-indigo-200 text-indigo-700 px-3 py-1.5 hover:bg-indigo-50 transition disabled:opacity-50">
+                    className="text-xs rounded-lg border border-royal-200 text-navy-700 px-3 py-1.5 hover:bg-royal-50 transition disabled:opacity-50">
                     {atsLoading ? 'Checking…' : ats ? 'Re-check' : 'Check my score'}
                   </button>
                 </div>
@@ -558,7 +585,7 @@ export default function BuildFromRolePage() {
                         <ol className="space-y-1.5">
                           {ats.prioritized_fixes.slice(0, 4).map((f, i) => (
                             <li key={i} className="text-xs text-gray-600 flex gap-2">
-                              <span className="shrink-0 font-semibold text-indigo-600">+{f.impact_points}</span>
+                              <span className="shrink-0 font-semibold text-navy-600">+{f.impact_points}</span>
                               <span><b>{f.title}.</b> {f.detail}</span>
                             </li>
                           ))}
@@ -602,7 +629,7 @@ function Field({ label, value, onChange }: { label: string; value: string; onCha
     <label className="block">
       <span className="text-[11px] text-gray-500">{label}</span>
       <input value={value} onChange={(e) => onChange(e.target.value)}
-        className="mt-0.5 w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-indigo-100" />
+        className="mt-0.5 w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-royal-100" />
     </label>
   )
 }
