@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { useAuthStore } from '@/lib/store'
+import Logo from './Logo'
 
 const NAV = [
   { href: '/dashboard', icon: '⊞', label: 'Dashboard' },
@@ -45,9 +46,7 @@ export default function Sidebar({ open = true, onClose }: { open?: boolean; onCl
         <button onClick={onClose} aria-label="Close menu"
           className="md:hidden absolute top-4 right-3 text-gray-500 hover:text-gray-800 text-lg">✕</button>
         <div className="flex items-center gap-2.5">
-          <div className="w-9 h-9 bg-brand-gradient rounded-xl flex items-center justify-center text-white font-bold shadow-glow">
-            S
-          </div>
+          <Logo size={36} />
           <div>
             <div className="text-sm font-bold text-gray-900 leading-tight font-display">SahiCareer</div>
             <div className="text-[11px] text-gray-500">My Resume</div>

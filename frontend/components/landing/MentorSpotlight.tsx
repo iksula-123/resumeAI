@@ -7,7 +7,7 @@ import { Container, Reveal, SectionHeading } from './shared'
 const MENTORS = [
   {
     initials: 'AR',
-    name: 'Aditi R.',
+    name: 'Yaqub.',
     role: 'Senior Product Manager',
     experience: '9 yrs experience',
     rating: 4.9,
@@ -17,7 +17,7 @@ const MENTORS = [
   },
   {
     initials: 'KM',
-    name: 'Karan M.',
+    name: 'Amresh P.',
     role: 'Engineering Lead',
     experience: '11 yrs experience',
     rating: 5.0,
@@ -27,7 +27,7 @@ const MENTORS = [
   },
   {
     initials: 'SN',
-    name: 'Sana N.',
+    name: 'Ajay M',
     role: 'HR Business Partner',
     experience: '7 yrs experience',
     rating: 4.8,

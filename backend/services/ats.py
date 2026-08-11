@@ -1,3 +1,28 @@
+"""
+LEGACY — FROZEN (Phase 3, "ATS Intelligence" consolidation).
+
+services/ats_engine/ is now the canonical ATS implementation — see its
+scoring.py for the Match/Completeness/Confidence model and ats_service.py
+for the orchestrator. Do NOT add new ATS logic here.
+
+This module is kept alive only because three existing frontend surfaces
+depend on the EXACT response shapes of the functions below, and reshaping
+those pages is out of this phase's scope (would mean rebuilding UI that
+Phase 3 didn't ask to touch):
+
+  analyze_resume()             → routers/upgrade.py (/api/upgrade/analyze,
+                                  /api/upgrade/enhance's before/after) →
+                                  frontend/app/ai-upgrade/page.tsx
+  analyze_resume_prioritized() → routers/ats.py (/api/ats/analyze) →
+                                  frontend/app/resumes/[id]/edit/page.tsx
+  score_resume()               → routers/ats.py (/api/ats/score) →
+                                  frontend/app/job-match/page.tsx AND
+                                  frontend/app/resumes/[id]/edit/page.tsx
+
+None of these were touched by Phase 3 — same behavior, same response shape,
+as before. See the Phase 3 implementation report for the full "legacy
+callers migrated / still required / safe to remove" breakdown.
+"""
 import re
 from collections import Counter
 
@@ -28,6 +53,41 @@ def _skill_name(s) -> str:
     if isinstance(s, dict):
         return str(s.get("name", ""))
     return str(s or "")
+
+
+def _filled(v) -> bool:
+    return bool(str(v or "").strip())
+
+
+# Core fields we actually check for "is this entry filled in", not just "does
+# the section exist" — a resume with "M.Com" and nothing else is NOT a
+# complete education entry, and a job with only a company name is NOT a
+# complete experience entry. Scoring on presence alone rewards blank fields.
+_EDU_CORE_FIELDS = ("degree", "institution", "endDate")
+_EXP_CORE_FIELDS = ("position", "company", "startDate")
+
+
+def _education_completeness(education: list[dict]) -> float:
+    """Average fraction of core fields filled in, across all education entries."""
+    if not education:
+        return 0.0
+    ratios = []
+    for e in education:
+        filled = sum(1 for f in _EDU_CORE_FIELDS if _filled(e.get(f)))
+        ratios.append(filled / len(_EDU_CORE_FIELDS))
+    return sum(ratios) / len(ratios)
+
+
+def _experience_completeness(experience: list[dict]) -> float:
+    """Average fraction of core fields (+has bullets) filled in, across all roles."""
+    if not experience:
+        return 0.0
+    ratios = []
+    for e in experience:
+        filled = sum(1 for f in _EXP_CORE_FIELDS if _filled(e.get(f)))
+        has_bullets = 1 if any(_filled(b) for b in (e.get("bullets") or [])) else 0
+        ratios.append((filled + has_bullets) / (len(_EXP_CORE_FIELDS) + 1))
+    return sum(ratios) / len(ratios)
 
 
 def _resume_to_text(content: dict) -> str:
@@ -78,14 +138,17 @@ def analyze_resume(content: dict) -> dict:
         summary_score = 0
         recs.append("Add a professional summary — it's the first thing recruiters read.")
 
-    # Experience + quantified bullets (30)
+    # Experience: field completeness (10) + quantified bullets (20)
     all_bullets = [b for e in experience for b in (e.get("bullets") or []) if b.strip()]
     exp_score = 0
     if experience:
-        exp_score += 10
+        exp_completeness = _experience_completeness(experience)
+        exp_score += round(exp_completeness * 10)
         quantified = sum(1 for b in all_bullets if re.search(r"\d", b))
         ratio = quantified / len(all_bullets) if all_bullets else 0
         exp_score += round(ratio * 20)
+        if exp_completeness < 1:
+            recs.append("Fill in the missing details on your work experience (job title, company, start date, and bullet points) — partial entries score lower.")
         if ratio < 0.5:
             recs.append("Add numbers/metrics to more bullet points (%, $, time saved, scale).")
         if all_bullets and len(all_bullets) < 2 * len(experience):
@@ -99,10 +162,13 @@ def analyze_resume(content: dict) -> dict:
     if n_skills < 6:
         recs.append("List at least 6-10 relevant skills to pass keyword filters.")
 
-    # Education (10)
-    edu_score = 10 if education else 0
+    # Education: field completeness (10) — a degree name alone isn't a complete entry
+    edu_completeness = _education_completeness(education)
+    edu_score = round(edu_completeness * 10)
     if not education:
         recs.append("Add your education section.")
+    elif edu_completeness < 1:
+        recs.append("Add the missing details on your education (institution name and graduation year) for full credit.")
 
     # Action verbs (15)
     action_verbs = ("led", "built", "developed", "designed", "improved", "increased",
@@ -201,13 +267,14 @@ def analyze_resume_prioritized(content: dict, role_keywords: list[str] | None = 
 
     exp_earned = 0
     if experience:
-        exp_earned += 8
+        exp_earned += round(_experience_completeness(experience) * 8)
         quantified = sum(1 for b in all_bullets if re.search(r"\d", b))
         ratio = quantified / len(all_bullets) if all_bullets else 0
         exp_earned += round(ratio * 17)
     comps.append((exp_earned, 25, "Experience & quantified impact",
                   "Add numbers to your bullet points",
-                  "Quantify results — customers handled/day, % target met, time saved — in more bullets."))
+                  "Quantify results — customers handled/day, % target met, time saved — in more bullets."
+                  if experience else "Add your work experience with job title, company, dates and bullet points."))
 
     action_verbs = ("led", "built", "developed", "designed", "improved", "increased",
                     "reduced", "launched", "managed", "created", "delivered", "handled",
@@ -223,9 +290,11 @@ def analyze_resume_prioritized(content: dict, role_keywords: list[str] | None = 
                   "List more relevant skills",
                   f"You have {n_skills}; aim for 8–10 skills recruiters filter for."))
 
-    comps.append((10 if education else 0, 10, "Education",
-                  "Add your education",
-                  "Include your qualification, institution and year — important for freshers."))
+    edu_earned = round(_education_completeness(education) * 10)
+    comps.append((edu_earned, 10, "Education",
+                  "Add your education" if not education else "Complete your education details",
+                  "Include your qualification, institution and year — important for freshers."
+                  if not education else "Add the missing institution name and/or graduation year — a degree name alone isn't a complete entry."))
 
     kw_earned = round(cov["coverage_pct"] / 100 * 15)
     tgt = f' for "{role_title}"' if role_title else ""

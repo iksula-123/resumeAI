@@ -2,8 +2,9 @@
 
 import Link from 'next/link'
 import { useState } from 'react'
-import { Sparkles, Twitter, Linkedin, Instagram, Youtube, ArrowRight } from 'lucide-react'
+import { Twitter, Linkedin, Instagram, Youtube, ArrowRight } from 'lucide-react'
 import { Container } from './shared'
+import Logo from '../Logo'
 
 const COLUMNS = [
   {
@@ -19,7 +20,7 @@ const COLUMNS = [
     links: [
       { label: 'Resume Builder', href: '/resumes/build' },
       { label: 'AI Buddy', href: '/copilot' },
-      { label: 'Mentorly', href: '/auth/signup' },
+      { label: 'Mentorly', href: '/mentorship' },
     ],
   },
   {
@@ -57,9 +58,7 @@ export default function Footer() {
         <div className="grid gap-12 lg:grid-cols-[1.3fr_repeat(4,1fr)]">
           <div>
             <Link href="#top" className="flex items-center gap-2.5">
-              <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-navy-600 via-navy-500 to-royal-600 text-white shadow-lg shadow-navy-600/25">
-                <Sparkles className="h-4.5 w-4.5" strokeWidth={2.25} />
-              </span>
+              <Logo size={36} />
               <span className="text-[1.05rem] font-bold tracking-tight text-navy-600 dark:text-white">SahiCareer</span>
             </Link>
             <p className="mt-4 max-w-xs text-sm leading-relaxed text-slate-500 dark:text-slate-400">

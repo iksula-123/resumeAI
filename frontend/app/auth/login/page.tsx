@@ -4,7 +4,9 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { useAuthStore } from '@/lib/store'
+import { takePostLoginRedirect, roleLandingPath } from '@/lib/authRedirect'
 import OAuthButtons from '@/components/OAuthButtons'
+import Logo from '@/components/Logo'
 
 export default function LoginPage() {
   const [email, setEmail] = useState('')
@@ -18,7 +20,8 @@ export default function LoginPage() {
     setError('')
     try {
       await login(email, password)
-      router.push('/dashboard')
+      const freshUser = useAuthStore.getState().user
+      router.push(takePostLoginRedirect(freshUser ? roleLandingPath(freshUser) : '/dashboard'))
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Login failed. Check your credentials.')
     }
@@ -29,7 +32,7 @@ export default function LoginPage() {
       <div className="w-full max-w-md glass-card p-8 animate-fade-up">
         {/* Logo */}
         <div className="flex items-center justify-center gap-2 mb-6">
-          <div className="w-9 h-9 bg-gradient-to-br from-navy-600 to-royal-600 rounded-xl flex items-center justify-center text-white font-bold">S</div>
+          <Logo size={36} />
           <span className="font-bold text-gray-900">SahiCareer <span className="font-normal text-gray-500">· My Resume</span></span>
         </div>
 

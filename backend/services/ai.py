@@ -123,6 +123,19 @@ def _extract_json_object(raw: str) -> dict | None:
     return None
 
 
+def _finish_incomplete(text: str) -> str:
+    """Guard against a generation that got cut off mid-sentence (e.g. hit the token
+    budget before finishing) — trim back to the last complete sentence instead of
+    showing a dangling half-word/phrase like "...Agile methodologies, data-"."""
+    text = text.strip()
+    if not text or text[-1] in '.!?"\'”’':
+        return text
+    for i in range(len(text) - 1, -1, -1):
+        if text[i] in ".!?":
+            return text[:i + 1].strip()
+    return text  # no earlier sentence boundary found — better to show it than blank it
+
+
 def _clean_lines(raw: str) -> list[str]:
     """Fallback parse: one item per line, stripped of bullets/quotes/fences."""
     out = []
@@ -176,10 +189,10 @@ async def enhance_bullet(bullet: str) -> str:
 
 Rules: strong action verb, quantified result if possible, ≤20 words.
 Return ONLY the improved bullet text, no quotes or explanation."""
-    raw = await _chat(prompt, max_tokens=300)
+    raw = await _chat(prompt, max_tokens=500)
     if raw is None:
         return bullet
-    return raw.strip().strip('"').strip("'")
+    return _finish_incomplete(raw.strip().strip('"').strip("'"))
 
 
 async def generate_summary(experience: str, skills: str) -> str:
@@ -193,7 +206,7 @@ Requirements:
 - Sentence 3: What value they bring to employers
 
 Return ONLY the 3-sentence summary, no labels or extra text."""
-    raw = await _chat(prompt, max_tokens=600)
+    raw = await _chat(prompt, max_tokens=1000)
     if raw is None:
         role = experience.split(" at ")[0] if " at " in experience else (experience[:40] if experience else "professional")
         return (
@@ -202,7 +215,7 @@ Return ONLY the 3-sentence summary, no labels or extra text."""
             "with a consistent track record of delivering high-impact projects on time. "
             "Passionate about clean code, cross-team collaboration, and continuous professional growth."
         )
-    return raw.strip()
+    return _finish_incomplete(raw.strip())
 
 
 async def generate_cover_letter(
@@ -235,7 +248,7 @@ Return ONLY the body paragraphs, no salutation, no signature."""
             f"I would welcome the opportunity to discuss how my experience can benefit {company}. "
             "Thank you for considering my application — I hope to speak with you soon."
         )
-    return raw.strip()
+    return _finish_incomplete(raw.strip())
 
 
 async def role_summary_suggestion(
@@ -265,13 +278,13 @@ Strict rules (this is a suggestion the candidate will confirm, not a factual cla
 - Weave in these skills naturally where relevant: {skill_str}.
 
 Return ONLY the summary text, no labels, no quotes."""
-    raw = await _chat(prompt, max_tokens=400)
+    raw = await _chat(prompt, max_tokens=700)
     if raw is None:
         base = "Motivated" if is_fresher else "Results-driven"
         return (f"{base} candidate seeking a {role_title} role{ind}, with a foundation in "
                 f"{skill_str}. Quick to learn, dependable, and eager to contribute and grow. "
                 "Edit this summary to reflect your own experience and strengths.")
-    return raw.strip().strip('"')
+    return _finish_incomplete(raw.strip().strip('"'))
 
 
 async def suggest_skills(job_title: str, existing: list[str] | None = None) -> list[str]:
@@ -362,11 +375,11 @@ Candidate's answer: {answer}
 Call out one genuine strength and 1-2 specific, actionable improvements.
 Reference the STAR method if the answer lacks structure. Be encouraging but honest.
 Return only the feedback text."""
-    raw = await _chat(prompt, max_tokens=500)
+    raw = await _chat(prompt, max_tokens=700)
     if raw is None:
         return ("Structure your answer with the STAR method (Situation, Task, Action, Result) "
                 "and include a measurable outcome. Keep it concise and focused on your specific contribution.")
-    return raw.strip()
+    return _finish_incomplete(raw.strip())
 
 
 async def sample_answer(question: str, job_title: str) -> str:
@@ -377,12 +390,12 @@ Question: {question}
 
 Use the STAR method where relevant, include a concrete example with a measurable result,
 and sound human, not robotic. Return only the answer text."""
-    raw = await _chat(prompt, max_tokens=700)
+    raw = await _chat(prompt, max_tokens=900)
     if raw is None:
         return ("A strong answer follows STAR: briefly set the Situation and your Task, detail the "
                 "Actions you personally took, and finish with a measurable Result (e.g. a % improvement "
                 "or time saved). Tie it back to the role you're applying for.")
-    return raw.strip()
+    return _finish_incomplete(raw.strip())
 
 
 # ─── Multilingual (Phase 3) ───────────────────────────────────────────────────
@@ -522,10 +535,10 @@ When relevant, point the user to app tools: Resume Editor, ATS Scan, Skill-Gap, 
 Recent conversation:
 {convo}User: {message}
 Copilot:"""
-    raw = await _chat(prompt, max_tokens=700)
+    raw = await _chat(prompt, max_tokens=900)
     if raw is None:
         return {"reply": _copilot_fallback(message), "ai": False}
-    return {"reply": raw.strip(), "ai": True}
+    return {"reply": _finish_incomplete(raw.strip()), "ai": True}
 
 
 # ─── Skill-gap analysis ───────────────────────────────────────────────────────

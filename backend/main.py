@@ -1,3 +1,4 @@
+import asyncio
 import logging
 import os
 from pathlib import Path
@@ -21,6 +22,26 @@ from database import init_db, DATABASE_URL, IS_SQLITE
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+REMINDER_SWEEP_INTERVAL_SECONDS = 300  # 5 min — matches the 1hr session-reminder window granularity
+
+
+async def _reminder_loop():
+    """Background task: periodically scans for session/review reminders to
+    send. Runs for the lifetime of the app process; each tick uses its own
+    DB session so a slow/failed sweep can't hold a connection open forever."""
+    from database import AsyncSessionLocal
+    from services.mentorship import run_reminder_sweep
+
+    while True:
+        try:
+            async with AsyncSessionLocal() as db:
+                result = await run_reminder_sweep(db)
+                if result["session_reminders"] or result["review_reminders"]:
+                    logger.info("Reminder sweep: %s", result)
+        except Exception as exc:
+            logger.warning("Reminder sweep failed: %s", exc)
+        await asyncio.sleep(REMINDER_SWEEP_INTERVAL_SECONDS)
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -36,7 +57,10 @@ async def lifespan(app: FastAPI):
         ensure_bucket()
     except Exception as exc:
         logger.warning("Storage bucket init skipped: %s", exc)
+
+    reminder_task = asyncio.create_task(_reminder_loop())
     yield
+    reminder_task.cancel()
 
 
 app = FastAPI(
@@ -95,6 +119,7 @@ _try_include("cover_letters")
 _try_include("ai")
 _try_include("ats")
 _try_include("ats_engine")
+_try_include("mentorship")
 _try_include("export")
 _try_include("billing")
 _try_include("upgrade")

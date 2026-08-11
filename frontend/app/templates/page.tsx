@@ -8,7 +8,16 @@ import { DUMMY_RESUME } from '@/lib/dummyResume'
 import { api } from '@/lib/api'
 import { useAuthStore } from '@/lib/store'
 
-const CATEGORIES = ['All Templates', 'Modern', 'Professional', 'Minimal', 'Creative', 'Executive']
+const CATEGORIES = [
+  'All Templates', 'Modern', 'Professional', 'Minimal', 'Creative', 'Executive',
+  'Technical', 'Entry-Level', 'Academic', 'Healthcare', 'International',
+]
+
+const ATS_BADGE: Record<string, string> = {
+  excellent: 'bg-green-50 text-green-700 border-green-200',
+  good: 'bg-blue-50 text-blue-700 border-blue-200',
+  fair: 'bg-amber-50 text-amber-700 border-amber-200',
+}
 
 export default function TemplatesPage() {
   const [activeCategory, setActiveCategory] = useState('All Templates')
@@ -97,8 +106,19 @@ export default function TemplatesPage() {
                   )}
                 </div>
                 <div className="p-2.5 bg-white">
-                  <div className="font-semibold text-sm text-gray-800">{template.name}</div>
-                  <div className="text-xs text-gray-500">{template.description}</div>
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="font-semibold text-sm text-gray-800">{template.name}</div>
+                    <span className={`shrink-0 text-[9px] px-1.5 py-0.5 rounded-full border ${ATS_BADGE[template.atsCompatibility] || ATS_BADGE.good}`}>
+                      ATS {template.atsCompatibility}
+                    </span>
+                  </div>
+                  <div className="text-[10px] text-gray-400 mt-0.5">{template.category}</div>
+                  <div className="text-xs text-gray-500 mt-1">{template.description}</div>
+                  {template.bestFor?.length > 0 && (
+                    <div className="text-[10px] text-gray-400 mt-1.5">
+                      <span className="font-medium">Best for:</span> {template.bestFor.slice(0, 2).join(', ')}
+                    </div>
+                  )}
                 </div>
               </div>
             ))}
@@ -127,7 +147,7 @@ export default function TemplatesPage() {
         <div className="flex-1 bg-[#F0F2F8] overflow-y-auto p-6">
           <div className="max-w-2xl mx-auto">
             {/* Template info header */}
-            <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center justify-between mb-2 flex-wrap gap-2">
               <div>
                 <h2 className="font-bold text-gray-800">{selectedTemplate?.name} Template</h2>
                 <p className="text-xs text-gray-500">{selectedTemplate?.description} · Showing with sample data</p>
@@ -140,6 +160,15 @@ export default function TemplatesPage() {
                     style={{ background: t.accent }} />
                 ))}
               </div>
+            </div>
+            <div className="flex items-center gap-2 flex-wrap mb-4 text-[11px]">
+              <span className="px-2 py-0.5 rounded-full bg-gray-100 text-gray-600">{selectedTemplate?.category}</span>
+              <span className={`px-2 py-0.5 rounded-full border ${ATS_BADGE[selectedTemplate?.atsCompatibility || 'good']}`}>
+                ATS: {selectedTemplate?.atsCompatibility}
+              </span>
+              {selectedTemplate?.bestFor?.length ? (
+                <span className="text-gray-400">Best for: {selectedTemplate.bestFor.join(', ')}</span>
+              ) : null}
             </div>
 
             {/* Resume preview */}

@@ -56,15 +56,6 @@ const SECTIONS = [
   { key: 'interests', icon: '❤️', label: 'Interests' },
 ]
 
-const SCORE_BREAKDOWN = [
-  { label: 'Formatting', key: 'formatting' },
-  { label: 'Keywords', key: 'keywords' },
-  { label: 'Skills', key: 'skills' },
-  { label: 'Readability', key: 'readability' },
-  { label: 'Experience', key: 'experience' },
-  { label: 'Grammar', key: 'grammar' },
-]
-
 function uid() { return Math.random().toString(36).slice(2) }
 
 function emptyContent(): ResumeContent {
@@ -533,9 +524,14 @@ export default function EditResumePage() {
   const [activeSection, setActiveSection] = useState<string | null>(null)
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
-  const [atsScore, setAtsScore] = useState(72)
+  const [atsScore, setAtsScore] = useState<number | null>(null)
+  const [analyzing, setAnalyzing] = useState(false)
+  const [breakdown, setBreakdown] = useState<{ label: string; value: number }[]>([])
+  const [fixes, setFixes] = useState<{ title: string; detail: string }[]>([])
   const [jd, setJd] = useState('')
   const [scoring, setScoring] = useState(false)
+  const [matchScore, setMatchScore] = useState<number | null>(null)
+  const [scoreError, setScoreError] = useState('')
   const [atsHistory, setAtsHistory] = useState<{ id: string; score: number; job_title: string | null; created_at: string | null }[]>([])
   const [atsMissing, setAtsMissing] = useState<string[]>([])
   const [aiGenerating, setAiGenerating] = useState<string | null>(null)
@@ -553,6 +549,25 @@ export default function EditResumePage() {
   const resizing = useRef(false)
   const autoSaveTimer = useRef<ReturnType<typeof setTimeout>>()
 
+  // Real, content-derived ATS analysis (no job description needed) — replaces any
+  // guessed/placeholder score with the actual per-section breakdown from the backend.
+  const analyzeContent = useCallback(async (c: ResumeContent, resumeId?: string) => {
+    setAnalyzing(true)
+    try {
+      const r = await api.post<{ score: number; breakdown: Record<string, number>; prioritized_fixes: { title: string; detail: string; category: string }[] }>(
+        '/api/ats/analyze',
+        { content: c, resume_id: resumeId }
+      )
+      setAtsScore(r.score)
+      setBreakdown(Object.entries(r.breakdown || {}).map(([label, value]) => ({ label, value })))
+      setFixes(r.prioritized_fixes || [])
+    } catch {
+      /* best-effort — leave the last known score/breakdown in place */
+    } finally {
+      setAnalyzing(false)
+    }
+  }, [])
+
   // Reload the resume from the server (used after a version rollback)
   const reloadResume = useCallback(async () => {
     if (!id || id === 'new') return
@@ -560,9 +575,9 @@ export default function EditResumePage() {
       const r = await api.get<Resume>(`/api/resumes/${id}`)
       setResume(r); setTitle(r.title); setContent(r.content || emptyContent())
       setTemplateId(r.template_id || 'modern')
-      if (r.ats_score != null) setAtsScore(r.ats_score)
+      analyzeContent(r.content || emptyContent(), r.id)
     } catch { /* ignore */ }
-  }, [id])
+  }, [id, analyzeContent])
 
   // Drag-to-resize the sections panel
   useEffect(() => {
@@ -608,12 +623,12 @@ export default function EditResumePage() {
       api.get<Resume>(`/api/resumes/${id}`)
         .then(r => {
           setResume(r); setTitle(r.title); setContent(r.content || emptyContent()); setTemplateId(r.template_id || 'modern')
-          if (r.ats_score != null) setAtsScore(r.ats_score)
+          analyzeContent(r.content || emptyContent(), r.id)
           loadAtsHistory(r.id)
         })
         .catch(() => router.push('/dashboard'))
     }
-  }, [id, user, router, loadAtsHistory])
+  }, [id, user, router, loadAtsHistory, analyzeContent])
 
   const patch = useCallback(<K extends keyof ResumeContent>(key: K, val: ResumeContent[K]) => {
     setContent(c => ({ ...c, [key]: val }))
@@ -645,9 +660,22 @@ export default function EditResumePage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [content, title, templateId, resume])
 
+  // Re-run the real ATS analysis whenever the resume content actually changes,
+  // so the score/breakdown in the Insights panel stay in sync with what's on the page.
+  const analyzeTimer = useRef<ReturnType<typeof setTimeout>>()
+  useEffect(() => {
+    if (!resume) return
+    if (!didLoad.current) return
+    clearTimeout(analyzeTimer.current)
+    analyzeTimer.current = setTimeout(() => analyzeContent(content, resume.id), 1200)
+    return () => clearTimeout(analyzeTimer.current)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [content])
+
   const scoreAts = async () => {
     if (!jd.trim()) return
     setScoring(true)
+    setScoreError('')
     try {
       const r = await api.post<{ score: number; missing?: string[] }>('/api/ats/score', {
         resume_content: content,
@@ -655,11 +683,11 @@ export default function EditResumePage() {
         resume_id: resume?.id,
         job_title: content.personalInfo?.jobTitle || title,
       })
-      setAtsScore(r.score)
+      setMatchScore(r.score)
       setAtsMissing(r.missing || [])
       if (resume?.id) loadAtsHistory(resume.id)
     } catch {
-      setAtsScore(Math.floor(Math.random() * 30) + 60)
+      setScoreError('Could not score against this job description — try again.')
     } finally {
       setScoring(false)
     }
@@ -845,14 +873,6 @@ export default function EditResumePage() {
     }
   }
 
-  const scoreBreakdown = {
-    formatting: Math.min(100, atsScore + 20),
-    keywords: Math.max(50, atsScore - 10),
-    skills: Math.min(100, atsScore + 15),
-    readability: Math.min(100, atsScore + 18),
-    experience: Math.max(60, atsScore - 5),
-    grammar: 100,
-  }
 
   const sectionComplete = (key: string) => {
     const c = content as any
@@ -967,8 +987,8 @@ export default function EditResumePage() {
                         <textarea value={content.summary}
                           onChange={e => patch('summary', e.target.value)}
                           placeholder="Write a brief professional summary..."
-                          rows={4}
-                          className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-royal-300 resize-none" />
+                          rows={6}
+                          className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-royal-300 resize-y" />
                         <button onClick={generateSummary} disabled={aiGenerating === 'summary'}
                           className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-royal-500 to-teal-500 text-white py-2 rounded-lg text-xs hover:opacity-90 transition">
                           {aiGenerating === 'summary' ? '✨ Generating…' : '✨ Generate with AI'}
@@ -1066,37 +1086,42 @@ export default function EditResumePage() {
                   <span className="text-sm font-semibold text-gray-800">ATS Score</span>
                   <button className="text-xs text-gray-500">▲</button>
                 </div>
-                <div className="flex flex-col items-center py-2">
-                  <CircularScore score={atsScore} max={100} size={100} color={atsScore >= 80 ? '#1E7A46' : atsScore >= 60 ? '#F5A623' : '#c0392b'} />
-                  <div className={`text-xs font-medium mt-2 ${atsScore >= 80 ? 'text-green-600' : atsScore >= 60 ? 'text-yellow-600' : 'text-red-600'}`}>
-                    {atsScore >= 80 ? 'Excellent' : atsScore >= 60 ? 'Good' : 'Needs Work'}
+                {atsScore == null ? (
+                  <div className="flex flex-col items-center py-6 text-xs text-gray-400">
+                    {analyzing ? 'Analyzing your resume…' : 'Fill in your resume to see your ATS score.'}
                   </div>
-                  <p className="text-xs text-gray-500 text-center mt-1">
-                    {atsScore >= 80 ? 'This resume is highly likely to pass ATS.' : 'Add more keywords to improve your score.'}
-                  </p>
-                </div>
+                ) : (
+                  <div className={`flex flex-col items-center py-2 transition-opacity ${analyzing ? 'opacity-60' : ''}`}>
+                    <CircularScore score={atsScore} max={100} size={100} color={atsScore >= 80 ? '#1E7A46' : atsScore >= 60 ? '#F5A623' : '#c0392b'} />
+                    <div className={`text-xs font-medium mt-2 ${atsScore >= 80 ? 'text-green-600' : atsScore >= 60 ? 'text-yellow-600' : 'text-red-600'}`}>
+                      {atsScore >= 80 ? 'Excellent' : atsScore >= 60 ? 'Good' : 'Needs Work'}
+                    </div>
+                    <p className="text-xs text-gray-500 text-center mt-1">
+                      {atsScore >= 80 ? 'This resume is highly likely to pass ATS.' : 'Add more keywords to improve your score.'}
+                    </p>
+                  </div>
+                )}
               </div>
 
               {/* Score Breakdown */}
-              <div className="px-4 py-4 border-b border-gray-100">
-                <div className="text-xs font-semibold text-gray-800 mb-3">Score Breakdown</div>
-                <div className="space-y-2">
-                  {SCORE_BREAKDOWN.map(item => {
-                    const score = (scoreBreakdown as any)[item.key]
-                    return (
-                      <div key={item.key} className="flex items-center justify-between">
+              {breakdown.length > 0 && (
+                <div className="px-4 py-4 border-b border-gray-100">
+                  <div className="text-xs font-semibold text-gray-800 mb-3">Score Breakdown</div>
+                  <div className="space-y-2">
+                    {breakdown.map(item => (
+                      <div key={item.label} className="flex items-center justify-between">
                         <span className="text-xs text-gray-500">{item.label}</span>
                         <div className="flex items-center gap-2">
                           <div className="w-24 h-1.5 bg-gray-100 rounded-full overflow-hidden">
-                            <div className="h-full bg-gradient-to-r from-royal-500 to-teal-500 rounded-full" style={{ width: `${score}%` }} />
+                            <div className="h-full bg-gradient-to-r from-royal-500 to-teal-500 rounded-full" style={{ width: `${item.value}%` }} />
                           </div>
-                          <span className="text-xs font-medium text-gray-700 w-8 text-right">{score}</span>
+                          <span className="text-xs font-medium text-gray-700 w-8 text-right">{item.value}</span>
                         </div>
                       </div>
-                    )
-                  })}
+                    ))}
+                  </div>
                 </div>
-              </div>
+              )}
 
               {/* Keyword Match */}
               <div className="px-4 py-4 border-b border-gray-100">
@@ -1109,9 +1134,10 @@ export default function EditResumePage() {
                   className="w-full bg-navy-600 hover:bg-navy-700 text-white py-2 rounded-lg text-xs font-medium transition disabled:opacity-50">
                   {scoring ? 'Analyzing…' : 'Analyze Match'}
                 </button>
-                {jd && (
+                {scoreError && <p className="text-xs text-red-500 mt-2">{scoreError}</p>}
+                {matchScore != null && (
                   <div className="mt-3 flex flex-col items-center">
-                    <CircularScore score={Math.round(atsScore * 0.9)} size={70} color="#6366f1" />
+                    <CircularScore score={matchScore} size={70} color="#6366f1" />
                     <div className="text-xs text-gray-500 mt-1">Match Score</div>
                   </div>
                 )}
@@ -1159,20 +1185,20 @@ export default function EditResumePage() {
                 </div>
               )}
 
-              {/* AI Suggestions */}
+              {/* AI Suggestions — real, ranked by how many ATS points each would add */}
               <div className="px-4 py-4">
                 <div className="text-xs font-semibold text-gray-800 mb-3">AI Suggestions</div>
                 <div className="space-y-2">
-                  {[
-                    'Add more quantified achievements to your experience section',
-                    'Include metrics and numbers to improve impact',
-                    'Add missing keywords to increase ATS score',
-                  ].map((s, i) => (
+                  {fixes.length > 0 ? fixes.map((f, i) => (
                     <div key={i} className="flex gap-2 text-xs text-gray-600 bg-royal-50 rounded-lg px-3 py-2">
                       <span className="text-royal-500 flex-shrink-0">•</span>
-                      {s}
+                      <span><span className="font-medium text-gray-700">{f.title}.</span> {f.detail}</span>
                     </div>
-                  ))}
+                  )) : (
+                    <div className="text-xs text-gray-400">
+                      {analyzing ? 'Analyzing…' : "Nothing to flag — this resume is in great shape."}
+                    </div>
+                  )}
                 </div>
                 <button
                   onClick={improveWithAI}

@@ -127,6 +127,19 @@ def list_user_files(user_id: str) -> list[dict]:
     return out
 
 
+def download_bytes(path: str) -> bytes | None:
+    """Fetch a file's raw bytes back from storage (e.g. an original upload
+    kept for design preservation — see services/docx_editor.py)."""
+    sb = _client()
+    if sb is None:
+        return None
+    try:
+        return sb.storage.from_(BUCKET).download(path)
+    except Exception as exc:
+        logger.warning("download_bytes failed (%s): %s", path, exc)
+        return None
+
+
 def delete_file(user_id: str, path: str) -> bool:
     """Delete a file — only if it belongs to the given user (path scoping)."""
     if not path.startswith(f"{user_id}/"):

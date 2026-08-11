@@ -8,12 +8,14 @@ This router translates between the two:
   * _to_content(resume)      → assemble content dict from the resume + children
   * _apply_content(db, r, c) → decompose content into normalized child rows
 """
+import io
 import re
 import uuid
 from datetime import datetime, timezone
 from typing import Optional, Any
 
 from fastapi import APIRouter, HTTPException, Depends
+from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
 from sqlalchemy import select, delete
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -111,6 +113,11 @@ def _to_dict(r: Resume) -> dict:
         "template_id": r.template_id,
         "is_public": r.is_public,
         "ats_score": r.ats_score,
+        "template_type": r.template_type,
+        "preserve_original": r.preserve_original,
+        "original_file_type": r.original_file_type,
+        "original_filename": r.original_filename,
+        "font_metadata": r.font_metadata,
         "content": _to_content(r),
         "created_at": r.created_at.isoformat() if r.created_at else None,
         "updated_at": r.updated_at.isoformat() if r.updated_at else None,
@@ -501,4 +508,94 @@ async def restore_version(
     await db.commit()
     audit(actor_id=str(user.id), actor_email=user.email, action="resume.rollback",
           entity_type="resume", entity_id=str(r.id), meta={"version_id": version_id})
+    return _to_dict(full)
+
+
+# ── design-preserving downloads (Mode 1 vs Mode 2 — see services/docx_editor.py) ──
+@router.get("/{resume_id}/download/{fmt}")
+async def download_resume(
+    resume_id: str,
+    fmt: str,
+    db: AsyncSession = Depends(get_db),
+    user: User = Depends(get_current_user),
+):
+    """Download this resume as PDF/DOCX.
+
+    If it was uploaded and design preservation is on (preserve_original),
+    reuses the ORIGINAL file's design instead of the SahiCareer generator —
+    a PDF is returned byte-for-byte unchanged (see services/docx_editor.py's
+    docstring for why PDFs are never rewritten); a DOCX gets the AI-improved
+    text merged into the original's runs, keeping every font/color/table/
+    header/footer untouched. Resumes built from scratch — or any resume after
+    the user explicitly chooses 'Change Template' — use the normal generator.
+    """
+    if fmt not in ("pdf", "docx"):
+        raise HTTPException(status_code=400, detail="Format must be 'pdf' or 'docx'.")
+    r = await _get_owned(db, resume_id, user)
+    safe_title = (r.title or "Resume").replace(" ", "_")
+    media = ("application/pdf" if fmt == "pdf"
+              else "application/vnd.openxmlformats-officedocument.wordprocessingml.document")
+
+    if r.preserve_original and r.original_file_path and r.original_file_type == fmt:
+        from services.storage import download_bytes
+        original_bytes = download_bytes(r.original_file_path)
+        if original_bytes is None:
+            raise HTTPException(status_code=502, detail="Could not retrieve your original file — try 'Change Template' instead.")
+
+        if fmt == "pdf":
+            out_bytes = original_bytes  # never rewritten — the original IS the download
+        else:
+            from services.docx_editor import apply_content_edits
+            v1 = (await db.execute(
+                select(ResumeVersion)
+                .where(ResumeVersion.resume_id == r.id, ResumeVersion.source == "original_upload")
+                .order_by(ResumeVersion.created_at.asc()).limit(1)
+            )).scalar_one_or_none()
+            baseline = v1.content if v1 and v1.content else _to_content(r)
+            out_bytes, _report = apply_content_edits(original_bytes, baseline, _to_content(r))
+
+        await log_usage_event(str(user.id), f"download_{fmt}_preserved", tenant_id=tenant_of(user),
+                              metadata={"resume_id": resume_id})
+        return StreamingResponse(
+            io.BytesIO(out_bytes), media_type=media,
+            headers={"Content-Disposition": f'attachment; filename="{safe_title}.{fmt}"'},
+        )
+
+    # Not preserving an original design — use the template-aware SahiCareer
+    # generator. r.template_id (DB) is the only source consulted here — this
+    # endpoint has no request body, so there's no client-supplied value to
+    # even consider mixing in (see export.py's module docstring on
+    # template_id resolution).
+    from routers.export import TEMPLATE_BUILDERS, TEMPLATE_SPECS, DEFAULT_TEMPLATE_ID
+    template_id = r.template_id if r.template_id in TEMPLATE_SPECS else DEFAULT_TEMPLATE_ID
+    builder = TEMPLATE_BUILDERS.get(template_id, TEMPLATE_BUILDERS[DEFAULT_TEMPLATE_ID])
+    sections = TEMPLATE_SPECS[template_id]["sections"]
+    content = _to_content(r)
+    out_bytes = builder.pdf(content, r.title, sections) if fmt == "pdf" else builder.docx(content, r.title, sections)
+    await log_usage_event(str(user.id), f"download_{fmt}", tenant_id=tenant_of(user),
+                          metadata={"resume_id": resume_id, "template_id": template_id})
+    return StreamingResponse(
+        io.BytesIO(out_bytes), media_type=media,
+        headers={"Content-Disposition": f'attachment; filename="{safe_title}.{fmt}"'},
+    )
+
+
+@router.post("/{resume_id}/change-template")
+async def change_template(
+    resume_id: str,
+    db: AsyncSession = Depends(get_db),
+    user: User = Depends(get_current_user),
+):
+    """Mode 2 — the ONLY way a resume's design switches away from a preserved
+    original to the SahiCareer template. Always explicit, never automatic."""
+    r = await _get_owned(db, resume_id, user)
+    r.preserve_original = False
+    r.template_type = "sahicareer"
+    r.updated_at = datetime.now(timezone.utc)
+    await db.commit()
+    full = await _load_full(db, r.id)
+    await _snapshot(db, full, user.id, "change_template")
+    await db.commit()
+    audit(actor_id=str(user.id), actor_email=user.email, action="resume.change_template",
+          entity_type="resume", entity_id=str(r.id), meta={})
     return _to_dict(full)

@@ -5,10 +5,19 @@ Combines ResumeParser + JobParser output, KeywordEngine's categorized
 matching, and SimilarityService's semantic scores into the full dashboard
 payload: every score the spec asks for, each with a `found`/`missing`/`note`
 explanation — never a bare number.
+
+Phase 3 (ATS Intelligence): `overall_score` is now computed by
+scoring.analyze_categories() — the dynamic Match/Completeness/Confidence
+model with weight redistribution (never a flat/hardcoded weighted average,
+never silently zeros a category just because data is missing). The original
+9-dimension `scores` dict (industry_match, readability_score, etc.) is kept
+as supplementary detail — still real, still computed, just no longer the
+number that drives the headline score. interview_probability/
+hiring_probability are unchanged, still explicitly-labeled heuristics.
 """
 import re
 
-from . import keyword_engine, similarity_service
+from . import keyword_engine, similarity_service, scoring as ats_scoring
 
 _DEGREE_RANK = [
     (5, ("phd", "doctorate")),
@@ -121,8 +130,35 @@ async def analyze(resume: dict, job: dict) -> dict:
     missing_required = len(kw["required_skills_match"]["missing"])
     hiring_probability = max(0, round(interview_probability * 0.75) - missing_required * 3)
 
+    # ── Phase 3: dynamic Match/Completeness/Confidence category analysis ──
+    # This — not the fixed 9-dimension weighted average above — is now the
+    # canonical `overall_score`. See scoring.py's module docstring.
+    category_result = await ats_scoring.analyze_categories(resume, job)
+    keyword_analysis = ats_scoring.categorize_keywords(resume, job)
+    resume_skills_all = list(resume.get("skills") or []) + list(resume.get("hard_skills") or [])
+    job_skills_all = list(job.get("required_skills") or []) + list(job.get("preferred_skills") or [])
+    skills_breakdown = ats_scoring.skills_breakdown(resume_skills_all, job_skills_all, resume.get("raw_text", ""))
+    profile_completeness = ats_scoring.profile_completeness(resume)
+    recommendations = ats_scoring.build_recommendations(category_result["categories"], keyword_analysis)
+    candidate_questions = ats_scoring.build_candidate_questions(resume, category_result["categories"])
+
     return {
-        "overall_score": overall,
+        # ── canonical Phase 3 score (dynamic, never hardcoded, never a
+        # silent zero for missing data — see scoring.py) ──
+        "overall_score": category_result["overall_score"],
+        "score_confidence": category_result["score_confidence"],
+        "score_explanation": category_result["score_explanation"],
+        "category_analysis": category_result["categories"],
+        "weights_used": category_result["weights_used"],
+        "excluded_categories": category_result["excluded_categories"],
+        "keyword_analysis": keyword_analysis,
+        "skills_breakdown": skills_breakdown,
+        "profile_completeness": profile_completeness,
+        "recommendations_prioritized": recommendations,
+        "candidate_questions": candidate_questions,
+        # ── legacy 9-dimension detail — kept as supplementary information,
+        # no longer drives `overall_score` (see module docstring) ──
+        "legacy_overall_score": overall,
         "scores": {
             "keyword_match": {"pct": components["keyword_match"], **{k: v for k, v in kw["keyword_match"].items() if k != "pct"}},
             "skills_match": {"pct": kw["skills_match"]["pct"], "found": kw["skills_match"]["found"], "missing": kw["skills_match"]["missing"]},

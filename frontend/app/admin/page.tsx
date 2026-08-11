@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 import { useAuthStore } from '@/lib/store'
 import { api } from '@/lib/api'
 import AppShell from '@/components/AppShell'
@@ -45,7 +46,7 @@ interface AuditEntry {
 }
 
 export default function AdminPage() {
-  const { user } = useAuthStore()
+  const { user, hasHydrated } = useAuthStore()
   const router = useRouter()
   const [stats, setStats] = useState<Stats | null>(null)
   const [analytics, setAnalytics] = useState<Analytics | null>(null)
@@ -76,10 +77,14 @@ export default function AdminPage() {
   }, [])
 
   useEffect(() => {
+    // Wait for the persisted session to load before deciding there's no
+    // user/wrong role — otherwise a hard refresh sees the pre-rehydration
+    // `null` flash and wrongly bounces a logged-in admin out.
+    if (!hasHydrated) return
     if (!user) { router.push('/auth/login'); return }
     if (user.role !== 'admin') { router.push('/dashboard'); return }
     load()
-  }, [user, router, load])
+  }, [user, hasHydrated, router, load])
 
   const setRole = async (u: AdminUser, role: 'user' | 'admin') => {
     setBusy(u.id)
@@ -124,6 +129,9 @@ export default function AdminPage() {
         <h1 className="text-sm font-semibold text-gray-800 flex items-center gap-2">🛡️ Admin Panel</h1>
         <p className="text-xs text-gray-500">Manage users, roles, and platform data</p>
       </div>
+      <Link href="/admin/mentorship" className="text-xs text-navy-600 bg-royal-50 hover:bg-royal-100 px-3 py-1.5 rounded-lg transition">
+        🎓 Mentorship Admin
+      </Link>
       <button onClick={load} className="text-xs text-navy-600 bg-royal-50 hover:bg-royal-100 px-3 py-1.5 rounded-lg transition">
         ↻ Refresh
       </button>

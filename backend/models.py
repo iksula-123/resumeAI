@@ -11,7 +11,7 @@ Notes for dual SQLite / Supabase-Postgres operation:
   * profiles.id is NOT declared as a FK to auth.users here (auth schema isn't
     managed by SQLAlchemy); the real FK lives in the SQL migration.
 """
-from sqlalchemy import Column, String, DateTime, Boolean, Text, Integer, Float, ForeignKey, JSON
+from sqlalchemy import Column, String, DateTime, Date, Time, Boolean, Text, Integer, Float, ForeignKey, JSON
 from sqlalchemy import Uuid as UUID
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
@@ -74,6 +74,23 @@ class Resume(Base):
     achievements = Column(JSON, nullable=False, default=list)
     interests = Column(JSON, nullable=False, default=list)
     ats_score = Column(Integer, nullable=True)
+
+    # ── Design preservation (uploaded resumes) ──────────────────────────────
+    # template_type: "sahicareer" (built-in template, default for resumes built
+    # from scratch) | "uploaded_original" (came from an uploaded file whose
+    # visual design is preserved). preserve_original gates which download path
+    # export/resumes routes take — see services/docx_editor.py and
+    # routers/upgrade.py. Original uploads are NEVER deleted or overwritten;
+    # original_file_path points at the untouched file in Supabase Storage.
+    template_type = Column(String(50), nullable=False, default="sahicareer")
+    preserve_original = Column(Boolean, nullable=False, default=False)
+    original_file_path = Column(Text, nullable=True)     # storage path (services/storage.py), not a public URL
+    original_file_type = Column(String(10), nullable=True)  # "pdf" | "docx"
+    original_filename = Column(String(255), nullable=True)
+    font_metadata = Column(JSON, nullable=True)
+    color_metadata = Column(JSON, nullable=True)
+    layout_metadata = Column(JSON, nullable=True)
+
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
 
@@ -241,6 +258,30 @@ class AtsReport(Base):
     matched_keywords = Column(JSON, nullable=False, default=list)
     missing_keywords = Column(JSON, nullable=False, default=list)
     suggestions = Column(JSON, nullable=False, default=list)
+    # Pre-existing DB column (migration 0003) never reflected in the ORM
+    # model until now — has a DB-side default, so adding it here is additive,
+    # not a schema change. Populated going forward via tenant_of(user), same
+    # attribution pattern as services/usage.py's usage_events.
+    tenant_id = Column(UUID(as_uuid=True), nullable=True)
+
+    # ── Phase 3 (ATS Intelligence) — additive, nullable; existing rows and
+    # existing readers of the original columns above are unaffected. ──
+    target_role = Column(String(255), nullable=True)         # role_slug/title when analyzed without a JD
+    analysis_mode = Column(String(20), nullable=True)         # "job_description" | "role_based"
+    score_confidence = Column(String(10), nullable=True)      # "high" | "medium" | "low"
+    score_breakdown = Column(JSON, nullable=True)              # legacy 9-dimension {key: pct} snapshot
+    category_scores = Column(JSON, nullable=True)              # {key: {match, completeness, confidence, ...}}
+    category_completeness = Column(JSON, nullable=True)        # {key: completeness} convenience projection
+    category_confidence = Column(JSON, nullable=True)          # {key: confidence} convenience projection
+    overall_confidence = Column(String(10), nullable=True)     # same scale as score_confidence
+    critical_keywords = Column(JSON, nullable=True)
+    important_keywords = Column(JSON, nullable=True)
+    partial_matches = Column(JSON, nullable=True)
+    formatting_analysis = Column(JSON, nullable=True)
+    profile_completeness = Column(JSON, nullable=True)
+    recommendations = Column(JSON, nullable=True)               # {high: [...], medium: [...], low: [...]}
+    candidate_questions = Column(JSON, nullable=True)
+    analysis_version = Column(String(20), nullable=True, default="v2-phase3")
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
     def __repr__(self):
@@ -393,3 +434,448 @@ class ResumeVersion(Base):
 
     def __repr__(self):
         return f"<ResumeVersion {self.resume_id} {self.source}>"
+
+
+# ═══════════════════════════════════════════════════════════════════════════
+# Mentorship module (supabase/migrations/0006_mentorship.sql)
+#
+# Reuses Profile for both learners and mentors (a mentor is a profile with a
+# matching `mentors` row) and Tenant for "organization" — no parallel user or
+# org table. Constraints (checks, the double-booking exclusion on `sessions`)
+# live in the SQL migration; these models mirror the column shapes for ORM use.
+# ═══════════════════════════════════════════════════════════════════════════
+
+MENTOR_STATUSES = {"pending", "approved", "rejected", "suspended"}
+BOOKING_STATUSES = {"pending", "confirmed", "cancelled", "completed", "rescheduled"}
+SESSION_STATUSES = {"scheduled", "completed", "cancelled", "no_show", "rescheduled"}
+SESSION_TYPES = {"one_on_one", "resume_review", "mock_interview", "career_guidance", "group_session"}
+
+
+class MentorCategory(Base):
+    __tablename__ = "mentor_categories"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    tenant_id = Column(UUID(as_uuid=True), nullable=True)  # tenants FK enforced in SQL migration, not ORM (matches Profile.tenant_id)
+    name = Column(String(255), nullable=False)
+    slug = Column(String(255), unique=True, nullable=False)
+    icon = Column(Text, nullable=True)
+    sort_order = Column(Integer, nullable=False, default=0)
+    is_active = Column(Boolean, nullable=False, default=True)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
+
+
+class Mentor(Base):
+    __tablename__ = "mentors"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    profile_id = Column(UUID(as_uuid=True), ForeignKey("profiles.id", ondelete="CASCADE"), nullable=False, unique=True, index=True)
+    tenant_id = Column(UUID(as_uuid=True), nullable=True)  # tenants FK enforced in SQL migration, not ORM (matches Profile.tenant_id)
+    status = Column(String(20), nullable=False, default="pending", index=True)
+    headline = Column(Text, nullable=True)
+    bio = Column(Text, nullable=True)
+    designation = Column(String(255), nullable=True)
+    company = Column(String(255), nullable=True)
+    years_experience = Column(Integer, nullable=False, default=0)
+    country = Column(String(100), nullable=True)
+    timezone = Column(String(64), nullable=False, default="Asia/Kolkata")
+    session_price_amount = Column(Integer, nullable=False, default=0)
+    session_price_currency = Column(String(10), nullable=False, default="INR")
+    is_featured = Column(Boolean, nullable=False, default=False)
+    rating_avg = Column(Float, nullable=False, default=0)
+    rating_count = Column(Integer, nullable=False, default=0)
+    sessions_completed = Column(Integer, nullable=False, default=0)
+    approved_at = Column(DateTime(timezone=True), nullable=True)
+    approved_by = Column(UUID(as_uuid=True), ForeignKey("profiles.id"), nullable=True)
+    reviewed_by = Column(UUID(as_uuid=True), ForeignKey("profiles.id"), nullable=True)  # set on approve AND reject
+    reviewed_at = Column(DateTime(timezone=True), nullable=True)
+    rejection_reason = Column(Text, nullable=True)
+    achievements = Column(JSON, nullable=False, default=list)  # jsonb string array — matches Resume.achievements
+    created_by = Column(UUID(as_uuid=True), ForeignKey("profiles.id"), nullable=True)
+    deleted_at = Column(DateTime(timezone=True), nullable=True)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
+
+    profile = relationship("Profile", foreign_keys=[profile_id])
+    skills = relationship("MentorSkill", cascade="all, delete-orphan")
+    languages = relationship("MentorLanguage", cascade="all, delete-orphan")
+    category_links = relationship("MentorCategoryLink", cascade="all, delete-orphan")
+    availability = relationship("MentorAvailability", cascade="all, delete-orphan")
+    experience = relationship("MentorExperience", cascade="all, delete-orphan", order_by="MentorExperience.sort_order")
+    education = relationship("MentorEducation", cascade="all, delete-orphan", order_by="MentorEducation.sort_order")
+    certifications = relationship("MentorCertification", cascade="all, delete-orphan", order_by="MentorCertification.sort_order")
+    offerings = relationship("MentorOffering", cascade="all, delete-orphan", order_by="MentorOffering.sort_order")
+
+    def __repr__(self):
+        return f"<Mentor {self.profile_id} ({self.status})>"
+
+
+class MentorExperience(Base):
+    __tablename__ = "mentor_experience"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    mentor_id = Column(UUID(as_uuid=True), ForeignKey("mentors.id", ondelete="CASCADE"), nullable=False, index=True)
+    position = Column(String(255), nullable=False)
+    company = Column(String(255), nullable=True)
+    location = Column(String(255), nullable=True)
+    start_date = Column(String(50), nullable=True)
+    end_date = Column(String(50), nullable=True)
+    is_current = Column(Boolean, nullable=False, default=False)
+    bullets = Column(JSON, nullable=False, default=list)
+    sort_order = Column(Integer, nullable=False, default=0)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
+
+
+class MentorEducation(Base):
+    __tablename__ = "mentor_education"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    mentor_id = Column(UUID(as_uuid=True), ForeignKey("mentors.id", ondelete="CASCADE"), nullable=False, index=True)
+    institution = Column(String(255), nullable=False)
+    degree = Column(String(255), nullable=True)
+    field = Column(String(255), nullable=True)
+    start_date = Column(String(50), nullable=True)
+    end_date = Column(String(50), nullable=True)
+    sort_order = Column(Integer, nullable=False, default=0)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
+
+
+class MentorCertification(Base):
+    __tablename__ = "mentor_certifications"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    mentor_id = Column(UUID(as_uuid=True), ForeignKey("mentors.id", ondelete="CASCADE"), nullable=False, index=True)
+    name = Column(String(255), nullable=False)
+    issuer = Column(String(255), nullable=True)
+    issue_date = Column(String(50), nullable=True)
+    credential_url = Column(Text, nullable=True)
+    sort_order = Column(Integer, nullable=False, default=0)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
+
+
+class MentorCategoryLink(Base):
+    __tablename__ = "mentor_category_links"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    mentor_id = Column(UUID(as_uuid=True), ForeignKey("mentors.id", ondelete="CASCADE"), nullable=False, index=True)
+    category_id = Column(UUID(as_uuid=True), ForeignKey("mentor_categories.id", ondelete="CASCADE"), nullable=False, index=True)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+    category = relationship("MentorCategory")
+
+
+class MentorSkill(Base):
+    __tablename__ = "mentor_skills"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    mentor_id = Column(UUID(as_uuid=True), ForeignKey("mentors.id", ondelete="CASCADE"), nullable=False, index=True)
+    skill = Column(String(255), nullable=False)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+
+class MentorLanguage(Base):
+    __tablename__ = "mentor_languages"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    mentor_id = Column(UUID(as_uuid=True), ForeignKey("mentors.id", ondelete="CASCADE"), nullable=False, index=True)
+    language = Column(String(100), nullable=False)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+
+class MentorAvailability(Base):
+    __tablename__ = "mentor_availability"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    mentor_id = Column(UUID(as_uuid=True), ForeignKey("mentors.id", ondelete="CASCADE"), nullable=False, index=True)
+    tenant_id = Column(UUID(as_uuid=True), nullable=True)  # tenants FK enforced in SQL migration, not ORM (matches Profile.tenant_id)
+    rule_type = Column(String(20), nullable=False, default="recurring")
+    day_of_week = Column(Integer, nullable=True)
+    specific_date = Column(Date, nullable=True)
+    start_time = Column(Time, nullable=False)
+    end_time = Column(Time, nullable=False)
+    timezone = Column(String(64), nullable=False, default="Asia/Kolkata")
+    is_active = Column(Boolean, nullable=False, default=True)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
+
+
+class MeetingLink(Base):
+    __tablename__ = "meeting_links"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    tenant_id = Column(UUID(as_uuid=True), nullable=True)  # tenants FK enforced in SQL migration, not ORM (matches Profile.tenant_id)
+    provider = Column(String(30), nullable=False, default="jitsi")
+    url = Column(Text, nullable=False)
+    created_by = Column(UUID(as_uuid=True), ForeignKey("profiles.id"), nullable=True)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
+
+
+class Booking(Base):
+    __tablename__ = "bookings"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    tenant_id = Column(UUID(as_uuid=True), nullable=True)  # tenants FK enforced in SQL migration, not ORM (matches Profile.tenant_id)
+    learner_id = Column(UUID(as_uuid=True), ForeignKey("profiles.id", ondelete="CASCADE"), nullable=False, index=True)
+    mentor_id = Column(UUID(as_uuid=True), ForeignKey("mentors.id", ondelete="CASCADE"), nullable=False, index=True)
+    session_type = Column(String(30), nullable=False, default="one_on_one")
+    duration_minutes = Column(Integer, nullable=False, default=30)
+    agenda = Column(Text, nullable=True)
+    status = Column(String(20), nullable=False, default="pending", index=True)
+    price_amount = Column(Integer, nullable=False, default=0)
+    price_currency = Column(String(10), nullable=False, default="INR")
+    cancellation_reason = Column(Text, nullable=True)
+    cancelled_by = Column(UUID(as_uuid=True), ForeignKey("profiles.id"), nullable=True)
+    created_by = Column(UUID(as_uuid=True), ForeignKey("profiles.id"), nullable=True)
+    deleted_at = Column(DateTime(timezone=True), nullable=True)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
+
+    mentor = relationship("Mentor")
+    sessions = relationship("MentorSession", back_populates="booking", cascade="all, delete-orphan")
+
+    def __repr__(self):
+        return f"<Booking {self.learner_id}->{self.mentor_id} ({self.status})>"
+
+
+class MentorSession(Base):
+    """Named MentorSession (not Session) to avoid clashing with SQLAlchemy's own Session class."""
+    __tablename__ = "sessions"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    booking_id = Column(UUID(as_uuid=True), ForeignKey("bookings.id", ondelete="CASCADE"), nullable=False, index=True)
+    mentor_id = Column(UUID(as_uuid=True), ForeignKey("mentors.id", ondelete="CASCADE"), nullable=False, index=True)
+    tenant_id = Column(UUID(as_uuid=True), nullable=True)  # tenants FK enforced in SQL migration, not ORM (matches Profile.tenant_id)
+    scheduled_start = Column(DateTime(timezone=True), nullable=False)
+    scheduled_end = Column(DateTime(timezone=True), nullable=False)
+    status = Column(String(20), nullable=False, default="scheduled", index=True)
+    meeting_link_id = Column(UUID(as_uuid=True), ForeignKey("meeting_links.id"), nullable=True)
+    actual_start = Column(DateTime(timezone=True), nullable=True)
+    actual_end = Column(DateTime(timezone=True), nullable=True)
+    created_by = Column(UUID(as_uuid=True), ForeignKey("profiles.id"), nullable=True)
+    deleted_at = Column(DateTime(timezone=True), nullable=True)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
+
+    booking = relationship("Booking", back_populates="sessions")
+    meeting_link = relationship("MeetingLink")
+
+
+class Review(Base):
+    __tablename__ = "reviews"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    tenant_id = Column(UUID(as_uuid=True), nullable=True)  # tenants FK enforced in SQL migration, not ORM (matches Profile.tenant_id)
+    booking_id = Column(UUID(as_uuid=True), ForeignKey("bookings.id", ondelete="CASCADE"), nullable=False, unique=True)
+    learner_id = Column(UUID(as_uuid=True), ForeignKey("profiles.id", ondelete="CASCADE"), nullable=False)
+    mentor_id = Column(UUID(as_uuid=True), ForeignKey("mentors.id", ondelete="CASCADE"), nullable=False, index=True)
+    rating = Column(Integer, nullable=False)
+    review_text = Column(Text, nullable=True)
+    is_anonymous = Column(Boolean, nullable=False, default=False)
+    created_by = Column(UUID(as_uuid=True), ForeignKey("profiles.id"), nullable=True)
+    deleted_at = Column(DateTime(timezone=True), nullable=True)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
+
+
+class MentorshipNotification(Base):
+    """Named MentorshipNotification to leave room for a general-purpose Notification model later."""
+    __tablename__ = "notifications"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    tenant_id = Column(UUID(as_uuid=True), nullable=True)  # tenants FK enforced in SQL migration, not ORM (matches Profile.tenant_id)
+    user_id = Column(UUID(as_uuid=True), ForeignKey("profiles.id", ondelete="CASCADE"), nullable=False, index=True)
+    type = Column(String(50), nullable=False)
+    title = Column(String(255), nullable=False)
+    body = Column(Text, nullable=True)
+    related_entity_type = Column(String(50), nullable=True)
+    related_entity_id = Column(UUID(as_uuid=True), nullable=True)
+    is_read = Column(Boolean, nullable=False, default=False)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+
+class CareerGoal(Base):
+    __tablename__ = "career_goals"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    tenant_id = Column(UUID(as_uuid=True), nullable=True)  # tenants FK enforced in SQL migration, not ORM (matches Profile.tenant_id)
+    learner_id = Column(UUID(as_uuid=True), ForeignKey("profiles.id", ondelete="CASCADE"), nullable=False, index=True)
+    title = Column(String(255), nullable=False)
+    description = Column(Text, nullable=True)
+    target_date = Column(DateTime(timezone=False), nullable=True)
+    status = Column(String(20), nullable=False, default="active")
+    created_by = Column(UUID(as_uuid=True), ForeignKey("profiles.id"), nullable=True)
+    deleted_at = Column(DateTime(timezone=True), nullable=True)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
+
+
+class SessionNote(Base):
+    __tablename__ = "session_notes"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    session_id = Column(UUID(as_uuid=True), ForeignKey("sessions.id", ondelete="CASCADE"), nullable=False, index=True)
+    author_id = Column(UUID(as_uuid=True), ForeignKey("profiles.id"), nullable=False)
+    note_text = Column(Text, nullable=False)
+    visibility = Column(String(20), nullable=False, default="shared")
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
+
+
+class MentorDocument(Base):
+    __tablename__ = "mentor_documents"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    mentor_id = Column(UUID(as_uuid=True), ForeignKey("mentors.id", ondelete="CASCADE"), nullable=False, index=True)
+    doc_type = Column(String(30), nullable=False)
+    file_path = Column(Text, nullable=False)
+    status = Column(String(20), nullable=False, default="pending")
+    reviewed_by = Column(UUID(as_uuid=True), ForeignKey("profiles.id"), nullable=True)
+    reviewed_at = Column(DateTime(timezone=True), nullable=True)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
+
+
+# ═══════════════════════════════════════════════════════════════════════════
+# Mentorship Phase 2 (supabase/migrations/0008_mentorship_phase2.sql)
+#
+# Offerings, Programs, Events, Tasks, Platform Feedback, Privacy Requests,
+# Platform Settings — the pieces the marketplace/booking core (above) didn't
+# need. Same conventions: mirrors the SQL migration's columns/constraints,
+# no ORM-level FK to tenants (matches every other tenant_id column here).
+# ═══════════════════════════════════════════════════════════════════════════
+
+PROGRAM_STATUSES = {"active", "archived"}
+PARTICIPANT_ROLES = {"mentor", "mentee"}
+TASK_STATUSES = {"pending", "completed"}
+PRIVACY_REQUEST_TYPES = {"access", "delete"}
+PRIVACY_REQUEST_STATUSES = {"pending", "completed", "rejected"}
+
+
+class MentorOffering(Base):
+    __tablename__ = "mentor_offerings"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    mentor_id = Column(UUID(as_uuid=True), ForeignKey("mentors.id", ondelete="CASCADE"), nullable=False, index=True)
+    title = Column(String(255), nullable=False)
+    description = Column(Text, nullable=True)
+    session_type = Column(String(30), nullable=False, default="one_on_one")
+    duration_minutes = Column(Integer, nullable=False, default=30)
+    is_active = Column(Boolean, nullable=False, default=True)
+    sort_order = Column(Integer, nullable=False, default=0)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
+
+
+class Program(Base):
+    __tablename__ = "programs"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    tenant_id = Column(UUID(as_uuid=True), nullable=True)
+    title = Column(String(255), nullable=False)
+    description = Column(Text, nullable=True)
+    duration = Column(String(100), nullable=True)
+    status = Column(String(20), nullable=False, default="active")
+    created_by = Column(UUID(as_uuid=True), ForeignKey("profiles.id"), nullable=True)
+    deleted_at = Column(DateTime(timezone=True), nullable=True)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
+
+    participants = relationship("ProgramParticipant", cascade="all, delete-orphan")
+
+
+class ProgramParticipant(Base):
+    __tablename__ = "program_participants"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    program_id = Column(UUID(as_uuid=True), ForeignKey("programs.id", ondelete="CASCADE"), nullable=False, index=True)
+    profile_id = Column(UUID(as_uuid=True), ForeignKey("profiles.id", ondelete="CASCADE"), nullable=False, index=True)
+    role = Column(String(10), nullable=False)
+    joined_at = Column(DateTime(timezone=True), server_default=func.now())
+
+    profile = relationship("Profile", foreign_keys=[profile_id])
+
+
+class Event(Base):
+    __tablename__ = "events"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    tenant_id = Column(UUID(as_uuid=True), nullable=True)
+    title = Column(String(255), nullable=False)
+    description = Column(Text, nullable=True)
+    event_date = Column(DateTime(timezone=True), nullable=False)
+    created_by = Column(UUID(as_uuid=True), ForeignKey("profiles.id"), nullable=True)
+    deleted_at = Column(DateTime(timezone=True), nullable=True)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
+
+    attendees = relationship("EventAttendee", cascade="all, delete-orphan")
+
+
+class EventAttendee(Base):
+    __tablename__ = "event_attendees"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    event_id = Column(UUID(as_uuid=True), ForeignKey("events.id", ondelete="CASCADE"), nullable=False, index=True)
+    profile_id = Column(UUID(as_uuid=True), ForeignKey("profiles.id", ondelete="CASCADE"), nullable=False, index=True)
+    registered_at = Column(DateTime(timezone=True), server_default=func.now())
+    attended = Column(Boolean, nullable=False, default=False)
+
+    profile = relationship("Profile", foreign_keys=[profile_id])
+
+
+class Task(Base):
+    __tablename__ = "tasks"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    tenant_id = Column(UUID(as_uuid=True), nullable=True)
+    mentee_id = Column(UUID(as_uuid=True), ForeignKey("profiles.id", ondelete="CASCADE"), nullable=False, index=True)
+    assigned_by = Column(UUID(as_uuid=True), ForeignKey("profiles.id"), nullable=False)
+    session_id = Column(UUID(as_uuid=True), ForeignKey("sessions.id", ondelete="SET NULL"), nullable=True)
+    program_id = Column(UUID(as_uuid=True), ForeignKey("programs.id", ondelete="SET NULL"), nullable=True)
+    title = Column(String(255), nullable=False)
+    description = Column(Text, nullable=True)
+    due_date = Column(Date, nullable=True)
+    status = Column(String(20), nullable=False, default="pending")
+    completed_at = Column(DateTime(timezone=True), nullable=True)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
+
+
+class PlatformFeedback(Base):
+    __tablename__ = "platform_feedback"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    tenant_id = Column(UUID(as_uuid=True), nullable=True)
+    user_id = Column(UUID(as_uuid=True), ForeignKey("profiles.id", ondelete="CASCADE"), nullable=False, index=True)
+    rating = Column(Integer, nullable=False)
+    comment = Column(Text, nullable=True)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+
+class PrivacyRequest(Base):
+    __tablename__ = "privacy_requests"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    user_id = Column(UUID(as_uuid=True), ForeignKey("profiles.id", ondelete="CASCADE"), nullable=False, index=True)
+    type = Column(String(10), nullable=False)
+    status = Column(String(20), nullable=False, default="pending")
+    notes = Column(Text, nullable=True)
+    processed_by = Column(UUID(as_uuid=True), ForeignKey("profiles.id"), nullable=True)
+    processed_at = Column(DateTime(timezone=True), nullable=True)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+
+class PlatformSettings(Base):
+    __tablename__ = "platform_settings"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    brand_name = Column(String(255), nullable=False, default="Mentorle")
+    support_email = Column(String(255), nullable=True)
+    maintenance_mode = Column(Boolean, nullable=False, default=False)
+    announcement = Column(Text, nullable=True)
+    updated_by = Column(UUID(as_uuid=True), ForeignKey("profiles.id"), nullable=True)
+    updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())

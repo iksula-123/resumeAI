@@ -28,7 +28,9 @@ class LoginRequest(BaseModel):
     password: str
 
 
-def _serialize(u: User) -> dict:
+async def _serialize(db: AsyncSession, u: User) -> dict:
+    from models import Mentor
+    mentor_status = (await db.execute(select(Mentor.status).where(Mentor.profile_id == u.id, Mentor.deleted_at.is_(None)))).scalar_one_or_none()
     return {
         "id": str(u.id),
         "email": u.email,
@@ -36,6 +38,15 @@ def _serialize(u: User) -> dict:
         "role": u.role,
         "avatar_url": u.avatar_url,
         "subscription_tier": u.subscription_tier or "free",
+        "mentor_status": mentor_status,
+        # Included so My Profile (and anything else) can prefill a form with
+        # real current values instead of blanking them on the next save.
+        "headline": u.headline,
+        "phone": u.phone,
+        "location": u.location,
+        "linkedin_url": u.linkedin_url,
+        "github_url": u.github_url,
+        "website_url": u.website_url,
     }
 
 
@@ -81,7 +92,7 @@ async def signup(request: SignupRequest, db: AsyncSession = Depends(get_db)):
     return {
         "message": "User registered successfully",
         "access_token": result["token"],
-        "user": _serialize(db_user),
+        "user": await _serialize(db, db_user),
     }
 
 
@@ -102,18 +113,41 @@ async def login(request: LoginRequest, db: AsyncSession = Depends(get_db)):
     return {
         "message": "Login successful",
         "access_token": result["token"],
-        "user": _serialize(db_user),
+        "user": await _serialize(db, db_user),
     }
 
 
 @router.get("/me")
-async def get_me(user: User = Depends(get_current_user)):
+async def get_me(db: AsyncSession = Depends(get_db), user: User = Depends(get_current_user)):
     """Return the current authenticated user (with role)."""
-    return _serialize(user)
+    return await _serialize(db, user)
 
 
 @router.get("/profile/{user_id}")
-async def get_profile(user_id: str, user: User = Depends(get_current_user)):
+async def get_profile(user_id: str, db: AsyncSession = Depends(get_db), user: User = Depends(get_current_user)):
     if str(user.id) != user_id and not user.is_admin:
         raise HTTPException(status_code=403, detail="Forbidden")
-    return _serialize(user)
+    return await _serialize(db, user)
+
+
+class UpdateProfileRequest(BaseModel):
+    full_name: str | None = None
+    avatar_url: str | None = None
+    headline: str | None = None
+    phone: str | None = None
+    location: str | None = None
+    linkedin_url: str | None = None
+    github_url: str | None = None
+    website_url: str | None = None
+
+
+@router.patch("/profile")
+async def update_my_profile(req: UpdateProfileRequest, db: AsyncSession = Depends(get_db), user: User = Depends(get_current_user)):
+    """Self-service edit of the caller's own profile — full_name/avatar/headline
+    etc. Used by the mentee's My Profile page (and reusable anywhere else that
+    needs it)."""
+    for key, value in req.model_dump().items():
+        if value is not None:
+            setattr(user, key, value)
+    await db.commit()
+    return await _serialize(db, user)

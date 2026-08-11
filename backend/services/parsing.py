@@ -99,3 +99,101 @@ def quick_contact(text: str) -> dict:
         "phone": phone.group(0).strip() if phone else "",
         "jobTitle": "", "location": "", "linkedin": "", "github": "", "website": "",
     }
+
+
+# ── No-AI structured fallback ────────────────────────────────────────────────
+# Used when the AI parse call fails/is unavailable (rate limit, no credits,
+# network). Splitting into real sections is a MUCH safer degrade than dumping
+# the whole resume into "summary" and leaving experience/education/skills
+# empty — a candidate's actual experience shouldn't disappear just because the
+# AI provider is temporarily down.
+_SECTION_HEADERS = {
+    "summary": ("summary", "objective", "profile", "about", "about me"),
+    "experience": ("experience", "work experience", "employment", "employment history",
+                    "professional experience", "work history"),
+    "education": ("education", "academic background", "qualifications", "academic qualifications"),
+    "skills": ("skills", "technical skills", "core competencies", "key skills", "skill set"),
+}
+_ALL_HEADERS = {h for headers in _SECTION_HEADERS.values() for h in headers}
+
+
+def _detect_section(line: str) -> str | None:
+    normalized = line.strip().lower().rstrip(":").strip()
+    if len(normalized) > 40 or not normalized:
+        return None
+    for section, headers in _SECTION_HEADERS.items():
+        if normalized in headers:
+            return section
+    return None
+
+
+def heuristic_structured_parse(text: str) -> dict:
+    """No-AI structured parse: detects standard section headers (Experience,
+    Education, Skills, Summary) and extracts entries with simple regex
+    heuristics. Not as accurate as the AI parser, but preserves the
+    candidate's real content structure instead of losing it."""
+    lines = [l.rstrip() for l in (text or "").splitlines()]
+
+    sections: dict[str, list[str]] = {}
+    current: str | None = None
+    for line in lines:
+        section = _detect_section(line)
+        if section:
+            current = section
+            sections.setdefault(section, [])
+            continue
+        if current and line.strip():
+            sections.setdefault(current, []).append(line.strip())
+
+    personal = quick_contact(text)
+    summary = " ".join(sections.get("summary", [])).strip()[:600]
+
+    # Experience: a line that looks like a role/company header (has a
+    # separator, "at", or a year) starts a new entry; everything else under it
+    # becomes a bullet for that entry.
+    experience: list[dict] = []
+    current_entry: dict | None = None
+    for line in sections.get("experience", []):
+        is_bullet = line.startswith(("-", "•", "*")) or bool(re.match(r"^\d+[.)]\s", line))
+        looks_like_header = not is_bullet and (
+            re.search(r"\s[-–—]\s", line) or re.search(r"\bat\b", line, re.IGNORECASE)
+            or re.search(r"\b(19|20)\d{2}\b", line)
+        )
+        if current_entry is None or looks_like_header:
+            current_entry = {"position": "", "company": "", "startDate": "", "endDate": "", "current": False, "bullets": []}
+            parts = re.split(r"\s[-–—]\s|,\s+", line, maxsplit=1)
+            if len(parts) == 2:
+                current_entry["position"], current_entry["company"] = parts[0].strip(), parts[1].strip()
+            else:
+                current_entry["position"] = line.strip()
+            experience.append(current_entry)
+        else:
+            bullet = re.sub(r"^[-•*]\s*|^\d+[.)]\s*", "", line).strip()
+            if bullet:
+                current_entry["bullets"].append(bullet)
+
+    # Education: each non-bullet line is treated as its own entry (most
+    # resumes list one degree/institution per line).
+    education = [
+        {"degree": line, "field": "", "institution": "", "startDate": "", "endDate": "", "gpa": ""}
+        for line in sections.get("education", [])
+        if not line.startswith(("-", "•", "*"))
+    ]
+
+    skills: list[str] = []
+    for line in sections.get("skills", []):
+        for part in re.split(r"[,•|/]", line):
+            name = part.strip().strip("-").strip()
+            if name and len(name) <= 40:
+                skills.append(name)
+
+    return {
+        "personalInfo": personal,
+        "summary": summary,
+        "experience": experience,
+        "education": education,
+        "skills": skills,
+        "projects": [],
+        "certifications": [],
+        "languages": [],
+    }

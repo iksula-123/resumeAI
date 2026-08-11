@@ -3,17 +3,21 @@
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { AnimatePresence, motion } from 'framer-motion'
-import { Menu, X, Sparkles } from 'lucide-react'
+import { Menu, X } from 'lucide-react'
 import { Container } from './shared'
+import Logo from '../Logo'
 
 const LINKS = [
   { href: '#top', label: 'Home' },
   { href: '#services', label: 'Services' },
   { href: '#features', label: 'Features' },
+  { href: '/mentorship', label: 'Mentorship' },
   { href: '#why', label: 'About' },
   { href: '#pricing', label: 'Pricing' },
   { href: '#faq', label: 'Contact' },
 ]
+/** Anchors (#...) scroll within this page; real routes (/...) navigate the app. */
+const isRoute = (href: string) => href.startsWith('/')
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false)
@@ -36,24 +40,21 @@ export default function Navbar() {
     >
       <Container className="flex h-16 items-center justify-between lg:h-20">
         <Link href="#top" className="flex items-center gap-2.5">
-          <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-brand-gradient text-white shadow-md shadow-navy-600/25">
-            <Sparkles className="h-4.5 w-4.5" strokeWidth={2.25} />
-          </span>
+          <Logo size={36} />
           <span className="text-[1.05rem] font-bold tracking-tight text-navy-600 dark:text-white">
             SahiCareer
           </span>
         </Link>
 
         <nav className="hidden items-center gap-1 lg:flex">
-          {LINKS.map((l) => (
-            <a
-              key={l.href}
-              href={l.href}
-              className="rounded-lg px-4 py-2 text-sm font-medium text-slate-600 transition hover:bg-slate-100 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-white/5 dark:hover:text-white"
-            >
-              {l.label}
-            </a>
-          ))}
+          {LINKS.map((l) => {
+            const linkClass = "rounded-lg px-4 py-2 text-sm font-medium text-slate-600 transition hover:bg-slate-100 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-white/5 dark:hover:text-white"
+            return isRoute(l.href) ? (
+              <Link key={l.href} href={l.href} className={linkClass}>{l.label}</Link>
+            ) : (
+              <a key={l.href} href={l.href} className={linkClass}>{l.label}</a>
+            )
+          })}
         </nav>
 
         <div className="hidden items-center gap-2 lg:flex">
@@ -87,16 +88,14 @@ export default function Navbar() {
             className="overflow-hidden border-t border-slate-200 bg-white/95 backdrop-blur-xl lg:hidden dark:border-white/10 dark:bg-slate-950/95"
           >
             <Container className="flex flex-col gap-1 py-4">
-              {LINKS.map((l) => (
-                <a
-                  key={l.href}
-                  href={l.href}
-                  onClick={() => setOpen(false)}
-                  className="rounded-lg px-3 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-white/5"
-                >
-                  {l.label}
-                </a>
-              ))}
+              {LINKS.map((l) => {
+                const linkClass = "rounded-lg px-3 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-white/5"
+                return isRoute(l.href) ? (
+                  <Link key={l.href} href={l.href} onClick={() => setOpen(false)} className={linkClass}>{l.label}</Link>
+                ) : (
+                  <a key={l.href} href={l.href} onClick={() => setOpen(false)} className={linkClass}>{l.label}</a>
+                )
+              })}
               <div className="mt-2 flex items-center gap-2 border-t border-slate-200 pt-4 dark:border-white/10">
                 <Link
                   href="/auth/login"

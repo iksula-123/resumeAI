@@ -214,6 +214,8 @@ async def delete_user(
     if not u:
         raise HTTPException(status_code=404, detail="User not found")
     email = u.email
+    from services.auth import delete_supabase_user
+    await delete_supabase_user(uid)  # revoke login capability, not just the local row
     await db.delete(u)
     await db.commit()
     audit(actor_id=str(admin.id), actor_email=admin.email, action="admin.delete_user",

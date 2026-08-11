@@ -10,6 +10,14 @@ export interface User {
   role: 'user' | 'admin'
   avatar_url?: string | null
   subscription_tier: 'free' | 'pro' | 'enterprise'
+  /** null = not a mentor; else the mentor application's status. */
+  mentor_status?: 'pending' | 'approved' | 'rejected' | 'suspended' | null
+  headline?: string | null
+  phone?: string | null
+  location?: string | null
+  linkedin_url?: string | null
+  github_url?: string | null
+  website_url?: string | null
 }
 
 export type OAuthProvider = 'google' | 'github'
@@ -18,8 +26,16 @@ interface AuthStore {
   user: User | null
   accessToken: string | null
   isLoading: boolean
+  /** False until the persisted session has been read back from localStorage.
+   * Route guards (AppShell/MentorshipShell/AdminMentorshipShell) must wait
+   * for this before redirecting on `!user` — otherwise a hard refresh or a
+   * direct URL visit sees the one-render `user: null` flash that happens
+   * before rehydration completes and wrongly bounces a logged-in user to
+   * /auth/login. */
+  hasHydrated: boolean
 
   setUser: (user: User | null) => void
+  setHasHydrated: (v: boolean) => void
   setAccessToken: (token: string | null) => void
   logout: () => void
   login: (email: string, password: string) => Promise<void>
@@ -36,8 +52,10 @@ export const useAuthStore = create<AuthStore>()(
       user: null,
       accessToken: null,
       isLoading: false,
+      hasHydrated: false,
 
       setUser: (user) => set({ user }),
+      setHasHydrated: (v) => set({ hasHydrated: v }),
 
       setAccessToken: (token) => {
         setAuthToken(token)
@@ -126,9 +144,18 @@ export const useAuthStore = create<AuthStore>()(
       name: 'auth-storage',
       storage: createJSONStorage(() => localStorage),
       onRehydrateStorage: () => (state) => {
+        // IMPORTANT: never reference the `useAuthStore` binding in here — the
+        // persist middleware invokes this callback synchronously as part of
+        // `create()`'s own evaluation, before the `const useAuthStore = ...`
+        // assignment completes. Referencing it throws a TDZ ReferenceError
+        // that zustand swallows silently, so `hasHydrated` would just never
+        // get set — no crash, no error, the shells just render null forever.
+        // Call the action off the callback's own `state` snapshot instead
+        // (it carries the same live, bound action functions).
         if (state?.accessToken) {
           setAuthToken(state.accessToken)
         }
+        state?.setHasHydrated(true)
       },
     }
   )

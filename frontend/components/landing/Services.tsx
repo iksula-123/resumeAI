@@ -36,7 +36,7 @@ const SERVICES = [
     description: 'Connect with experienced industry mentors.',
     features: ['Book Mentors', 'Career Sessions', 'Mock Interviews', 'Portfolio Reviews', 'Roadmaps', 'Industry Guidance'],
     cta: 'Find a Mentor',
-    href: '/auth/signup',
+    href: '/mentorship',
     gradient: 'from-teal-600 to-teal-500',
     ring: 'group-hover:shadow-teal-500/20',
   },

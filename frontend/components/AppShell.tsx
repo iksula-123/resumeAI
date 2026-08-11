@@ -3,7 +3,9 @@
 import { useEffect, useState } from 'react'
 import { usePathname, useRouter } from 'next/navigation'
 import { useAuthStore } from '@/lib/store'
+import { setPostLoginRedirect } from '@/lib/authRedirect'
 import Sidebar from './Sidebar'
+import Logo from './Logo'
 
 interface Props {
   children: React.ReactNode
@@ -11,19 +13,25 @@ interface Props {
 }
 
 export default function AppShell({ children, topBar }: Props) {
-  const { user } = useAuthStore()
+  const { user, hasHydrated } = useAuthStore()
   const router = useRouter()
   const pathname = usePathname()
   const [navOpen, setNavOpen] = useState(false)
 
   useEffect(() => {
-    if (!user) router.push('/auth/login')
-  }, [user, router])
+    // Wait for the persisted session to load before deciding there's no
+    // user — otherwise a hard refresh sees the pre-rehydration `null` flash
+    // and wrongly bounces a logged-in user to /auth/login.
+    if (hasHydrated && !user) {
+      setPostLoginRedirect(pathname)
+      router.push('/auth/login')
+    }
+  }, [user, hasHydrated, router, pathname])
 
   // close the mobile drawer on route change
   useEffect(() => { setNavOpen(false) }, [pathname])
 
-  if (!user) return null
+  if (!hasHydrated || !user) return null
 
   return (
     <div className="flex min-h-screen">
@@ -40,7 +48,7 @@ export default function AppShell({ children, topBar }: Props) {
           <button onClick={() => setNavOpen(true)} aria-label="Open menu"
             className="w-10 h-10 -ml-1 flex items-center justify-center rounded-lg text-gray-700 hover:bg-white/60 text-xl">☰</button>
           <div className="flex items-center gap-2">
-            <div className="w-7 h-7 bg-brand-gradient rounded-lg flex items-center justify-center text-white text-sm font-bold">S</div>
+            <Logo size={28} />
             <span className="font-bold text-gray-900 text-sm">SahiCareer</span>
           </div>
         </header>

@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabaseClient'
 import { useAuthStore } from '@/lib/store'
+import { takePostLoginRedirect, roleLandingPath } from '@/lib/authRedirect'
 
 /**
  * OAuth landing page.
@@ -26,7 +27,8 @@ export default function AuthCallbackPage() {
       done.current = true
       try {
         await syncSession(token)
-        router.replace('/dashboard')
+        const freshUser = useAuthStore.getState().user
+        router.replace(takePostLoginRedirect(freshUser ? roleLandingPath(freshUser) : '/dashboard'))
       } catch (e) {
         setError(e instanceof Error ? e.message : 'Sign-in failed')
       }

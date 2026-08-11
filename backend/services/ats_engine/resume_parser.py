@@ -81,6 +81,140 @@ def _heuristic_parse(text: str) -> dict:
     }
 
 
+# ── Build parsed-resume shape directly from the Resume Builder's own content ──
+# (Career Vault path — the candidate already entered this via the builder, so
+# there's nothing to extract or guess: no AI call, no re-parsing, no risk of
+# the LLM mangling data the candidate already confirmed.)
+
+_SOFT_SKILL_TERMS = {
+    "communication", "leadership", "teamwork", "collaboration", "problem solving",
+    "problem-solving", "critical thinking", "time management", "adaptability",
+    "creativity", "work ethic", "attention to detail", "public speaking",
+    "negotiation", "conflict resolution", "mentoring", "coaching", "empathy",
+    "decision making", "decision-making", "stakeholder management", "presentation",
+}
+
+
+def _years_from_date(s: str) -> int | None:
+    m = re.search(r"(19|20)\d{2}", s or "")
+    return int(m.group(0)) if m else None
+
+
+def _estimate_total_experience(experience: list[dict]) -> float | None:
+    """Career span (earliest start → latest end/'now') in years — robust to
+    overlapping roles, unlike summing each job's duration."""
+    import datetime as _dt
+
+    starts, ends = [], []
+    for e in experience or []:
+        sy = _years_from_date(e.get("startDate") or "")
+        if sy:
+            starts.append(sy)
+        if e.get("current"):
+            ends.append(_dt.date.today().year)
+        else:
+            ey = _years_from_date(e.get("endDate") or "")
+            if ey:
+                ends.append(ey)
+    if not starts or not ends:
+        return None
+    span = max(ends) - min(starts)
+    return float(span) if span > 0 else 0.5  # same-year roles: at least a few months
+
+
+def from_content(content: dict) -> dict:
+    """Turn the Resume Builder's structured `content` blob into the same shape
+    `parse()` returns from raw text — used for a candidate's saved resume, so
+    the ATS engine can run without re-extracting anything via AI."""
+    content = content or {}
+    personal = content.get("personalInfo") or {}
+    skills_raw = content.get("skills") or []
+    skill_names = [s.get("name") if isinstance(s, dict) else str(s) for s in skills_raw]
+    skill_names = [s.strip() for s in skill_names if s and str(s).strip()]
+
+    soft_skills = [s for s in skill_names if s.lower() in _SOFT_SKILL_TERMS]
+    hard_skills = [s for s in skill_names if s.lower() not in _SOFT_SKILL_TERMS]
+
+    experience = []
+    all_bullets: list[str] = []
+    for e in content.get("experience") or []:
+        bullets = [b for b in (e.get("bullets") or []) if str(b).strip()]
+        all_bullets.extend(bullets)
+        end = "Present" if e.get("current") else (e.get("endDate") or "")
+        experience.append({
+            "title": e.get("position") or "",
+            "company": e.get("company") or "",
+            "duration": f"{e.get('startDate') or ''} – {end}".strip(" –"),
+            "bullets": bullets,
+        })
+
+    projects = []
+    for p in content.get("projects") or []:
+        techs = p.get("technologies") or ""
+        tech_list = [t.strip() for t in techs.split(",") if t.strip()] if isinstance(techs, str) else list(techs)
+        projects.append({
+            "name": p.get("name") or "",
+            "description": p.get("description") or "",
+            "technologies": tech_list,
+        })
+
+    education = [
+        {
+            "degree": e.get("degree") or "",
+            "institution": e.get("institution") or "",
+            "year": e.get("endDate") or e.get("startDate") or "",
+        }
+        for e in content.get("education") or []
+    ]
+
+    certifications = [c.get("name") or "" for c in (content.get("certifications") or []) if c.get("name")]
+
+    words = re.findall(r"\b[a-zA-Z][a-zA-Z+#.]*\b", " ".join(all_bullets))
+    action_verbs = sorted({w for w in {w.lower() for w in words} if w in _ACTION_VERBS})
+
+    tech_keywords = [t for p in projects for t in p["technologies"]]
+    keywords = list(dict.fromkeys([*skill_names, *tech_keywords, *certifications]))[:25]
+
+    raw_text_parts = [
+        personal.get("fullName", ""), personal.get("jobTitle", ""), content.get("summary", ""),
+        *[f"{e['title']} {e['company']} {' '.join(e['bullets'])}" for e in experience],
+        *[f"{p['name']} {p['description']} {' '.join(p['technologies'])}" for p in projects],
+        *[f"{e['degree']} {e['institution']}" for e in education],
+        ", ".join(skill_names), ", ".join(certifications),
+        personal.get("email", ""), personal.get("phone", ""),
+    ]
+    raw_text = "\n".join(p for p in raw_text_parts if p)
+
+    return {
+        "full_name": personal.get("fullName") or None,
+        "email": personal.get("email") or None,
+        "phone": personal.get("phone") or None,
+        "location": personal.get("location") or None,
+        "job_title": personal.get("jobTitle") or None,
+        "summary": content.get("summary") or None,
+        "skills": skill_names,
+        "hard_skills": hard_skills,
+        "soft_skills": soft_skills,
+        "experience": experience,
+        "projects": projects,
+        "education": education,
+        "certifications": certifications,
+        "action_verbs": action_verbs,
+        "keywords": keywords,
+        "total_experience_years": _estimate_total_experience(content.get("experience") or []),
+        "bullets": all_bullets,
+        "raw_text": raw_text,
+        "languages": [
+            {"name": lang.get("name", ""), "proficiency": lang.get("proficiency", "")}
+            for lang in (content.get("languages") or [])
+            if lang.get("name")
+        ],
+        "achievements": [a for a in (content.get("achievements") or []) if a],
+        "interests": [i for i in (content.get("interests") or []) if i],
+        "parsed_by": "profile",  # from the candidate's saved Career Vault resume, not AI-extracted
+    }
+
+
 _PARSE_PROMPT = """You are an expert resume parser for an ATS system. Extract structured \
 data from the resume text below. Be exhaustive but only include what's actually present \
 — never invent skills, employers, or dates that aren't in the text.
