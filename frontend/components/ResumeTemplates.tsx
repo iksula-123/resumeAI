@@ -36,6 +36,7 @@ export interface ResumeContent {
   achievements?: string[]
   languages?: (Language | string)[]
   interests?: string[]
+  customSections?: { id: string; title: string; content: string }[]
 }
 
 export interface TemplateSpec {

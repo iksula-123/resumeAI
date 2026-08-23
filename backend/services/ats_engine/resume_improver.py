@@ -8,6 +8,7 @@ ordering, and phrasing to match the target job. Output matches the frontend's
 a new resume.
 """
 from .llm import chat_json
+from .resume_parser import to_content
 
 _PROMPT = """You are an expert resume writer. Rewrite the candidate's resume to be tailored \
 for the job description below — same real facts (same employers, dates, degrees, projects), \
@@ -53,6 +54,19 @@ async def tailor(resume: dict, job: dict) -> dict:
         max_tokens=3000,
     )
 
+    if result is None:
+        # No AI available — return the parsed original as-is (still real data,
+        # just untailored). Shares the exact same honest mapping
+        # resume_parser.to_content() uses for the ATS Checker's "Improve My
+        # Resume" handoff (Phase H1 follow-up) — not duplicated here anymore.
+        # job.get("job_title") overrides the parsed resume's own job_title
+        # when tailoring for a specific posting, which to_content() alone
+        # doesn't know about, so it's applied on top.
+        content = to_content(resume)
+        content["personalInfo"]["jobTitle"] = job.get("job_title") or resume.get("job_title") or ""
+        content["tailored_by"] = "none"
+        return content
+
     personal_info = {
         "fullName": resume.get("full_name") or "",
         "jobTitle": job.get("job_title") or resume.get("job_title") or "",
@@ -60,32 +74,6 @@ async def tailor(resume: dict, job: dict) -> dict:
         "phone": resume.get("phone") or "",
         "location": resume.get("location") or "",
     }
-
-    if result is None:
-        # No AI available — return the parsed original as-is (still real data, just untailored)
-        return {
-            "personalInfo": personal_info,
-            "summary": resume.get("summary") or "",
-            "experience": [
-                {"position": e.get("title", ""), "company": e.get("company", ""),
-                 "startDate": "", "endDate": e.get("duration", ""), "current": False,
-                 "bullets": e.get("bullets", [])}
-                for e in (resume.get("experience") or [])
-            ],
-            "skills": [{"name": s, "level": 75} for s in (resume.get("skills") or [])],
-            "education": [
-                {"degree": e.get("degree", ""), "field": "", "institution": e.get("institution", ""), "endDate": e.get("year", "")}
-                for e in (resume.get("education") or [])
-            ],
-            "projects": [
-                {"name": p.get("name", ""), "technologies": ", ".join(p.get("technologies", []) or []), "description": p.get("description", "")}
-                for p in (resume.get("projects") or [])
-            ],
-            "certifications": [{"name": c, "issuer": ""} for c in (resume.get("certifications") or [])],
-            "languages": [], "achievements": [], "interests": [],
-            "tailored_by": "none",
-        }
-
     return {
         "personalInfo": personal_info,
         "summary": result.get("summary", "") or "",

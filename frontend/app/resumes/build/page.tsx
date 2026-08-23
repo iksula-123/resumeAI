@@ -9,8 +9,9 @@
  * be confirmed, and bullet scaffolds are blank templates the candidate fills in.
  */
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, usePathname } from 'next/navigation'
 import { useAuthStore } from '@/lib/store'
+import { setPostLoginRedirect } from '@/lib/authRedirect'
 import { api } from '@/lib/api'
 
 const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'
@@ -76,7 +77,9 @@ function encodeWav(chunks: Float32Array[], inRate: number, outRate = 16000): Arr
 
 export default function BuildFromRolePage() {
   const router = useRouter()
+  const pathname = usePathname()
   const user = useAuthStore((s) => s.user)
+  const hasHydrated = useAuthStore((s) => s.hasHydrated)
 
   const [step, setStep] = useState<'pick' | 'build'>('pick')
   const [search, setSearch] = useState('')
@@ -116,7 +119,17 @@ export default function BuildFromRolePage() {
   const [certChecks, setCertChecks] = useState<{ name: string; category?: string | null; checked: boolean }[]>([])
   const [bullets, setBullets] = useState<string[]>([])
 
-  useEffect(() => { if (!user) router.push('/auth/login') }, [user, router])
+  useEffect(() => {
+    // Same guard pattern as AppShell/MentorshipShell — wait for the
+    // persisted session to rehydrate before deciding there's no user, and
+    // preserve this exact deep link so login sends the candidate back to
+    // /resumes/build instead of the default landing path.
+    if (!hasHydrated) return
+    if (!user) {
+      setPostLoginRedirect(pathname)
+      router.replace('/auth/login')
+    }
+  }, [user, hasHydrated, pathname, router])
 
   /* ── role picker ─────────────────────────────────────────── */
   const loadRoles = useCallback(async (q: string) => {

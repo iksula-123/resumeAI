@@ -17,7 +17,7 @@ hiring_probability are unchanged, still explicitly-labeled heuristics.
 """
 import re
 
-from . import keyword_engine, similarity_service, scoring as ats_scoring
+from . import keyword_engine, similarity_service, scoring as ats_scoring, ats_intelligence_v2
 
 _DEGREE_RANK = [
     (5, ("phd", "doctorate")),
@@ -142,6 +142,14 @@ async def analyze(resume: dict, job: dict) -> dict:
     recommendations = ats_scoring.build_recommendations(category_result["categories"], keyword_analysis)
     candidate_questions = ats_scoring.build_candidate_questions(resume, category_result["categories"])
 
+    # ── Phase B (ATS Intelligence 2.0): dual-score output, computed IN
+    # PARALLEL — does not touch overall_score above or anything it derives
+    # from. Deterministic, no extra AI/embedding calls beyond what
+    # category_result already made for the responsibility category. See
+    # ats_intelligence_v2.py's module docstring for exactly what's reused
+    # vs. rebuilt and why. ──
+    ats_intelligence_v2_result = ats_intelligence_v2.analyze_v2(resume, job)
+
     return {
         # ── canonical Phase 3 score (dynamic, never hardcoded, never a
         # silent zero for missing data — see scoring.py) ──
@@ -156,6 +164,11 @@ async def analyze(resume: dict, job: dict) -> dict:
         "profile_completeness": profile_completeness,
         "recommendations_prioritized": recommendations,
         "candidate_questions": candidate_questions,
+        "scoring_engine_version": ats_intelligence_v2_result["scoring_engine_version"],
+        # ── ATS Intelligence 2.0 (Phase B) — dual-score output. Additive only:
+        # does NOT change overall_score above or anything the UI currently
+        # shows. See docs/ATS_CHANGELOG.md for what this is and isn't yet. ──
+        "ats_intelligence_v2": ats_intelligence_v2_result,
         # ── legacy 9-dimension detail — kept as supplementary information,
         # no longer drives `overall_score` (see module docstring) ──
         "legacy_overall_score": overall,

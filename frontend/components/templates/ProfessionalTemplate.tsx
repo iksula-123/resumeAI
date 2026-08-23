@@ -1,8 +1,10 @@
 import type { ResumeContent } from '../ResumeTemplates'
+import CustomSectionsBlock from './CustomSectionsBlock'
 
 export default function ProfessionalTemplate({ data }: { data: ResumeContent }) {
-  const { personalInfo: p, summary, experience = [], education = [], skills = [] } = data
+  const { personalInfo: p, summary, experience = [], education = [], skills = [], projects = [], customSections = [] } = data
   const skillNames = skills.map(s => typeof s === 'string' ? s : s.name)
+  const HEADING = "font-bold text-gray-900 uppercase text-[9px] tracking-widest border-b border-gray-300 pb-0.5 mb-2"
 
   return (
     <div className="w-full min-h-full text-[10px] leading-relaxed font-serif bg-white px-8 py-6">
@@ -59,8 +61,8 @@ export default function ProfessionalTemplate({ data }: { data: ResumeContent }) 
       )}
 
       {skillNames.length > 0 && (
-        <section>
-          <h2 className="font-bold text-gray-900 uppercase text-[9px] tracking-widest border-b border-gray-300 pb-0.5 mb-2">Technical Skills</h2>
+        <section className="mb-3">
+          <h2 className={HEADING}>Technical Skills</h2>
           <div className="flex flex-wrap gap-2">
             {skillNames.map((s, i) => (
               <span key={i} className="border border-gray-400 text-gray-700 px-2 py-0.5 text-[9px]">{s}</span>
@@ -68,6 +70,20 @@ export default function ProfessionalTemplate({ data }: { data: ResumeContent }) 
           </div>
         </section>
       )}
+
+      {projects.length > 0 && (
+        <section className="mb-3">
+          <h2 className={HEADING}>Projects</h2>
+          {projects.map((proj, i) => (
+            <div key={proj.id || i} className="mb-2">
+              <div className="font-bold text-gray-800">{proj.name}{proj.technologies && <span className="font-normal text-gray-500 italic"> — {proj.technologies}</span>}</div>
+              {proj.description && <div className="text-gray-600">{proj.description}</div>}
+            </div>
+          ))}
+        </section>
+      )}
+
+      <CustomSectionsBlock sections={customSections} headingClassName={HEADING} />
     </div>
   )
 }

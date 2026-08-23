@@ -1,8 +1,10 @@
 import type { ResumeContent } from '../ResumeTemplates'
+import CustomSectionsBlock from './CustomSectionsBlock'
 
 export default function MinimalTemplate({ data }: { data: ResumeContent }) {
-  const { personalInfo: p, summary, experience = [], education = [], skills = [] } = data
+  const { personalInfo: p, summary, experience = [], education = [], skills = [], projects = [], customSections = [] } = data
   const skillNames = skills.map(s => typeof s === 'string' ? s : s.name)
+  const HEADING = "text-[8px] uppercase tracking-[0.2em] text-gray-400 font-medium mb-2"
 
   return (
     <div className="w-full min-h-full text-[10px] leading-relaxed font-sans bg-white px-8 py-7">
@@ -59,8 +61,8 @@ export default function MinimalTemplate({ data }: { data: ResumeContent }) {
       )}
 
       {skillNames.length > 0 && (
-        <section>
-          <h2 className="text-[8px] uppercase tracking-[0.2em] text-gray-400 font-medium mb-2">Skills</h2>
+        <section className="mb-4">
+          <h2 className={HEADING}>Skills</h2>
           <div className="flex flex-wrap gap-1.5">
             {skillNames.map((s, i) => (
               <span key={i} className="text-gray-500 text-[9px] bg-gray-50 px-2 py-0.5 rounded">{s}</span>
@@ -68,6 +70,20 @@ export default function MinimalTemplate({ data }: { data: ResumeContent }) {
           </div>
         </section>
       )}
+
+      {projects.length > 0 && (
+        <section className="mb-4">
+          <h2 className={HEADING}>Projects</h2>
+          {projects.map((proj, i) => (
+            <div key={proj.id || i} className="mb-2">
+              <div className="font-medium text-gray-800">{proj.name}{proj.technologies && <span className="font-normal text-gray-400"> — {proj.technologies}</span>}</div>
+              {proj.description && <div className="text-gray-500">{proj.description}</div>}
+            </div>
+          ))}
+        </section>
+      )}
+
+      <CustomSectionsBlock sections={customSections} headingClassName={HEADING} textClassName="text-gray-500" sectionClassName="mb-4" />
     </div>
   )
 }

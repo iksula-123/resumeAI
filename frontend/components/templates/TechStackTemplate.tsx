@@ -1,5 +1,6 @@
 import type { ResumeContent } from '../ResumeTemplates'
 import { groupSkillsByCategory } from '@/lib/skillCategories'
+import CustomSectionsBlock from './CustomSectionsBlock'
 
 const ACCENT = '#0ea5e9'
 
@@ -14,7 +15,7 @@ const ACCENT = '#0ea5e9'
 export default function TechStackTemplate({ data }: { data: ResumeContent }) {
   const {
     personalInfo: p, summary, experience = [], education = [], skills = [],
-    projects = [], certifications = [], achievements = [], languages = [],
+    projects = [], certifications = [], achievements = [], languages = [], customSections = [],
   } = data
   const skillNames = skills.map(s => typeof s === 'string' ? s : s.name).filter(Boolean)
   const grouped = groupSkillsByCategory(skillNames)
@@ -124,13 +125,17 @@ export default function TechStackTemplate({ data }: { data: ResumeContent }) {
       )}
 
       {languages.length > 0 && (
-        <section>
+        <section className="mb-3">
           <h2 className="font-bold uppercase text-[9px] tracking-widest border-b pb-0.5 mb-2" style={{ color: ACCENT, borderColor: '#e5e7eb' }}>Languages</h2>
           <div className="text-gray-600">
             {languages.map((l, i) => typeof l === 'string' ? l : `${l.name}${l.proficiency ? ` (${l.proficiency})` : ''}`).join('  ·  ')}
           </div>
         </section>
       )}
+
+      <CustomSectionsBlock sections={customSections}
+        headingClassName="font-bold uppercase text-[9px] tracking-widest border-b pb-0.5 mb-2"
+        headingStyle={{ color: ACCENT, borderColor: '#e5e7eb' }} />
     </div>
   )
 }

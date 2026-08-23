@@ -12,7 +12,7 @@ const SERVICES = [
     description: 'Create professional, ATS-friendly resumes in minutes using AI.',
     features: ['AI Resume Generation', 'ATS Score', 'Resume Templates', 'Cover Letters', 'Resume Tailoring'],
     cta: 'Explore Resume Builder',
-    href: '/resumes/build',
+    href: '/dashboard',
     gradient: 'from-navy-600 to-navy-500',
     ring: 'group-hover:shadow-navy-500/20',
   },

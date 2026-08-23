@@ -1,8 +1,13 @@
 import type { ResumeContent } from '../ResumeTemplates'
+import CustomSectionsBlock from './CustomSectionsBlock'
 
 export default function ExecutiveTemplate({ data }: { data: ResumeContent }) {
-  const { personalInfo: p, summary, experience = [], education = [], skills = [], certifications = [], achievements = [] } = data
+  const { personalInfo: p, summary, experience = [], education = [], skills = [], certifications = [], achievements = [], projects = [], customSections = [] } = data
   const skillNames = skills.map(s => typeof s === 'string' ? s : s.name)
+  const HEADING = "text-[8px] font-bold uppercase tracking-[0.2em] text-gray-900 flex items-center gap-2 mb-2"
+  const dividerHeading = (text: string) => (
+    <h2 className={HEADING}><span className="flex-1 h-px bg-gray-200" />{text}<span className="flex-1 h-px bg-gray-200" /></h2>
+  )
 
   return (
     <div className="w-full min-h-full text-[10px] leading-relaxed font-sans bg-white">
@@ -51,11 +56,21 @@ export default function ExecutiveTemplate({ data }: { data: ResumeContent }) {
             </section>
           )}
 
+          {projects.length > 0 && (
+            <section>
+              {dividerHeading('Projects')}
+              {projects.map((proj, i) => (
+                <div key={proj.id || i} className="mb-2.5">
+                  <div className="font-bold text-gray-900">{proj.name}{proj.technologies && <span className="font-medium text-gray-600 italic"> — {proj.technologies}</span>}</div>
+                  {proj.description && <div className="text-gray-600">{proj.description}</div>}
+                </div>
+              ))}
+            </section>
+          )}
+
           {achievements.length > 0 && (
             <section>
-              <h2 className="text-[8px] font-bold uppercase tracking-[0.2em] text-gray-900 flex items-center gap-2 mb-2">
-                <span className="flex-1 h-px bg-gray-200" />Key Achievements<span className="flex-1 h-px bg-gray-200" />
-              </h2>
+              {dividerHeading('Key Achievements')}
               <ul className="space-y-1">
                 {achievements.map((a, i) => (
                   <li key={i} className="flex gap-2 text-gray-600"><span className="text-gray-900 font-bold">▸</span>{a}</li>
@@ -63,6 +78,8 @@ export default function ExecutiveTemplate({ data }: { data: ResumeContent }) {
               </ul>
             </section>
           )}
+
+          <CustomSectionsBlock sections={customSections} headingClassName={HEADING} />
         </div>
 
         {/* Right sidebar */}

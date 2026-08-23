@@ -140,7 +140,7 @@ export default function VersionHistory({ resumeId, open, onClose, onRestored }: 
                           <div className="min-w-0">
                             <div className="text-sm font-medium text-gray-800 truncate">{v.title || 'Untitled'}</div>
                             {v.ats_score != null && (
-                              <div className="text-xs text-gray-500">ATS <span className={`font-semibold ${scoreColor(v.ats_score)}`}>{v.ats_score}</span></div>
+                              <div className="text-xs text-gray-500">Resume Health <span className={`font-semibold ${scoreColor(v.ats_score)}`}>{v.ats_score}</span></div>
                             )}
                           </div>
                           {!isLatest && (

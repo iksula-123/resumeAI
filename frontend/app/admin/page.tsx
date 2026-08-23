@@ -175,7 +175,7 @@ export default function AdminPage() {
                 { label: 'AI Requests', value: analytics.ai.requests.toLocaleString(), icon: '⚡', color: 'bg-royal-50 text-navy-700' },
                 { label: 'Total Tokens', value: analytics.ai.total_tokens.toLocaleString(), icon: '🔢', color: 'bg-blue-50 text-blue-700' },
                 { label: 'Est. Cost', value: `$${analytics.ai.est_cost.toFixed(4)}`, icon: '💰', color: 'bg-green-50 text-green-700' },
-                { label: 'Avg ATS Score', value: analytics.totals.avg_ats || '—', icon: '🎯', color: 'bg-orange-50 text-orange-700' },
+                { label: 'Avg Resume Health', value: analytics.totals.avg_ats || '—', icon: '🎯', color: 'bg-orange-50 text-orange-700' },
               ].map(s => (
                 <div key={s.label} className="card-premium p-5">
                   <div className={`w-11 h-11 ${s.color} rounded-xl flex items-center justify-center text-xl mb-3 shadow-soft`}>{s.icon}</div>

@@ -25,16 +25,26 @@ interface Resume {
 export default function PreviewPage() {
   const { id } = useParams<{ id: string }>()
   const router = useRouter()
-  const { user, accessToken } = useAuthStore()
+  const { user, accessToken, hasHydrated } = useAuthStore()
   const [resume, setResume] = useState<Resume | null>(null)
   const [downloading, setDownloading] = useState<'pdf' | 'docx' | null>(null)
 
   useEffect(() => {
+    // Same guard as the editor/dashboard: on a fresh mount (e.g. clicking
+    // "Preview" from a resume card, or a direct link) the persisted auth
+    // session hasn't rehydrated from localStorage yet, so `user` reads as
+    // a momentary `null`. Without this guard that null flash bounced the
+    // page straight to /dashboard before the real GET ever fired -- the
+    // page never rendered ResumeTemplates at all (not just missing
+    // Projects/Custom Sections, ALL content, including Summary).
+    if (!hasHydrated) return
     if (!user) { router.push('/auth/login'); return }
+    let ignore = false
     api.get<Resume>(`/api/resumes/${id}`)
-      .then(setResume)
-      .catch(() => router.push('/dashboard'))
-  }, [id, user, router])
+      .then(r => { if (!ignore) setResume(r) })
+      .catch(() => { if (!ignore) router.push('/dashboard') })
+    return () => { ignore = true }
+  }, [id, user, hasHydrated, router])
 
   const download = async (format: 'pdf' | 'docx') => {
     if (!resume) return
@@ -70,7 +80,7 @@ export default function PreviewPage() {
       <div className="flex items-center gap-2 ml-auto">
         {resume?.ats_score != null && (
           <div className="flex items-center gap-2 bg-green-50 px-3 py-1.5 rounded-full">
-            <span className="text-xs font-medium text-green-700">ATS: {resume.ats_score}</span>
+            <span className="text-xs font-medium text-green-700">Resume Health: {resume.ats_score}</span>
           </div>
         )}
         <button onClick={() => download('pdf')} disabled={downloading === 'pdf'}
@@ -101,10 +111,10 @@ export default function PreviewPage() {
 
         {/* Side panel */}
         <div className="w-64 space-y-4 flex-shrink-0">
-          {/* ATS Score */}
+          {/* Resume ATS Health — canonical mode_orchestrator.resume_health_mode() score, server-computed only */}
           {resume?.ats_score != null && (
             <div className="bg-white rounded-2xl shadow-sm p-5 flex flex-col items-center">
-              <div className="text-sm font-semibold text-gray-800 mb-3">ATS Score</div>
+              <div className="text-sm font-semibold text-gray-800 mb-3">Resume ATS Health</div>
               <CircularScore score={resume.ats_score} size={90} color={resume.ats_score >= 80 ? '#1E7A46' : '#F5A623'} />
               <div className="text-xs text-gray-500 mt-2 text-center">
                 {resume.ats_score >= 80 ? 'Excellent — ready to apply!' : 'Good — a few improvements can help'}

@@ -11,11 +11,13 @@ const KEY = 'post-login-redirect'
 
 /** Where a user lands right after login/signup when there's no pending deep
  * link: admins go to the mentorship admin console, approved mentors to their
- * mentor dashboard, everyone else to the mentee dashboard. */
+ * mentor dashboard, everyone else to the SahiCareer dashboard — NOT Mentorly.
+ * SahiCareer is the main platform; Mentorly is one of three services reached
+ * from it (see frontend/components/landing/Services.tsx / /dashboard). */
 export function roleLandingPath(user: Pick<User, 'role' | 'mentor_status'>): string {
   if (user.role === 'admin') return '/admin/mentorship'
   if (user.mentor_status === 'approved') return '/mentorship/mentor/dashboard'
-  return '/mentorship/dashboard'
+  return '/dashboard'
 }
 
 /** Only accept same-origin relative paths — never an absolute/external URL. */

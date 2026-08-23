@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState, useCallback, useRef } from 'react'
-import { useParams, useRouter } from 'next/navigation'
+import { useParams, useRouter, useSearchParams } from 'next/navigation'
 import { useAuthStore } from '@/lib/store'
 import { api } from '@/lib/api'
 import AppShell from '@/components/AppShell'
@@ -26,6 +26,7 @@ interface Education {
 interface Project { id: string; name: string; technologies: string; description: string }
 interface Certification { id: string; name: string; issuer: string; date: string }
 interface Language { name: string; proficiency: string }
+interface CustomSection { id: string; title: string; content: string }
 
 interface ResumeContent {
   personalInfo: { fullName: string; jobTitle: string; email: string; phone: string; location: string; linkedin: string; website: string; github: string }
@@ -38,9 +39,48 @@ interface ResumeContent {
   achievements: string[]
   languages: Language[]
   interests: string[]
+  customSections: CustomSection[]
 }
 
-interface Resume { id: string; title: string; template_id: string; content: ResumeContent; ats_score?: number }
+interface FontMetadata { family: string; size: string }
+interface LayoutMetadata { spacing: string }
+interface Resume {
+  id: string; title: string; template_id: string; content: ResumeContent; ats_score?: number
+  font_metadata?: FontMetadata | null; layout_metadata?: LayoutMetadata | null
+}
+
+/* Phase C — mirrors backend/routers/ats_engine.py's POST /analyze-editor response */
+interface AtsCategory { match: number | null; completeness: number; confidence: string; matched_evidence: string[]; missing_evidence: string[]; reason: string }
+interface AtsRecommendation { issue: string; why: string; action: string; impact: string }
+interface AtsEditorResponse {
+  scores: { overall: number | null; ats_compatibility: number | null; job_match: number | null; resume_quality: number | null }
+  categories: { ats_compatibility: Record<string, AtsCategory>; job_match: Record<string, AtsCategory>; resume_quality: Record<string, AtsCategory> }
+  recommendations: { high: AtsRecommendation[]; medium: AtsRecommendation[]; low: AtsRecommendation[] }
+  candidate_questions: string[]
+  score_confidence: 'high' | 'medium' | 'low'
+  report_id: string | null
+  persisted_recommendations?: PersistedRec[]
+}
+
+/* Phase D — mirrors backend/routers/ats_engine.py's recommendation lifecycle
+ * endpoints (POST /recommendations/{id}/answer|preview|apply|reject, GET
+ * /resumes/{id}/recommendations, GET /resumes/{id}/change-history, POST
+ * /change-history/{id}/undo). Minimal editor UI for the AI apply loop —
+ * approve/reject/edit, before/after, score delta, undo (Phase D Part 22/25-28). */
+interface PersistedRec {
+  id: string; action_type: string; priority: 'high' | 'medium' | 'low'
+  title: string; reason: string; affected_section: string
+  score_impact_estimate: string
+  requires_user_input: boolean; question: string | null
+  evidence_tier: 'verified' | 'inferred' | 'suggested' | 'unknown'
+  status: string
+  proposed_content?: string | null
+}
+interface ChangeHistoryEntry {
+  id: string; action_type: string; before_score: number | null; after_score: number | null
+  score_delta: number | null; changed_metrics: any; changed_fields: any
+  created_at: string | null; recommendation_id: string | null
+}
 
 /* ─── Section config ──────────────────────────────────────────── */
 const SECTIONS = [
@@ -64,6 +104,7 @@ function emptyContent(): ResumeContent {
     summary: '',
     experience: [], education: [], skills: [], projects: [],
     certifications: [], achievements: [], languages: [], interests: [],
+    customSections: [],
   }
 }
 
@@ -434,6 +475,31 @@ function ProjectsEditor({ data, onChange }: { data: Project[], onChange: (d: Pro
   )
 }
 
+// A single user-named freeform section (e.g. "Professional Development",
+// "Publications") -- the Resume Builder's escape hatch for content that
+// doesn't fit any fixed section. Both title and content are user-entered;
+// remove deletes just this one section (the caller re-saves the whole
+// customSections array, same pattern as ProjectsEditor/CertificationsEditor
+// above -- there's no separate per-item API, PUT /api/resumes/{id} always
+// saves the full content blob).
+function CustomSectionEditor({ data, onChange, onRemove }: { data: CustomSection, onChange: (d: CustomSection) => void, onRemove: () => void }) {
+  return (
+    <div className="space-y-2">
+      <div className="flex justify-between items-center">
+        <span className="text-xs text-gray-400">Custom section</span>
+        <button onClick={onRemove} className="text-red-400 hover:text-red-600 text-xs">Remove Section</button>
+      </div>
+      <input value={data.title} onChange={e => onChange({ ...data, title: e.target.value })}
+        placeholder="Section Title (e.g. Professional Development)"
+        className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-royal-300" />
+      <textarea value={data.content} onChange={e => onChange({ ...data, content: e.target.value })}
+        placeholder="Add the content for this section..."
+        rows={4}
+        className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-royal-300 resize-y" />
+    </div>
+  )
+}
+
 function ListEditor({ data, onChange, placeholder }: { data: string[], onChange: (d: string[]) => void, placeholder: string }) {
   const [input, setInput] = useState('')
   const add = () => { if (!input.trim()) return; onChange([...data, input.trim()]); setInput('') }
@@ -516,7 +582,22 @@ function LanguagesEditor({ data, onChange }: { data: Language[], onChange: (d: L
 export default function EditResumePage() {
   const { id } = useParams<{ id: string }>()
   const router = useRouter()
-  const { user } = useAuthStore()
+  const searchParams = useSearchParams()
+  const { user, hasHydrated } = useAuthStore()
+
+  // Phase H1 follow-up — ATS Checker → Editor handoff context (see
+  // docs/ATS_NAVIGATION_AND_EDITOR_HANDOFF.md). Only ever short identifiers
+  // in the URL (a source flag, a role slug/title, a report id) — never the
+  // resume JSON itself. report_id, when present, is used ONCE below to
+  // prefill the existing JD box from the already-persisted AtsReport
+  // (GET /api/ats/v2/report/{id}, unchanged, pre-existing endpoint) — this
+  // does not auto-run a new score, it just restores what was already typed,
+  // so the candidate can pick up editing against the same target without
+  // re-pasting the JD.
+  const fromAtsChecker = searchParams.get('from') === 'ats-checker'
+  const atsRoleTitle = searchParams.get('roleTitle')
+  const atsReportId = searchParams.get('report_id')
+  const [showAtsBanner, setShowAtsBanner] = useState(fromAtsChecker)
 
   const [resume, setResume] = useState<Resume | null>(null)
   const [content, setContent] = useState<ResumeContent>(emptyContent())
@@ -534,33 +615,76 @@ export default function EditResumePage() {
   const [scoreError, setScoreError] = useState('')
   const [atsHistory, setAtsHistory] = useState<{ id: string; score: number; job_title: string | null; created_at: string | null }[]>([])
   const [atsMissing, setAtsMissing] = useState<string[]>([])
+  // Phase C — the three ATS Intelligence 2.0 layers (canonical v2 engine).
+  // job_match stays null (never 0) until a JD has been analyzed.
+  const [atsLayers, setAtsLayers] = useState<{ ats_compatibility: number | null; job_match: number | null; resume_quality: number | null } | null>(null)
+  const [atsConfidence, setAtsConfidence] = useState<'high' | 'medium' | 'low' | null>(null)
   const [aiGenerating, setAiGenerating] = useState<string | null>(null)
   const [aiMsg, setAiMsg] = useState('')
   const [translateLang, setTranslateLang] = useState('es')
   const [centerTab, setCenterTab] = useState<'preview' | 'edit'>('preview')
-  const [rightTab, setRightTab] = useState<'assistant' | 'insights' | 'skillgap'>('insights')
+  const [rightTab, setRightTab] = useState<'assistant' | 'insights' | 'skillgap' | 'fixes'>('insights')
+  // Phase D — AI apply loop: recommendations, per-recommendation UI state,
+  // change history + undo. See docs/SAHICAREER_ATS_INTELLIGENCE_2.md.
+  const [recs, setRecs] = useState<PersistedRec[]>([])
+  const [recBusy, setRecBusy] = useState<string | null>(null)
+  const [answerDrafts, setAnswerDrafts] = useState<Record<string, string>>({})
+  const [previews, setPreviews] = useState<Record<string, { current: string | null; proposed: string | null; source_note: string }>>({})
+  const [editDrafts, setEditDrafts] = useState<Record<string, string>>({})
+  const [changeHistory, setChangeHistory] = useState<ChangeHistoryEntry[]>([])
+  const [applyBanner, setApplyBanner] = useState('')
   const [gapTarget, setGapTarget] = useState('')
   const [gapLoading, setGapLoading] = useState(false)
   const [gap, setGap] = useState<{ required: string[]; matched: string[]; missing: string[]; match_score: number } | null>(null)
   const [templateId, setTemplateId] = useState('modern')
   const [showTemplatePicker, setShowTemplatePicker] = useState(false)
+  // Cosmetic-only (never read by any ATS scoring function) -- persisted via
+  // the existing, previously-unwired font_metadata/layout_metadata columns
+  // on Resume (models.py). fontFamily/fontSize apply to the Preview pane;
+  // spacing scales its line-height/section gaps.
+  const [fontFamily, setFontFamily] = useState('sans')
+  const [fontSize, setFontSize] = useState('regular')
+  const [spacing, setSpacing] = useState('comfortable')
+  const [showFontPicker, setShowFontPicker] = useState(false)
+  const [showSpacingPicker, setShowSpacingPicker] = useState(false)
   const [sectionsWidth, setSectionsWidth] = useState(240)
   const [showHistory, setShowHistory] = useState(false)
   const resizing = useRef(false)
   const autoSaveTimer = useRef<ReturnType<typeof setTimeout>>()
 
-  // Real, content-derived ATS analysis (no job description needed) — replaces any
-  // guessed/placeholder score with the actual per-section breakdown from the backend.
+  // Phase H1 follow-up — restore the JD text from the ATS report this
+  // resume was checked against, when the candidate arrived via "Improve My
+  // Resume" with a job_description-mode report. Reuses the EXISTING
+  // GET /api/ats/v2/report/{id} endpoint (unchanged) and the editor's own
+  // pre-existing `jd` box/scoreAts() flow — does not call any scoring
+  // engine itself, just fills in text the candidate already provided once.
+  useEffect(() => {
+    if (!atsReportId) return
+    let cancelled = false
+    api.get<{ job_description: string | null }>(`/api/ats/v2/report/${atsReportId}`)
+      .then((r) => { if (!cancelled && r.job_description) setJd(r.job_description) })
+      .catch(() => { /* best-effort — the banner already named the source; a failed fetch just means no JD prefill */ })
+    return () => { cancelled = true }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [atsReportId])
+
+  // Phase C — canonical ATS v2 analysis (services/ats_engine/ats_intelligence_v2.py),
+  // no job description needed for this debounced, content-derived call. The
+  // legacy /api/ats/analyze endpoint is UNCHANGED and still works — this is
+  // an incremental migration of the CALLER, not a removal of the old path.
   const analyzeContent = useCallback(async (c: ResumeContent, resumeId?: string) => {
     setAnalyzing(true)
     try {
-      const r = await api.post<{ score: number; breakdown: Record<string, number>; prioritized_fixes: { title: string; detail: string; category: string }[] }>(
-        '/api/ats/analyze',
-        { content: c, resume_id: resumeId }
-      )
-      setAtsScore(r.score)
-      setBreakdown(Object.entries(r.breakdown || {}).map(([label, value]) => ({ label, value })))
-      setFixes(r.prioritized_fixes || [])
+      const r = await api.post<AtsEditorResponse>('/api/ats/v2/analyze-editor', { content: c, resume_id: resumeId })
+      setAtsScore(r.scores.overall)
+      setAtsLayers(r.scores)
+      setAtsConfidence(r.score_confidence)
+      setBreakdown([
+        { label: 'ATS Compatibility', value: r.scores.ats_compatibility ?? 0 },
+        { label: 'Resume Quality', value: r.scores.resume_quality ?? 0 },
+        ...(r.scores.job_match != null ? [{ label: 'Job Match', value: r.scores.job_match }] : []),
+      ])
+      setFixes([...r.recommendations.high, ...r.recommendations.medium].map(f => ({ title: f.issue, detail: `${f.why} ${f.action}` })))
     } catch {
       /* best-effort — leave the last known score/breakdown in place */
     } finally {
@@ -613,39 +737,143 @@ export default function EditResumePage() {
     } catch { /* ignore */ }
   }, [])
 
+  // Phase D — authoritative recommendation list (excludes already-applied
+  // ones server-side). Re-fetched after apply/reject/undo so the panel
+  // never shows stale state.
+  const loadRecommendations = useCallback(async (rid: string) => {
+    try {
+      const r = await api.get<PersistedRec[]>(`/api/ats/v2/resumes/${rid}/recommendations`)
+      setRecs(r)
+    } catch { /* ignore */ }
+  }, [])
+
+  const loadChangeHistory = useCallback(async (rid: string) => {
+    try {
+      const r = await api.get<{ current_score: number | null; history: ChangeHistoryEntry[] }>(`/api/ats/v2/resumes/${rid}/change-history`)
+      setChangeHistory(r.history)
+    } catch { /* ignore */ }
+  }, [])
+
+  // After apply/undo, the resume content on the server has actually
+  // changed — reload it (not just the score) so the editor/preview reflect
+  // what was really written, never an optimistic guess.
+  const reloadContentOnly = useCallback(async (rid: string) => {
+    try {
+      const r = await api.get<Resume>(`/api/resumes/${rid}`)
+      setContent(r.content || emptyContent())
+    } catch { /* ignore */ }
+  }, [])
+
   useEffect(() => {
+    // Wait for the persisted auth store to actually finish rehydrating
+    // before deciding the user is logged out -- without this, a fresh
+    // mount of this page (a full reload, but also, it turns out, a
+    // client-side navigation landing here while React 18 Strict Mode's
+    // dev-only mount→unmount→remount cycle is still settling) can read
+    // `user` as momentarily null, bounce to /auth/login, and then bounce
+    // AGAIN to /dashboard once hydration actually catches up a moment
+    // later -- losing the "Improve My Resume" handoff entirely. Found via
+    // the CRUD/consistency acceptance test's live click-through (see
+    // docs/ATS_NAVIGATION_AND_EDITOR_HANDOFF.md). AppShell already guards
+    // its own redirect this same way; this brings the edit page's load
+    // effect in line with it instead of leaving it as the sole ungated
+    // check that could race the same value.
+    if (!hasHydrated) return
     if (!user) { router.push('/auth/login'); return }
+
+    // `ignore` is React's own standard pattern for this exact problem
+    // (see react.dev "Fetching data with Effects"): a LOCAL variable,
+    // fresh for every single invocation of this effect, captured only by
+    // that invocation's own .then() closures. React 18 Strict Mode
+    // double-invokes effects once on mount in dev (mount → cleanup →
+    // mount again) specifically to catch effects that don't handle this;
+    // this one didn't. A first attempt at guarding this used a `useRef`
+    // flag instead of a local variable -- REFS ARE NOT RESET BY THE
+    // SYNTHETIC UNMOUNT, so if the FIRST (soon-to-be-discarded)
+    // invocation's response happened to arrive before the SECOND
+    // (surviving) one, the ref-based guard let the discarded instance
+    // "claim" the id and then silently skipped the surviving instance's
+    // own, legitimate first population -- `resume` never got set AT ALL,
+    // so every click of "Save" silently no-opped forever (found via the
+    // CRUD/consistency acceptance test: zero PUT requests ever fired
+    // after adding a project). A plain local `ignore` variable doesn't
+    // have that failure mode: the discarded invocation's own cleanup
+    // (below) sets ITS `ignore` to true, so ITS .then() correctly no-ops,
+    // while the surviving invocation's `ignore` was never touched and
+    // its .then() applies normally -- regardless of which one's network
+    // response happens to arrive first.
+    let ignore = false
     if (id === 'new') {
       api.post<Resume>('/api/resumes/', { title: 'Untitled Resume', template_id: 'modern' })
-        .then(r => { setResume(r); setTitle(r.title); setContent(r.content || emptyContent()); setTemplateId(r.template_id || 'modern'); router.replace(`/resumes/${r.id}/edit`) })
-        .catch(() => router.push('/dashboard'))
+        .then(r => {
+          if (ignore) return
+          setResume(r); setTitle(r.title); setContent(r.content || emptyContent()); setTemplateId(r.template_id || 'modern')
+          router.replace(`/resumes/${r.id}/edit`)
+        })
+        .catch(() => { if (!ignore) router.push('/dashboard') })
     } else {
       api.get<Resume>(`/api/resumes/${id}`)
         .then(r => {
+          if (ignore) return
           setResume(r); setTitle(r.title); setContent(r.content || emptyContent()); setTemplateId(r.template_id || 'modern')
+          if (r.font_metadata?.family) setFontFamily(r.font_metadata.family)
+          if (r.font_metadata?.size) setFontSize(r.font_metadata.size)
+          if (r.layout_metadata?.spacing) setSpacing(r.layout_metadata.spacing)
           analyzeContent(r.content || emptyContent(), r.id)
           loadAtsHistory(r.id)
+          loadRecommendations(r.id)
+          loadChangeHistory(r.id)
         })
-        .catch(() => router.push('/dashboard'))
+        .catch(() => { if (!ignore) router.push('/dashboard') })
     }
-  }, [id, user, router, loadAtsHistory, analyzeContent])
+    return () => { ignore = true }
+  }, [id, user, hasHydrated, router, loadAtsHistory, analyzeContent, loadRecommendations, loadChangeHistory])
 
   const patch = useCallback(<K extends keyof ResumeContent>(key: K, val: ResumeContent[K]) => {
     setContent(c => ({ ...c, [key]: val }))
     setSaved(false)
   }, [])
 
+  // Single-flight save guard (found via the CRUD/consistency acceptance
+  // test): the debounced autosave and an explicit "Save" click can both
+  // call doSave() close together, each firing its own PUT with whatever
+  // content was current AT THAT CALL. Two in-flight PUTs to the same
+  // resume have no ordering guarantee on the network -- if the EARLIER
+  // (now-stale) request's response happened to arrive AFTER the later,
+  // correct one, its stale content silently overwrote the newer edit
+  // (observed losing a just-added custom section this way, intermittently
+  // -- consistent with a real race, not deterministic). Now at most one
+  // PUT is ever in flight: a save requested while one is already running
+  // is deferred and re-fires once the in-flight one finishes, always
+  // using doSaveRef's up-to-date closure so the retry saves whatever is
+  // ACTUALLY current, not a stale snapshot from when it was deferred.
+  const saveInFlight = useRef(false)
+  const saveAgainNeeded = useRef(false)
+  const doSaveRef = useRef<() => Promise<void>>()
+
   const doSave = async () => {
     if (!resume) return
+    if (saveInFlight.current) { saveAgainNeeded.current = true; return }
+    saveInFlight.current = true
     setSaving(true)
     try {
-      await api.put(`/api/resumes/${resume.id}`, { title, content, template_id: templateId })
+      await api.put(`/api/resumes/${resume.id}`, {
+        title, content, template_id: templateId,
+        font_metadata: { family: fontFamily, size: fontSize },
+        layout_metadata: { spacing },
+      })
       setSaved(true)
       setTimeout(() => setSaved(false), 3000)
     } finally {
       setSaving(false)
+      saveInFlight.current = false
+      if (saveAgainNeeded.current) {
+        saveAgainNeeded.current = false
+        doSaveRef.current?.()
+      }
     }
   }
+  doSaveRef.current = doSave
 
   // Debounced auto-save: fires whenever the resume actually changes (spec Milestone C).
   // Skips the initial populate after load so we don't re-save unchanged content.
@@ -658,7 +886,7 @@ export default function EditResumePage() {
     autoSaveTimer.current = setTimeout(() => { doSave() }, 1500)
     return () => clearTimeout(autoSaveTimer.current)
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [content, title, templateId, resume])
+  }, [content, title, templateId, fontFamily, fontSize, spacing, resume])
 
   // Re-run the real ATS analysis whenever the resume content actually changes,
   // so the score/breakdown in the Insights panel stay in sync with what's on the page.
@@ -672,24 +900,136 @@ export default function EditResumePage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [content])
 
+  // Phase C — same canonical v2 endpoint as analyzeContent(), now with a JD.
+  // Legacy /api/ats/score is UNCHANGED and still works for anything not yet
+  // migrated (see routers/ats.py) — this call site alone is what's migrated.
   const scoreAts = async () => {
     if (!jd.trim()) return
     setScoring(true)
     setScoreError('')
     try {
-      const r = await api.post<{ score: number; missing?: string[] }>('/api/ats/score', {
-        resume_content: content,
-        job_description: jd,
+      const r = await api.post<AtsEditorResponse>('/api/ats/v2/analyze-editor', {
+        content,
         resume_id: resume?.id,
+        job_description: jd,
         job_title: content.personalInfo?.jobTitle || title,
       })
-      setMatchScore(r.score)
-      setAtsMissing(r.missing || [])
-      if (resume?.id) loadAtsHistory(resume.id)
+      setMatchScore(r.scores.job_match)
+      setAtsMissing(r.categories.job_match?.keywords?.missing_evidence || [])
+      setAtsScore(r.scores.overall)
+      setAtsLayers(r.scores)
+      setAtsConfidence(r.score_confidence)
+      setBreakdown([
+        { label: 'ATS Compatibility', value: r.scores.ats_compatibility ?? 0 },
+        { label: 'Resume Quality', value: r.scores.resume_quality ?? 0 },
+        ...(r.scores.job_match != null ? [{ label: 'Job Match', value: r.scores.job_match }] : []),
+      ])
+      setFixes([...r.recommendations.high, ...r.recommendations.medium].map(f => ({ title: f.issue, detail: `${f.why} ${f.action}` })))
+      if (resume?.id) {
+        loadAtsHistory(resume.id)
+        // Phase D — a JD-based analysis freshly (re-)stages recommendations
+        // server-side; show that batch immediately rather than waiting on
+        // a separate round trip.
+        if (r.persisted_recommendations?.length) setRecs(r.persisted_recommendations)
+        else loadRecommendations(resume.id)
+      }
     } catch {
       setScoreError('Could not score against this job description — try again.')
     } finally {
       setScoring(false)
+    }
+  }
+
+  /* ── Phase D — AI apply loop actions ──────────────────────────────
+   * Answer → (lazy AI proposal) → Preview/edit → Apply (real reparse +
+   * rescore + change-history row) or Reject. Undo restores from history.
+   * Every action re-fetches the authoritative list afterward — never
+   * mutated optimistically, since status/score are server-computed truths. */
+  const submitAnswer = async (rec: PersistedRec) => {
+    const answer = (answerDrafts[rec.id] || '').trim()
+    if (!answer) return
+    setRecBusy(rec.id)
+    try {
+      const r = await api.post<{ proposed_content: string | null; evidence_tier: PersistedRec['evidence_tier']; source_note: string; status: string }>(
+        `/api/ats/v2/recommendations/${rec.id}/answer`, { answer })
+      setPreviews(p => ({ ...p, [rec.id]: { current: null, proposed: r.proposed_content, source_note: r.source_note } }))
+      setEditDrafts(d => ({ ...d, [rec.id]: r.proposed_content || '' }))
+      setRecs(list => list.map(x => x.id === rec.id ? { ...x, status: r.status, evidence_tier: r.evidence_tier, proposed_content: r.proposed_content } : x))
+    } catch (e) {
+      setApplyBanner(e instanceof Error ? e.message : 'Could not submit your answer — try again.')
+    } finally {
+      setRecBusy(null)
+    }
+  }
+
+  const doPreview = async (rec: PersistedRec) => {
+    setRecBusy(rec.id)
+    try {
+      const r = await api.post<{ current: string | null; proposed_content: string | null; evidence_tier: PersistedRec['evidence_tier']; source_note: string }>(
+        `/api/ats/v2/recommendations/${rec.id}/preview`, {})
+      setPreviews(p => ({ ...p, [rec.id]: { current: r.current, proposed: r.proposed_content, source_note: r.source_note } }))
+      setEditDrafts(d => ({ ...d, [rec.id]: r.proposed_content || '' }))
+      setRecs(list => list.map(x => x.id === rec.id ? { ...x, evidence_tier: r.evidence_tier, proposed_content: r.proposed_content } : x))
+    } catch (e) {
+      setApplyBanner(e instanceof Error ? e.message : 'Preview unavailable — try again.')
+    } finally {
+      setRecBusy(null)
+    }
+  }
+
+  const doApply = async (rec: PersistedRec) => {
+    if (!resume) return
+    const finalContent = editDrafts[rec.id]
+    setRecBusy(rec.id)
+    setApplyBanner('')
+    try {
+      const r = await api.post<{ success: boolean; before_score: number | null; after_score: number | null; score_delta: number | null; message: string }>(
+        `/api/ats/v2/recommendations/${rec.id}/apply`, finalContent !== undefined ? { final_content: finalContent } : {})
+      await reloadContentOnly(resume.id)
+      if (r.after_score != null) setAtsScore(r.after_score)
+      const delta = r.score_delta
+      setApplyBanner(
+        delta != null
+          ? `✓ 1 fix applied — Resume ATS Health ${r.before_score ?? '—'} → ${r.after_score ?? '—'} (${delta >= 0 ? '+' : ''}${delta})`
+          : `✓ ${r.message || 'Fix applied.'}`
+      )
+      loadRecommendations(resume.id)
+      loadChangeHistory(resume.id)
+    } catch (e) {
+      setApplyBanner(e instanceof Error ? e.message : 'Could not apply this fix — try again.')
+    } finally {
+      setRecBusy(null)
+      setTimeout(() => setApplyBanner(''), 8000)
+    }
+  }
+
+  const doReject = async (rec: PersistedRec) => {
+    if (!resume) return
+    setRecBusy(rec.id)
+    try {
+      await api.post(`/api/ats/v2/recommendations/${rec.id}/reject`, {})
+      setRecs(list => list.filter(x => x.id !== rec.id))
+    } catch { /* ignore */ }
+    finally { setRecBusy(null) }
+  }
+
+  const doUndo = async (h: ChangeHistoryEntry) => {
+    if (!resume) return
+    setRecBusy(h.id)
+    setApplyBanner('')
+    try {
+      const r = await api.post<{ before_score: number | null; after_score: number | null; score_delta: number | null }>(
+        `/api/ats/v2/change-history/${h.id}/undo`, {})
+      await reloadContentOnly(resume.id)
+      if (r.after_score != null) setAtsScore(r.after_score)
+      setApplyBanner(`↩ Undone — Resume ATS Health ${r.before_score ?? '—'} → ${r.after_score ?? '—'}`)
+      loadRecommendations(resume.id)
+      loadChangeHistory(resume.id)
+    } catch (e) {
+      setApplyBanner(e instanceof Error ? e.message : 'Could not undo this change.')
+    } finally {
+      setRecBusy(null)
+      setTimeout(() => setApplyBanner(''), 8000)
     }
   }
 
@@ -915,9 +1255,53 @@ export default function EditResumePage() {
             </div>
           )}
         </div>
-        {['Color', 'Font', 'Spacing', 'Tips'].map(t => (
+        {['Color', 'Tips'].map(t => (
           <button key={t} className="text-xs text-gray-500 hover:text-navy-600 px-2 py-1 rounded hover:bg-royal-50 transition">{t}</button>
         ))}
+        <div className="relative">
+          <button onClick={() => { setShowFontPicker(p => !p); setShowSpacingPicker(false) }}
+            className="text-xs text-gray-500 hover:text-navy-600 px-2 py-1 rounded hover:bg-royal-50 transition">Font</button>
+          {showFontPicker && (
+            <div className="absolute top-8 left-0 z-50 bg-white rounded-xl shadow-xl border border-gray-100 p-3 w-56 space-y-3">
+              <div>
+                <div className="text-[10px] uppercase text-gray-400 font-semibold mb-1">Family</div>
+                <div className="flex gap-1">
+                  {[{ id: 'sans', label: 'Sans' }, { id: 'serif', label: 'Serif' }, { id: 'mono', label: 'Mono' }].map(f => (
+                    <button key={f.id} onClick={() => setFontFamily(f.id)}
+                      className={`flex-1 py-1 px-2 rounded-lg text-xs transition ${fontFamily === f.id ? 'bg-navy-600 text-white' : 'bg-gray-50 hover:bg-gray-100 text-gray-700'}`}>
+                      {f.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              <div>
+                <div className="text-[10px] uppercase text-gray-400 font-semibold mb-1">Size</div>
+                <div className="flex gap-1">
+                  {[{ id: 'small', label: 'Small' }, { id: 'regular', label: 'Regular' }, { id: 'large', label: 'Large' }].map(s => (
+                    <button key={s.id} onClick={() => setFontSize(s.id)}
+                      className={`flex-1 py-1 px-2 rounded-lg text-xs transition ${fontSize === s.id ? 'bg-navy-600 text-white' : 'bg-gray-50 hover:bg-gray-100 text-gray-700'}`}>
+                      {s.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+        <div className="relative">
+          <button onClick={() => { setShowSpacingPicker(p => !p); setShowFontPicker(false) }}
+            className="text-xs text-gray-500 hover:text-navy-600 px-2 py-1 rounded hover:bg-royal-50 transition">Spacing</button>
+          {showSpacingPicker && (
+            <div className="absolute top-8 left-0 z-50 bg-white rounded-xl shadow-xl border border-gray-100 p-2 flex gap-2 w-56">
+              {[{ id: 'compact', label: 'Compact' }, { id: 'comfortable', label: 'Comfortable' }, { id: 'spacious', label: 'Spacious' }].map(s => (
+                <button key={s.id} onClick={() => { setSpacing(s.id); setShowSpacingPicker(false) }}
+                  className={`flex-1 py-1.5 px-2 rounded-lg text-xs transition text-center ${spacing === s.id ? 'bg-navy-600 text-white' : 'bg-gray-50 hover:bg-gray-100 text-gray-700'}`}>
+                  {s.label}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
         <button onClick={() => setShowHistory(true)}
           className="text-xs text-gray-600 bg-gray-50 hover:bg-gray-100 px-3 py-1.5 rounded-lg transition flex items-center gap-1"
           title="Version history & rollback">
@@ -927,9 +1311,10 @@ export default function EditResumePage() {
           className="text-xs text-navy-600 bg-royal-50 hover:bg-royal-100 px-3 py-1.5 rounded-lg transition">
           Preview
         </button>
-        <button onClick={doSave} disabled={saving}
+        <button onClick={doSave} disabled={saving || !resume}
+          title={!resume ? 'Loading your resume…' : undefined}
           className="text-xs bg-navy-600 hover:bg-navy-700 text-white px-3 py-1.5 rounded-lg transition disabled:opacity-50">
-          {saving ? 'Saving…' : 'Save'}
+          {saving ? 'Saving…' : !resume ? 'Loading…' : 'Save'}
         </button>
       </div>
     </>
@@ -944,6 +1329,16 @@ export default function EditResumePage() {
           onClose={() => setShowHistory(false)}
           onRestored={reloadResume}
         />
+      )}
+      {showAtsBanner && (
+        <div className="flex items-center justify-between gap-3 bg-royal-50 border-b border-royal-200 px-4 py-2 text-xs text-navy-700">
+          <span>
+            🎯 This resume came from ATS analysis.
+            {atsRoleTitle && <> Target role: <b>{atsRoleTitle}</b>.</>}
+            {atsReportId && <> Continue editing against the same job description below.</>}
+          </span>
+          <button onClick={() => setShowAtsBanner(false)} className="text-navy-500 hover:text-navy-700 shrink-0">✕</button>
+        </div>
       )}
       <div className="flex h-[calc(100vh-56px)] overflow-hidden">
 
@@ -1023,9 +1418,51 @@ export default function EditResumePage() {
                 )}
               </div>
             ))}
+
+            {/* Custom, user-named sections (content.customSections) --
+                same active/inactive toggle pattern as the fixed SECTIONS
+                above, keyed by `custom-${id}` instead of a fixed key. */}
+            {content.customSections.map((cs, i) => {
+              const sectionKey = `custom-${cs.id}`
+              return (
+                <div key={cs.id}>
+                  <button
+                    onClick={() => setActiveSection(activeSection === sectionKey ? null : sectionKey)}
+                    className={`w-full flex items-center gap-3 px-3 py-2.5 text-left text-sm transition-colors ${
+                      activeSection === sectionKey ? 'bg-royal-50 text-navy-700' : 'text-gray-600 hover:bg-gray-50'
+                    }`}
+                  >
+                    <span className="text-base w-5 text-center">📄</span>
+                    <div className="flex-1 min-w-0">
+                      <div className="font-medium truncate">{cs.title || 'New Section'}</div>
+                      {!cs.title.trim() && <div className="text-xs text-gray-500">Add a section title</div>}
+                    </div>
+                    {cs.title.trim() && cs.content.trim() && (
+                      <span className="w-5 h-5 bg-green-100 rounded-full flex items-center justify-center text-green-600 text-xs flex-shrink-0">✓</span>
+                    )}
+                    <span className="text-gray-300 text-xs">{activeSection === sectionKey ? '▲' : '▼'}</span>
+                  </button>
+                  {activeSection === sectionKey && (
+                    <div className="bg-gray-50 border-y border-gray-100 px-3 py-3 overflow-y-auto max-h-80">
+                      <CustomSectionEditor
+                        data={cs}
+                        onChange={v => patch('customSections', content.customSections.map((s, j) => j === i ? v : s))}
+                        onRemove={() => { patch('customSections', content.customSections.filter((_, j) => j !== i)); setActiveSection(null) }}
+                      />
+                    </div>
+                  )}
+                </div>
+              )
+            })}
           </div>
           <div className="px-3 py-3 border-t border-gray-100">
-            <button className="w-full text-xs text-navy-600 hover:text-royal-800 py-2 border border-dashed border-royal-200 rounded-lg hover:bg-royal-50 transition">
+            <button
+              onClick={() => {
+                const next: CustomSection = { id: uid(), title: '', content: '' }
+                patch('customSections', [...content.customSections, next])
+                setActiveSection(`custom-${next.id}`)
+              }}
+              className="w-full text-xs text-navy-600 hover:text-royal-800 py-2 border border-dashed border-royal-200 rounded-lg hover:bg-royal-50 transition">
               + Add Custom Section
             </button>
           </div>
@@ -1054,7 +1491,23 @@ export default function EditResumePage() {
             ))}
           </div>
           <div className="flex-1 overflow-y-auto p-6 flex justify-center">
-            <div className="w-full max-w-[600px]">
+            <div className="w-full max-w-[600px] resume-preview-styled">
+              {/* Font family/size + spacing are cosmetic-only (never read by
+                  any ATS scoring function) -- applied via a scoped override
+                  so the choice actually shows up regardless of which
+                  template's own Tailwind classes are active, without
+                  editing all 10 template files individually. */}
+              <style>{`
+                .resume-preview-styled { zoom: ${fontSize === 'small' ? 0.85 : fontSize === 'large' ? 1.15 : 1}; }
+                .resume-preview-styled, .resume-preview-styled * {
+                  font-family: ${fontFamily === 'serif' ? 'Georgia, "Times New Roman", serif'
+                    : fontFamily === 'mono' ? '"Roboto Mono", Consolas, monospace'
+                    : 'Inter, ui-sans-serif, system-ui, sans-serif'} !important;
+                }
+                .resume-preview-styled p, .resume-preview-styled li, .resume-preview-styled div {
+                  line-height: ${spacing === 'compact' ? 1.15 : spacing === 'spacious' ? 1.9 : 1.5} !important;
+                }
+              `}</style>
               <ResumeTemplates content={content} template={templateId} />
             </div>
           </div>
@@ -1066,6 +1519,7 @@ export default function EditResumePage() {
           <div className="flex border-b border-gray-100">
             {([
               ['insights', 'Insights'],
+              ['fixes', `AI Fixes${recs.length ? ` (${recs.length})` : ''}`],
               ['assistant', 'AI Assistant'],
               ['skillgap', 'Skill Gap'],
             ] as const).map(([t, label]) => (
@@ -1078,17 +1532,152 @@ export default function EditResumePage() {
             ))}
           </div>
 
-          {rightTab === 'insights' ? (
+          {rightTab === 'fixes' ? (
+            /* ── Phase D: AI ATS Agent — recommendation lifecycle ────── */
+            <div className="flex-1 overflow-y-auto p-4 space-y-4">
+              {applyBanner && (
+                <div className="text-xs text-navy-700 bg-royal-50 border border-royal-200 rounded-lg px-3 py-2">
+                  {applyBanner}
+                </div>
+              )}
+
+              <div>
+                <div className="text-xs font-semibold text-gray-800 mb-1">AI-Recommended Fixes</div>
+                <p className="text-[11px] text-gray-500 mb-2">
+                  Every fix needs your approval before it touches your resume. Nothing here is invented —
+                  fixes only use facts already on your resume, or facts you confirm below.
+                </p>
+                {recs.length === 0 ? (
+                  <p className="text-xs text-gray-400">
+                    Paste a job description in Insights → Keyword Match and click Analyze Match to generate fixes.
+                  </p>
+                ) : (
+                  <div className="space-y-3">
+                    {recs.map(rec => {
+                      const busy = recBusy === rec.id
+                      const preview = previews[rec.id]
+                      const canAnswer = rec.requires_user_input && rec.status !== 'answered' && !preview
+                      const canPreview = !rec.requires_user_input && !preview
+                      const canApply = !!preview?.proposed || (rec.requires_user_input && rec.status === 'answered')
+                      return (
+                        <div key={rec.id} className="border border-gray-200 rounded-xl p-3 space-y-2">
+                          <div className="flex items-start justify-between gap-2">
+                            <div className="min-w-0">
+                              <div className="text-xs font-medium text-gray-800">{rec.title}</div>
+                              <div className="text-[11px] text-gray-500 mt-0.5">{rec.reason}</div>
+                            </div>
+                            <span className={`flex-shrink-0 text-[10px] font-medium px-1.5 py-0.5 rounded-full ${
+                              rec.priority === 'high' ? 'bg-red-50 text-red-600' : rec.priority === 'medium' ? 'bg-amber-50 text-amber-700' : 'bg-gray-100 text-gray-500'
+                            }`}>{rec.priority}</span>
+                          </div>
+
+                          {rec.requires_user_input && canAnswer && (
+                            <div className="space-y-1.5">
+                              <div className="text-[11px] text-gray-600">{rec.question}</div>
+                              <textarea
+                                value={answerDrafts[rec.id] || ''}
+                                onChange={e => setAnswerDrafts(d => ({ ...d, [rec.id]: e.target.value }))}
+                                rows={2}
+                                placeholder="Your answer…"
+                                className="w-full border border-gray-200 rounded-lg px-2 py-1.5 text-xs focus:outline-none focus:ring-2 focus:ring-royal-300 resize-none"
+                              />
+                              <button onClick={() => submitAnswer(rec)} disabled={busy || !(answerDrafts[rec.id] || '').trim()}
+                                className="text-xs bg-navy-600 hover:bg-navy-700 text-white px-3 py-1.5 rounded-lg disabled:opacity-50">
+                                {busy ? 'Submitting…' : 'Submit answer'}
+                              </button>
+                            </div>
+                          )}
+
+                          {canPreview && (
+                            <button onClick={() => doPreview(rec)} disabled={busy}
+                              className="text-xs border border-royal-200 text-navy-600 hover:bg-royal-50 px-3 py-1.5 rounded-lg disabled:opacity-50">
+                              {busy ? 'Generating…' : '👁 Preview fix'}
+                            </button>
+                          )}
+
+                          {preview && (
+                            <div className="space-y-1.5">
+                              {preview.current && (
+                                <div className="text-[11px] text-gray-500 bg-gray-50 rounded-lg px-2 py-1.5">
+                                  <span className="font-medium">Before:</span> {preview.current}
+                                </div>
+                              )}
+                              {preview.proposed ? (
+                                <>
+                                  <div className="text-[11px] text-green-700 bg-green-50 rounded-lg px-2 py-1.5">
+                                    <span className="font-medium">After:</span>
+                                  </div>
+                                  <textarea
+                                    value={editDrafts[rec.id] ?? preview.proposed}
+                                    onChange={e => setEditDrafts(d => ({ ...d, [rec.id]: e.target.value }))}
+                                    rows={2}
+                                    className="w-full border border-green-200 rounded-lg px-2 py-1.5 text-xs focus:outline-none focus:ring-2 focus:ring-green-300 resize-none"
+                                  />
+                                  <p className="text-[10px] text-gray-400">{preview.source_note} — you can edit this before applying.</p>
+                                </>
+                              ) : (
+                                <p className="text-[11px] text-gray-400">{preview.source_note}</p>
+                              )}
+                            </div>
+                          )}
+
+                          <div className="flex gap-2 pt-1">
+                            {canApply && (
+                              <button onClick={() => doApply(rec)} disabled={busy}
+                                className="flex-1 text-xs bg-green-600 hover:bg-green-700 text-white px-3 py-1.5 rounded-lg disabled:opacity-50">
+                                {busy ? 'Applying…' : '✓ Apply fix'}
+                              </button>
+                            )}
+                            <button onClick={() => doReject(rec)} disabled={busy}
+                              className="text-xs text-gray-500 hover:text-red-500 px-3 py-1.5 rounded-lg disabled:opacity-50">
+                              Dismiss
+                            </button>
+                          </div>
+                        </div>
+                      )
+                    })}
+                  </div>
+                )}
+              </div>
+
+              {changeHistory.length > 0 && (
+                <div>
+                  <div className="text-xs font-semibold text-gray-800 mb-2">Change History</div>
+                  <div className="space-y-1.5">
+                    {changeHistory.slice(0, 10).map(h => (
+                      <div key={h.id} className="flex items-center justify-between text-xs bg-gray-50 rounded-lg px-3 py-2">
+                        <div className="min-w-0">
+                          <div className="text-gray-700 truncate capitalize">{h.action_type.replace(/_/g, ' ')}</div>
+                          <div className="text-gray-500" style={{ fontSize: 10 }}>
+                            {h.before_score ?? '—'} → {h.after_score ?? '—'}
+                            {h.score_delta != null && ` (${h.score_delta >= 0 ? '+' : ''}${h.score_delta})`}
+                          </div>
+                        </div>
+                        {h.action_type !== 'undo' && (
+                          <button onClick={() => doUndo(h)} disabled={recBusy === h.id}
+                            className="text-xs text-navy-600 hover:text-royal-800 disabled:opacity-50 flex-shrink-0 ml-2">
+                            {recBusy === h.id ? '…' : 'Undo'}
+                          </button>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          ) : rightTab === 'insights' ? (
             <div className="flex-1 overflow-y-auto">
-              {/* ATS Score */}
+              {/* Resume ATS Health — canonical mode_orchestrator.resume_health_mode()
+                  score; resume-only, never blended with Job Match even when a JD is
+                  loaded (Job Match is its own separate number a few lines below). */}
               <div className="px-4 py-4 border-b border-gray-100">
                 <div className="flex items-center justify-between mb-3">
-                  <span className="text-sm font-semibold text-gray-800">ATS Score</span>
+                  <span className="text-sm font-semibold text-gray-800">Resume ATS Health</span>
                   <button className="text-xs text-gray-500">▲</button>
                 </div>
                 {atsScore == null ? (
                   <div className="flex flex-col items-center py-6 text-xs text-gray-400">
-                    {analyzing ? 'Analyzing your resume…' : 'Fill in your resume to see your ATS score.'}
+                    {analyzing ? 'Analyzing your resume…' : 'Fill in your resume to see your Resume ATS Health.'}
                   </div>
                 ) : (
                   <div className={`flex flex-col items-center py-2 transition-opacity ${analyzing ? 'opacity-60' : ''}`}>
@@ -1099,9 +1688,36 @@ export default function EditResumePage() {
                     <p className="text-xs text-gray-500 text-center mt-1">
                       {atsScore >= 80 ? 'This resume is highly likely to pass ATS.' : 'Add more keywords to improve your score.'}
                     </p>
+                    {atsConfidence && (
+                      <span className={`mt-2 text-[10px] font-medium px-2 py-0.5 rounded-full border ${
+                        atsConfidence === 'high' ? 'bg-green-50 text-green-700 border-green-200'
+                        : atsConfidence === 'medium' ? 'bg-amber-50 text-amber-700 border-amber-200'
+                        : 'bg-gray-100 text-gray-500 border-gray-200'}`}>
+                        {atsConfidence} confidence
+                      </span>
+                    )}
                   </div>
                 )}
               </div>
+
+              {/* ATS Intelligence 2.0 — three layers (Phase C) */}
+              {atsLayers && (
+                <div className="px-4 py-4 border-b border-gray-100 grid grid-cols-3 gap-2 text-center">
+                  {([
+                    ['ats_compatibility', 'ATS Compat.'],
+                    ['job_match', 'Job Match'],
+                    ['resume_quality', 'Quality'],
+                  ] as const).map(([key, label]) => {
+                    const v = atsLayers[key]
+                    return (
+                      <div key={key} className="rounded-lg bg-gray-50 py-2">
+                        <div className="text-sm font-bold text-gray-800">{v == null ? '—' : v}</div>
+                        <div className="text-[10px] text-gray-500">{label}</div>
+                      </div>
+                    )
+                  })}
+                </div>
+              )}
 
               {/* Score Breakdown */}
               {breakdown.length > 0 && (

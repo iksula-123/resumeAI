@@ -1,4 +1,5 @@
 import type { ResumeContent } from '../ResumeTemplates'
+import CustomSectionsBlock from './CustomSectionsBlock'
 
 const ACCENT = '#0d9488'
 
@@ -15,6 +16,7 @@ export default function HealthcareTemplate({ data }: { data: ResumeContent }) {
   const {
     personalInfo: p, summary, experience = [], education = [], skills = [],
     projects = [], certifications = [], achievements = [], languages = [], interests = [],
+    customSections = [],
   } = data
   const skillNames = skills.map(s => typeof s === 'string' ? s : s.name).filter(Boolean)
 
@@ -132,11 +134,13 @@ export default function HealthcareTemplate({ data }: { data: ResumeContent }) {
       )}
 
       {interests.length > 0 && (
-        <section>
+        <section className="mb-3">
           {heading('Interests')}
           <div className="text-gray-600">{interests.join('  ·  ')}</div>
         </section>
       )}
+
+      <CustomSectionsBlock sections={customSections} headingClassName="font-bold uppercase text-[9px] tracking-widest mb-2" headingStyle={{ color: ACCENT }} />
     </div>
   )
 }

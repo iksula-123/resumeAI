@@ -1,8 +1,10 @@
 import type { ResumeContent } from '../ResumeTemplates'
+import CustomSectionsBlock from './CustomSectionsBlock'
 
 export default function CreativeTemplate({ data }: { data: ResumeContent }) {
-  const { personalInfo: p, summary, experience = [], education = [], skills = [] } = data
+  const { personalInfo: p, summary, experience = [], education = [], skills = [], projects = [], customSections = [] } = data
   const normalSkills = skills.map(s => typeof s === 'string' ? { name: s, level: 75 } : s)
+  const HEADING = "font-bold text-purple-700 text-[8px] uppercase tracking-widest mb-2"
 
   return (
     <div className="w-full min-h-full text-[10px] leading-relaxed font-sans bg-white">
@@ -50,6 +52,18 @@ export default function CreativeTemplate({ data }: { data: ResumeContent }) {
             </section>
           )}
 
+          {projects.length > 0 && (
+            <section>
+              <h2 className={HEADING}>Projects</h2>
+              {projects.map((proj, i) => (
+                <div key={proj.id || i} className="mb-2 pl-3 border-l-2 border-purple-100">
+                  <div className="font-bold text-gray-800">{proj.name}{proj.technologies && <span className="font-normal text-indigo-600"> — {proj.technologies}</span>}</div>
+                  {proj.description && <div className="text-gray-600">{proj.description}</div>}
+                </div>
+              ))}
+            </section>
+          )}
+
           <div className="grid grid-cols-2 gap-4">
             {education.length > 0 && (
               <section>
@@ -84,6 +98,8 @@ export default function CreativeTemplate({ data }: { data: ResumeContent }) {
               </section>
             )}
           </div>
+
+          <CustomSectionsBlock sections={customSections} headingClassName={HEADING} />
         </div>
       </div>
     </div>

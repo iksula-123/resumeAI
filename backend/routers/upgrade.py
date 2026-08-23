@@ -28,8 +28,24 @@ from models import User
 from services.deps import get_current_user
 from services.parsing import extract_text, quick_contact, heuristic_structured_parse, validate_upload, InvalidUpload
 from services.ai import parse_resume_to_content, enhance_resume, _normalize_content
-from services.ats import analyze_resume
+from services.ats_engine import mode_orchestrator, resume_parser as ats_resume_parser
 from services.usage import set_usage_context
+
+# ATS consolidation Phase 3: AI Resume Upgrade's before/after ATS scoring
+# used to be services.ats.analyze_resume() — a separate, simpler legacy
+# formula, completely disconnected from the canonical Resume ATS Health the
+# ATS Checker/Editor show (see docs/ATS scoring audit). Both "before" and
+# "after" now go through the SAME canonical engine those surfaces use — the
+# AI never invents or estimates a score, it only rewrites content; every
+# score below is a fresh, real call into mode_orchestrator.resume_health_mode()
+# via this same shape-preserving adapter (analyze_resume() used to return
+# {"score", "breakdown", "recommendations"} — the shape the frontend already
+# renders — so this migration doesn't require a frontend rewrite to land).
+
+
+def analyze_resume(content: dict) -> dict:
+    resume = ats_resume_parser.from_content(content or {})
+    return mode_orchestrator.resume_health_as_legacy_score_shape(resume)
 
 router = APIRouter(prefix="/api/upgrade", tags=["AI Upgrade"])
 
@@ -234,6 +250,13 @@ async def save_preserved(
             except Exception:
                 font_meta = None
 
+    # ATS consolidation Phase 4: Resume.ats_score = canonical Resume ATS
+    # Health only, computed server-side from the content actually being
+    # saved (the AI-improved version, which becomes this resume's live
+    # content below) — never a client-supplied number. Without this, a
+    # freshly-saved AI Upgrade resume would show no score anywhere until the
+    # editor's own /analyze-editor next ran, even though /enhance already
+    # computed and showed the user this exact number as "ats_after".
     r = Resume(
         user_id=user.id,
         title=body.title or "Untitled Resume",
@@ -244,6 +267,7 @@ async def save_preserved(
         original_file_type=body.original_file_type,
         original_filename=body.original_filename,
         font_metadata=font_meta,
+        ats_score=analyze_resume(body.enhanced_content or {})["score"],
         personal_info={}, achievements=[], interests=[],
     )
 

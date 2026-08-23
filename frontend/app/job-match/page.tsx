@@ -8,7 +8,37 @@ import AppShell from '@/components/AppShell'
 import CircularScore from '@/components/CircularScore'
 
 interface Resume { id: string; title: string; content: any; ats_score?: number | null }
-interface MatchResult { score: number; matched: string[]; missing: string[]; suggestions: string[] }
+
+// ATS consolidation Phase 6: this page used to call the legacy
+// POST /api/ats/score (services.ats.score_resume — a separate, simpler
+// formula, disconnected from the canonical engine ATS Checker/Editor use).
+// It now calls the same canonical POST /api/ats/v2/check the ATS Checker
+// calls, reading its `job_match` slot (mode_orchestrator.job_match_mode())
+// — so "Job Match" here is byte-identical to Job Match shown anywhere else
+// for the same resume + job description. Never computes/estimates a score
+// client-side; when the JD is too thin to score, no percentage is shown at
+// all (jd sufficiency gating), matching every other Job Match surface.
+interface JobMatchCategory { label?: string; matched_evidence?: string[]; missing_evidence?: string[] }
+interface JobMatchModeResult {
+  available: boolean
+  sufficient?: boolean
+  score: number | null
+  categories?: Record<string, JobMatchCategory>
+  message?: string
+}
+interface ResumeHealthModeResult {
+  score: number | null
+  priorities?: { action: string }[]
+}
+interface CheckModesResponse {
+  resume_health: ResumeHealthModeResult
+  job_match: JobMatchModeResult
+  report_id: string | null
+}
+
+type MatchResult =
+  | { sufficient: false; message: string }
+  | { sufficient: true; score: number; matched: string[]; missing: string[]; suggestions: string[] }
 
 const scoreColor = (s: number) => (s >= 80 ? '#1E7A46' : s >= 60 ? '#F5A623' : '#c0392b')
 
@@ -48,12 +78,27 @@ export default function JobMatchPage() {
     if (!selected || !jd.trim()) { setError('Pick a resume and paste a job description.'); return }
     setError(''); setMsg(''); setAnalyzing(true); setResult(null); setPickedMissing(new Set())
     try {
-      const r = await api.post<MatchResult>('/api/ats/score', {
-        resume_content: selected.content,
+      const r = await api.post<CheckModesResponse>('/api/ats/v2/check', {
+        resume_id: selected.id,
         job_description: jd,
       })
-      setResult(r)
-      setPickedMissing(new Set(r.missing.slice(0, 8))) // pre-select top missing
+      if (!r.job_match.sufficient) {
+        setResult({
+          sufficient: false,
+          message: r.job_match.message || 'Paste a more detailed job description (responsibilities, required skills/experience) to get a Job Match score.',
+        })
+        return
+      }
+      const keywords = r.job_match.categories?.keywords
+      const matched = keywords?.matched_evidence || []
+      const missing = keywords?.missing_evidence || []
+      // Resume-only priority actions (mode_orchestrator.resume_health_mode()'s
+      // own `priorities`) — canonical, not JD-specific, but the closest
+      // "recommendations" concept this consolidation has without inventing a
+      // new formula for JD-driven suggestions.
+      const suggestions = (r.resume_health.priorities || []).slice(0, 5).map(p => p.action)
+      setResult({ sufficient: true, score: r.job_match.score ?? 0, matched, missing, suggestions })
+      setPickedMissing(new Set(missing.slice(0, 8))) // pre-select top missing
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Analysis failed.')
     } finally {
@@ -77,11 +122,12 @@ export default function JobMatchPage() {
       const existing = new Set((content.skills || []).map((s: any) => (typeof s === 'string' ? s : s.name).toLowerCase()))
       const additions = Array.from(pickedMissing).filter(k => !existing.has(k.toLowerCase())).map(name => ({ name, level: 70 }))
       content.skills = [...(content.skills || []), ...additions]
+      // Resume.ats_score is always computed server-side from `content` on
+      // create (ATS consolidation Phase 4) — nothing to send here.
       const r = await api.post<{ id: string }>('/api/resumes/', {
         title: `${selected.title} — tailored`,
         template_id: 'modern',
         content,
-        ats_score: result?.score ?? null,
         source: 'ai_upgrade',
       })
       setMsg('✓ Saved a tailored copy to your resumes.')
@@ -95,17 +141,18 @@ export default function JobMatchPage() {
     if (!selected) return
     setBusy('ai'); setMsg('')
     try {
-      const enh = await api.post<{ enhanced: any; ats_after: { score: number } }>('/api/upgrade/enhance', { content: selected.content })
+      const enh = await api.post<{ enhanced: any }>('/api/upgrade/enhance', { content: selected.content })
       // also fold in the picked missing keywords
       const content = enh.enhanced
       const existing = new Set((content.skills || []).map((s: any) => (typeof s === 'string' ? s : s.name).toLowerCase()))
       const additions = Array.from(pickedMissing).filter(k => !existing.has(k.toLowerCase())).map(name => ({ name, level: 75 }))
       content.skills = [...(content.skills || []), ...additions]
+      // Resume.ats_score is always computed server-side from `content` on
+      // create (ATS consolidation Phase 4) — nothing to send here.
       const r = await api.post<{ id: string }>('/api/resumes/', {
         title: `${selected.title} — AI tailored`,
         template_id: 'modern',
         content,
-        ats_score: enh.ats_after?.score ?? result?.score ?? null,
         source: 'ai_upgrade',
       })
       setMsg('✓ AI-tailored resume saved.')
@@ -170,11 +217,19 @@ export default function JobMatchPage() {
                 <div className="h-24 rounded-2xl bg-gray-100 shimmer" />
               </div>
             )}
-            {result && (
+            {result && !result.sufficient && (
+              <div className="h-full flex flex-col items-center justify-center text-center text-gray-500 py-16 px-2">
+                <div className="text-4xl mb-2">📋</div>
+                <p className="text-sm font-medium text-gray-700 mb-1">Job description too short to score</p>
+                <p className="text-xs text-gray-500">{result.message}</p>
+              </div>
+            )}
+            {result && result.sufficient && (
               <div className="space-y-4 animate-fade-up">
                 <div className="flex flex-col items-center">
                   <CircularScore score={result.score} size={116} color={scoreColor(result.score)} />
-                  <div className="text-sm font-medium mt-2" style={{ color: scoreColor(result.score) }}>
+                  <div className="text-xs text-gray-500 mt-1">Job Match</div>
+                  <div className="text-sm font-medium mt-1" style={{ color: scoreColor(result.score) }}>
                     {result.score >= 80 ? 'Strong match' : result.score >= 60 ? 'Decent match' : 'Needs tailoring'}
                   </div>
                 </div>

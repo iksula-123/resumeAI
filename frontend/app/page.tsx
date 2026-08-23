@@ -1,9 +1,5 @@
 'use client'
 
-import { useEffect } from 'react'
-import { useRouter } from 'next/navigation'
-import { useAuthStore } from '@/lib/store'
-
 import Navbar from '@/components/landing/Navbar'
 import Hero from '@/components/landing/Hero'
 import TrustedBy from '@/components/landing/TrustedBy'
@@ -20,14 +16,12 @@ import FAQ from '@/components/landing/FAQ'
 import CTABanner from '@/components/landing/CTABanner'
 import Footer from '@/components/landing/Footer'
 
+// Deliberately NOT auto-redirecting a logged-in visitor away from here — the
+// three service cards below (Resume Builder / AI Buddy / Mentorly) must stay
+// clickable for an already-authenticated user, taking them straight to the
+// service (see Services.tsx), not bounced through /dashboard first. Anyone
+// who wants their dashboard can reach it via the navbar or a service card.
 export default function HomePage() {
-  const { user } = useAuthStore()
-  const router = useRouter()
-
-  useEffect(() => {
-    if (user) router.push('/dashboard')
-  }, [user, router])
-
   return (
     <main className="min-h-screen bg-white dark:bg-slate-950">
       <Navbar />

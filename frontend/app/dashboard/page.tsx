@@ -1,10 +1,12 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, usePathname } from 'next/navigation'
 import { useAuthStore } from '@/lib/store'
+import { setPostLoginRedirect } from '@/lib/authRedirect'
 import { api } from '@/lib/api'
 import AppShell from '@/components/AppShell'
+import ServiceCards from '@/components/services/ServiceCards'
 
 interface Resume {
   id: string
@@ -45,8 +47,9 @@ function relTime(iso?: string | null): string {
 const isOverdue = (iso?: string | null) => !!iso && new Date(iso + 'T23:59:59').getTime() < Date.now()
 
 export default function DashboardPage() {
-  const { user } = useAuthStore()
+  const { user, hasHydrated } = useAuthStore()
   const router = useRouter()
+  const pathname = usePathname()
   const [resumes, setResumes] = useState<Resume[]>([])
   const [apps, setApps] = useState<Application[]>([])
   const [loading, setLoading] = useState(true)
@@ -54,7 +57,17 @@ export default function DashboardPage() {
   const [duplicating, setDuplicating] = useState<string | null>(null)
 
   useEffect(() => {
-    if (!user) { router.push('/auth/login'); return }
+    // Same guard pattern as AppShell/MentorshipShell: wait for the persisted
+    // session to rehydrate before deciding there's no user (avoids the
+    // pre-rehydration `null` flash wrongly bouncing a logged-in user), and
+    // preserve the deep link so a direct visit to /dashboard while logged
+    // out returns here — not to the default landing path — after login.
+    if (!hasHydrated) return
+    if (!user) {
+      setPostLoginRedirect(pathname)
+      router.replace('/auth/login')
+      return
+    }
     Promise.allSettled([
       api.get<Resume[]>('/api/resumes/'),
       api.get<Application[]>('/api/applications/'),
@@ -62,7 +75,9 @@ export default function DashboardPage() {
       if (r.status === 'fulfilled') setResumes(r.value)
       if (a.status === 'fulfilled') setApps(a.value)
     }).finally(() => setLoading(false))
-  }, [user, router])
+  }, [user, hasHydrated, pathname, router])
+
+  if (!hasHydrated || !user) return null
 
   const handleDelete = async (id: string) => {
     if (!confirm('Delete this resume?')) return
@@ -158,6 +173,15 @@ export default function DashboardPage() {
           <p className="text-sm text-gray-500 mt-0.5">Here's your career snapshot and what to do next.</p>
         </div>
 
+        {/* The three SahiCareer services — this dashboard is the central
+            SahiCareer home, not a redirect to any one service. */}
+        <div className="mb-8">
+          <div className="flex items-center gap-2 mb-3">
+            <span className="text-sm font-semibold text-gray-800 font-display">🧭 Your services</span>
+          </div>
+          <ServiceCards />
+        </div>
+
         {/* Next Best Action */}
         <div className="mb-8">
           <div className="flex items-center gap-2 mb-3">
@@ -188,7 +212,7 @@ export default function DashboardPage() {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
           {[
             { label: 'Resumes', value: resumes.length, icon: '📄', color: 'bg-blue-50 text-blue-700' },
-            { label: 'Avg ATS Score', value: resumes.length ? avgAts : '—', icon: '🎯', color: 'bg-green-50 text-green-700' },
+            { label: 'Avg Resume Health', value: resumes.length ? avgAts : '—', icon: '🎯', color: 'bg-green-50 text-green-700' },
             { label: 'Applications', value: apps.length, icon: '🧲', color: 'bg-teal-50 text-royal-700' },
             { label: 'Interviewing', value: interviews, icon: '🎤', color: 'bg-orange-50 text-orange-700' },
           ].map(stat => (

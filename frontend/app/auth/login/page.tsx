@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { useAuthStore } from '@/lib/store'
@@ -13,7 +13,19 @@ export default function LoginPage() {
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const router = useRouter()
-  const { login, isLoading } = useAuthStore()
+  const { login, isLoading, user, hasHydrated } = useAuthStore()
+
+  // Already signed in and landing on /auth/login directly (e.g. a stale
+  // bookmark, browser back button, or clicking "Login" while logged in) —
+  // send them straight to where they belong instead of showing the form
+  // again. A pending deep link (someone was mid-redirect to a specific
+  // service) still wins over the role-based default; replace() so the login
+  // page doesn't linger in browser history.
+  useEffect(() => {
+    if (hasHydrated && user) {
+      router.replace(takePostLoginRedirect(roleLandingPath(user)))
+    }
+  }, [hasHydrated, user, router])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -21,11 +33,15 @@ export default function LoginPage() {
     try {
       await login(email, password)
       const freshUser = useAuthStore.getState().user
-      router.push(takePostLoginRedirect(freshUser ? roleLandingPath(freshUser) : '/dashboard'))
+      router.replace(takePostLoginRedirect(freshUser ? roleLandingPath(freshUser) : '/dashboard'))
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Login failed. Check your credentials.')
     }
   }
+
+  // Avoid flashing the login form for one render while the redirect above
+  // is in flight for an already-authenticated visitor.
+  if (hasHydrated && user) return null
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-royal-50 via-white to-teal-50 p-4">

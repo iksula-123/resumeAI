@@ -30,20 +30,73 @@ ALL_TEMPLATE_IDS = [
 ]
 
 
-def _expected_heading_map(template_id: str) -> dict[str, str]:
-    """The classic family uses generic headings (SUMMARY, EXPERIENCE, ...);
-    single-column templates use their own configured labels (e.g. fresher's
-    summary section is headed "Career Objective", not "Summary") — see
-    SINGLE_COLUMN_CONFIGS in routers/export.py. Sourcing the expectation from
-    the same config the builder actually uses is what makes this a real
-    section-parity check instead of an assumption."""
-    if template_id in SINGLE_COLUMN_CONFIGS:
-        return {k: v.upper() for k, v in SINGLE_COLUMN_CONFIGS[template_id]["labels"].items()}
-    return {
-        "summary": "SUMMARY", "experience": "EXPERIENCE", "education": "EDUCATION",
+# Each classic template now has its OWN heading labels (mirroring its
+# frontend component's actual copy — ModernTemplate.tsx says "Work
+# Experience", ExecutiveTemplate.tsx says "Executive Profile"/"Career
+# History", CreativeTemplate.tsx says "About Me", etc.) instead of every
+# classic template sharing one generic set. Minimal renders the summary as
+# an unheaded left-border quote (matching MinimalTemplate.tsx exactly) — no
+# "summary" key for it is intentional, not an omission.
+_CLASSIC_HEADING_MAPS: dict[str, dict[str, str]] = {
+    "modern": {
+        "summary": "PROFESSIONAL SUMMARY", "experience": "WORK EXPERIENCE", "education": "EDUCATION",
         "skills": "SKILLS", "projects": "PROJECTS", "certifications": "CERTIFICATIONS",
         "achievements": "ACHIEVEMENTS", "languages": "LANGUAGES", "interests": "INTERESTS",
-    }
+    },
+    "professional": {
+        "summary": "PROFESSIONAL SUMMARY", "experience": "EXPERIENCE", "education": "EDUCATION",
+        "skills": "SKILLS", "projects": "PROJECTS", "certifications": "CERTIFICATIONS",
+        "achievements": "ACHIEVEMENTS", "languages": "LANGUAGES", "interests": "INTERESTS",
+    },
+    "minimal": {
+        "experience": "EXPERIENCE", "education": "EDUCATION",
+        "skills": "SKILLS", "projects": "PROJECTS", "certifications": "CERTIFICATIONS",
+        "achievements": "ACHIEVEMENTS", "languages": "LANGUAGES", "interests": "INTERESTS",
+    },
+    "creative": {
+        "summary": "ABOUT ME", "experience": "EXPERIENCE", "education": "EDUCATION",
+        "skills": "SKILLS", "projects": "PROJECTS", "certifications": "CERTIFICATIONS",
+        "achievements": "ACHIEVEMENTS", "languages": "LANGUAGES", "interests": "INTERESTS",
+    },
+    "executive": {
+        "summary": "EXECUTIVE PROFILE", "experience": "CAREER HISTORY", "education": "EDUCATION",
+        "skills": "CORE COMPETENCIES", "projects": "PROJECTS", "certifications": "CERTIFICATIONS",
+        "achievements": "KEY ACHIEVEMENTS", "languages": "LANGUAGES", "interests": "INTERESTS",
+    },
+}
+
+
+def _docx_all_text(doc) -> str:
+    """python-docx's `doc.paragraphs` only walks TOP-LEVEL paragraphs — table
+    CELL content (used by the sidebar/2-column classic layouts: modern,
+    executive, creative) is invisible to it. Table cells can themselves
+    contain nested tables (none of the current layouts do, but walking
+    recursively costs nothing and avoids a silent gap if one ever does)."""
+    parts = [p.text for p in doc.paragraphs]
+
+    def walk_table(table):
+        for row in table.rows:
+            for cell in row.cells:
+                parts.extend(p.text for p in cell.paragraphs)
+                for nested in cell.tables:
+                    walk_table(nested)
+
+    for t in doc.tables:
+        walk_table(t)
+    return "\n".join(parts)
+
+
+def _expected_heading_map(template_id: str) -> dict[str, str]:
+    """Single-column templates use their own configured labels (e.g.
+    fresher's summary section is headed "Career Objective", not "Summary")
+    — see SINGLE_COLUMN_CONFIGS in routers/export.py. Classic templates each
+    have their own real design-matched labels — see _CLASSIC_HEADING_MAPS
+    above. Sourcing the expectation from the same config/labels the builder
+    actually uses is what makes this a real section-parity check instead of
+    an assumption."""
+    if template_id in SINGLE_COLUMN_CONFIGS:
+        return {k: v.upper() for k, v in SINGLE_COLUMN_CONFIGS[template_id]["labels"].items()}
+    return _CLASSIC_HEADING_MAPS[template_id]
 
 # Every optional section populated, so "does this template drop data" is
 # actually exercised for every template_id, not just the ones with rich specs.
@@ -141,7 +194,7 @@ def test_expected_sections_present_in_docx(template_id):
     sections = TEMPLATE_SPECS[template_id]["sections"]
     heading_map = _expected_heading_map(template_id)
     docx_bytes = TEMPLATE_BUILDERS[template_id].docx(SAMPLE_CONTENT, "Test Resume", sections)
-    text = "\n".join(p.text for p in Document(io.BytesIO(docx_bytes)).paragraphs).upper()
+    text = _docx_all_text(Document(io.BytesIO(docx_bytes))).upper()
     assert "PRIYA SHARMA" in text
     for key, heading in heading_map.items():
         if key in sections:

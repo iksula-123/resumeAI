@@ -197,12 +197,13 @@ export default function AiUpgradePage() {
         setSavedId(r.id)
       } else {
         // Mode 2 (Change Template was chosen, or a .txt upload with no design
-        // to preserve) — the normal SahiCareer-templated resume.
+        // to preserve) — the normal SahiCareer-templated resume. ats_score is
+        // never sent — Resume.ats_score is always computed server-side from
+        // `content` on create (ATS consolidation), never trusted from the client.
         const r = await api.post<{ id: string }>('/api/resumes/', {
           title: title || 'AI Upgraded Resume',
           template_id: 'modern',
           content: result.enhanced,
-          ats_score: result.ats_after.score,
           source: 'ai_upgrade',
         })
         setSavedId(r.id)
@@ -441,7 +442,7 @@ export default function AiUpgradePage() {
 
             <div className="grid md:grid-cols-3 gap-5">
             <div className="card-premium p-6 flex flex-col items-center text-center">
-              <div className="text-sm font-semibold text-gray-800 mb-3">Your Current ATS Score</div>
+              <div className="text-sm font-semibold text-gray-800 mb-3">Your Resume ATS Health</div>
               <CircularScore score={result.ats_before.score} size={130} color={scoreColor(result.ats_before.score)} />
               <div className="mt-3 text-sm font-medium" style={{ color: scoreColor(result.ats_before.score) }}>
                 {result.ats_before.score >= 80 ? 'Excellent' : result.ats_before.score >= 60 ? 'Good' : 'Needs Work'}
@@ -477,7 +478,7 @@ export default function AiUpgradePage() {
               <div className="mt-6 flex items-center justify-between bg-gradient-to-r from-royal-50 to-teal-50 rounded-xl p-4">
                 <div>
                   <div className="text-sm font-semibold text-gray-800">AI has already enhanced your resume</div>
-                  <div className="text-xs text-gray-500">Projected new score: <span className="font-bold text-green-600">{result.ats_after.score}</span> (+{result.ats_after.score - result.ats_before.score})</div>
+                  <div className="text-xs text-gray-500">New Resume ATS Health: <span className="font-bold text-green-600">{result.ats_after.score}</span> (+{result.ats_after.score - result.ats_before.score})</div>
                 </div>
                 <button onClick={() => setStep(4)} className="btn-primary text-sm">See Improvements →</button>
               </div>

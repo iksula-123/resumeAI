@@ -1,6 +1,5 @@
 import uuid
 from typing import Optional
-from datetime import datetime, timezone
 
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
@@ -73,9 +72,13 @@ async def ats_score(
                     suggestions=result["suggestions"],
                 )
                 db.add(report)
-                # keep the resume's headline score in sync with the latest scan
-                resume.ats_score = result["score"]
-                resume.updated_at = datetime.now(timezone.utc)
+                # ATS consolidation Phase 4: Resume.ats_score = canonical
+                # Resume ATS Health only (mode_orchestrator.resume_health_mode(),
+                # written by /api/ats/v2/check and /analyze-editor). This
+                # legacy endpoint's own score_resume() formula is unchanged
+                # and still saved on its own AtsReport row — it just no
+                # longer overwrites the resume's shared headline score with
+                # a different, non-canonical number.
                 await db.commit()
                 await db.refresh(report)
                 saved_id = str(report.id)
@@ -103,18 +106,11 @@ async def ats_analyze(
 
     result = analyze_resume_prioritized(req.content, role_keywords, role_title)
 
-    # Keep the resume's headline score in sync when tied to an owned resume
-    if req.resume_id:
-        try:
-            rid = uuid.UUID(req.resume_id)
-        except ValueError:
-            rid = None
-        if rid:
-            owned = (await db.execute(select(Resume).where(Resume.id == rid))).scalar_one_or_none()
-            if owned and owned.user_id == user.id:
-                owned.ats_score = result["score"]
-                owned.updated_at = datetime.now(timezone.utc)
-                await db.commit()
+    # ATS consolidation Phase 4: this legacy endpoint no longer syncs the
+    # resume's headline ats_score — that field is now written only from the
+    # canonical Resume ATS Health (mode_orchestrator.resume_health_mode(),
+    # via /api/ats/v2/check and /analyze-editor), never from this separate
+    # India-tuned formula. The endpoint's own result/formula is unchanged.
 
     await log_usage_event(str(user.id), "ats_analyze", tenant_id=tenant_of(user),
                           metadata={"role": req.role_slug, "score": result["score"]})

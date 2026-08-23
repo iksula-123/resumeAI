@@ -101,6 +101,7 @@ class Resume(Base):
     projects = relationship("Project", back_populates="resume", cascade="all, delete-orphan", order_by="Project.sort_order")
     certifications = relationship("Certification", back_populates="resume", cascade="all, delete-orphan", order_by="Certification.sort_order")
     languages = relationship("Language", back_populates="resume", cascade="all, delete-orphan", order_by="Language.sort_order")
+    custom_sections = relationship("CustomSection", back_populates="resume", cascade="all, delete-orphan", order_by="CustomSection.sort_order")
 
     def __repr__(self):
         return f"<Resume {self.title}>"
@@ -196,6 +197,26 @@ class Certification(Base):
     resume = relationship("Resume", back_populates="certifications")
 
 
+class CustomSection(Base):
+    """A user-named freeform section (e.g. "Professional Development",
+    "Publications") — the Resume Builder's escape hatch for content that
+    doesn't fit any of the fixed sections. Deliberately the same
+    id/resume_id/sort_order/timestamps shape as Project/Certification
+    above; `title` is user-entered (not one of the fixed SECTIONS labels)
+    and `content` is freeform text, same pattern as `summary`."""
+    __tablename__ = "custom_sections"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    resume_id = Column(UUID(as_uuid=True), ForeignKey("resumes.id", ondelete="CASCADE"), nullable=False, index=True)
+    title = Column(String(255), nullable=False, default="")
+    content = Column(Text, nullable=True)
+    sort_order = Column(Integer, default=0, nullable=False)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
+
+    resume = relationship("Resume", back_populates="custom_sections")
+
+
 class Language(Base):
     __tablename__ = "languages"
 
@@ -282,10 +303,141 @@ class AtsReport(Base):
     recommendations = Column(JSON, nullable=True)               # {high: [...], medium: [...], low: [...]}
     candidate_questions = Column(JSON, nullable=True)
     analysis_version = Column(String(20), nullable=True, default="v2-phase3")
+    # ── Phase B (ATS Intelligence 2.0) — additive, nullable. Distinct from
+    # analysis_version above: that versions the REPORT SHAPE (Phase 3's
+    # persistence schema); this versions the SCORING ENGINE/formula itself
+    # (services/ats_engine/ats_config.py::SCORING_ENGINE_VERSION), per Part 44
+    # of the product spec — "store the version with every ATS analysis... this
+    # allows rollback." Recorded on every report going forward; existing rows
+    # are simply null (pre-dates the v2 engine, nothing to backfill honestly).
+    scoring_engine_version = Column(String(20), nullable=True)
+    # ── Phase G (ATS Checker mode redesign) — additive, nullable. `score`
+    # above has ALWAYS meant different things depending on which engine
+    # wrote the row (legacy scoring.py vs. v2 blended vs., now, mode-aware
+    # resume_health) with nothing recording which — score_type fixes that
+    # going forward WITHOUT reinterpreting any existing row: old rows are
+    # simply null (honest — we don't know retroactively what they meant).
+    # jd_sufficient records job_parser.assess_sufficiency()'s verdict for
+    # this report's JD, when one was supplied — lets History/trend views
+    # filter out or flag insufficient-JD attempts instead of comparing them
+    # against real Job Match scores. See docs/ATS_ANALYSIS_MODES.md.
+    score_type = Column(String(20), nullable=True)          # "resume_health" | "role_readiness" | "job_match"
+    jd_sufficient = Column(Boolean, nullable=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
     def __repr__(self):
         return f"<AtsReport {self.resume_id} score={self.score}>"
+
+
+ATS_ACTION_TYPES = {
+    "quantify_bullet", "improve_bullet", "add_keyword", "improve_summary", "improve_skills",
+    "fix_section", "fix_formatting", "improve_grammar", "improve_readability",
+    "add_skill_evidence", "improve_experience_alignment", "remove_repetition",
+    "undo",  # Part 14 — restoring a previous value is its own first-class, auditable change_history record
+}
+ATS_RECOMMENDATION_STATUSES = {"pending", "answered", "approved", "rejected", "applied", "stale"}
+ATS_EVIDENCE_TIERS = {"verified", "inferred", "suggested", "unknown"}
+
+
+class AtsRecommendation(Base):
+    """Phase D — one persisted, addressable AI ATS recommendation.
+
+    Didn't exist before Phase D: through Phase C, recommendations were
+    ephemeral response objects with no durable identity, which is fine for
+    "show the user what's wrong" but not enough for "let the user approve
+    THIS specific one later" (POST /recommendations/{id}/apply) or for
+    staleness detection (Part 33) — both need something with a real id and
+    a snapshot of the resume state it was generated against.
+    """
+    __tablename__ = "ats_recommendations"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    resume_id = Column(UUID(as_uuid=True), ForeignKey("resumes.id", ondelete="CASCADE"), nullable=False, index=True)
+    user_id = Column(UUID(as_uuid=True), ForeignKey("profiles.id", ondelete="CASCADE"), nullable=False, index=True)
+    ats_report_id = Column(UUID(as_uuid=True), ForeignKey("ats_reports.id", ondelete="SET NULL"), nullable=True, index=True)
+
+    action_type = Column(String(50), nullable=False)          # one of ATS_ACTION_TYPES — never arbitrary free text
+    priority = Column(String(10), nullable=False, default="low")  # high | medium | low
+    title = Column(Text, nullable=False)
+    reason = Column(Text, nullable=True)
+    affected_section = Column(String(50), nullable=True)      # e.g. "experience"
+    affected_item_id = Column(String(100), nullable=True)     # e.g. an experience entry's index/id
+    # The exact, verbatim current text this recommendation targets (a bullet,
+    # or the summary) — captured once at staging time. This is the actual
+    # locator apply_fix.py uses to find-and-replace; NOT re-derived from
+    # title/reason text at apply time, which was a real bug (those strings
+    # don't reliably contain the right quoted substring for every action
+    # type — caught by the Phase D E2E test before this was ever applied).
+    target_text = Column(Text, nullable=True)
+    score_impact_estimate = Column(String(10), nullable=True)  # high | medium | low
+
+    requires_user_input = Column(Boolean, nullable=False, default=False)
+    question = Column(Text, nullable=True)
+    user_answer = Column(Text, nullable=True)                 # the evidence the user supplied, verbatim
+
+    evidence_tier = Column(String(10), nullable=False, default="unknown")  # ATS_EVIDENCE_TIERS
+    proposed_content = Column(Text, nullable=True)             # AI-proposed replacement text (only ever built from verified facts)
+    final_content = Column(Text, nullable=True)                # what actually gets applied — the AI proposal, OR the user's edit of it
+
+    status = Column(String(10), nullable=False, default="pending")  # ATS_RECOMMENDATION_STATUSES
+    rejection_reason = Column(Text, nullable=True)
+
+    # Staleness detection (Part 33): the resume's updated_at at the moment
+    # this recommendation was generated. If the resume has since changed,
+    # applying this recommendation is refused — see services/ats_engine/apply_fix.py.
+    resume_updated_at_snapshot = Column(DateTime(timezone=True), nullable=True)
+
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
+
+    resume = relationship("Resume")
+
+    def __repr__(self):
+        return f"<AtsRecommendation {self.action_type} status={self.status}>"
+
+
+class AtsChangeHistory(Base):
+    """Phase B schema, Phase D is the first thing that writes to it — one row
+    per AI-assisted (or manual) change applied to a resume, with the real
+    before/after score delta and enough content to restore the previous
+    state (Part 14 — Undo).
+
+    A SEPARATE table from AtsReport (Phase B decision 4) — this is a
+    growing, independently queryable log ("show me every applied fix for
+    this resume"), not a snapshot of one analysis.
+
+    Column names below were finalized in Phase D to match the product
+    spec's Part 12 exactly (`action_type`/`score_delta` rather than Phase
+    B's placeholder `change_type`/`delta`, plus `before_content`/
+    `after_content`/`user_approved`) — safe to rename because nothing had
+    ever written to this table yet (confirmed in the Phase C report).
+    """
+    __tablename__ = "ats_change_history"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    resume_id = Column(UUID(as_uuid=True), ForeignKey("resumes.id", ondelete="CASCADE"), nullable=False, index=True)
+    user_id = Column(UUID(as_uuid=True), ForeignKey("profiles.id", ondelete="CASCADE"), nullable=False, index=True)
+    # The report AFTER the change was applied and rescored, if persisted.
+    # Nullable + SET NULL: a change-history row must outlive the report it
+    # references (the report itself could later be pruned/rotated).
+    ats_report_id = Column(UUID(as_uuid=True), ForeignKey("ats_reports.id", ondelete="SET NULL"), nullable=True, index=True)
+    recommendation_id = Column(UUID(as_uuid=True), ForeignKey("ats_recommendations.id", ondelete="SET NULL"), nullable=True, index=True)
+    action_type = Column(String(50), nullable=True)
+    before_content = Column(Text, nullable=True)   # the exact field's value before the change — enough to restore it
+    after_content = Column(Text, nullable=True)
+    user_approved = Column(Boolean, nullable=False, default=True)  # false only for a system-initiated record, e.g. an Undo's own history row
+    before_score = Column(Integer, nullable=True)
+    after_score = Column(Integer, nullable=True)
+    score_delta = Column(Integer, nullable=True)
+    changed_fields = Column(JSON, nullable=True, default=list)    # e.g. ["experience[0].bullets[2]"]
+    changed_metrics = Column(JSON, nullable=True, default=list)   # e.g. [{"category": "keyword", "before": 74, "after": 82}]
+    scoring_engine_version = Column(String(20), nullable=True)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+    resume = relationship("Resume")
+
+    def __repr__(self):
+        return f"<AtsChangeHistory {self.resume_id} {self.before_score}->{self.after_score}>"
 
 
 class Payment(Base):

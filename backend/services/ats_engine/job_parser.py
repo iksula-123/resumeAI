@@ -8,6 +8,7 @@ if no AI key is set or the call fails.
 """
 import re
 
+from . import ats_config
 from .llm import chat_json
 
 _REQUIRED_MARKERS = ("required", "must have", "you have", "requirements")
@@ -91,3 +92,27 @@ async def parse(text: str) -> dict:
     result["raw_text"] = text
     result["parsed_by"] = "ai"
     return result
+
+
+# ── Phase G — JD sufficiency gate ───────────────────────────────────────────
+# A job title alone ("java developer") must never be scored as if it were a
+# complete JD. This runs AFTER parse() (heuristic or AI) and looks at what
+# was actually extracted — it doesn't re-read the raw text itself, so it
+# stays accurate however parse() evolves. See ats_config.py for the
+# threshold rationale; both conditions are required (AND, not OR).
+def assess_sufficiency(raw_text: str, parsed: dict) -> dict:
+    text_length = len((raw_text or "").strip())
+    signals_present = [f for f in ats_config.JD_SUFFICIENCY_SIGNAL_FIELDS if parsed.get(f)]
+    signal_count = len(signals_present)
+    sufficient = (
+        text_length >= ats_config.JD_SUFFICIENCY_MIN_CHARS
+        and signal_count >= ats_config.JD_SUFFICIENCY_MIN_SIGNALS
+    )
+    return {
+        "sufficient": sufficient,
+        "text_length": text_length,
+        "signal_count": signal_count,
+        "signals_present": signals_present,
+        "min_chars": ats_config.JD_SUFFICIENCY_MIN_CHARS,
+        "min_signals": ats_config.JD_SUFFICIENCY_MIN_SIGNALS,
+    }

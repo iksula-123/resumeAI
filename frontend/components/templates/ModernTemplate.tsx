@@ -1,7 +1,9 @@
 import type { ResumeContent } from '../ResumeTemplates'
+import CustomSectionsBlock from './CustomSectionsBlock'
 
 export default function ModernTemplate({ data }: { data: ResumeContent }) {
-  const { personalInfo: p, summary, experience = [], education = [], skills = [], languages = [] } = data
+  const { personalInfo: p, summary, experience = [], education = [], skills = [], languages = [], projects = [], customSections = [] } = data
+  const HEADING = "text-[8px] font-bold text-[#1e3a8a] uppercase tracking-widest border-b border-[#1e3a8a] pb-0.5 mb-1.5"
   const normalSkills = skills.map(s => typeof s === 'string' ? { name: s, level: 75 } : s)
 
   return (
@@ -85,6 +87,17 @@ export default function ModernTemplate({ data }: { data: ResumeContent }) {
             ))}
           </section>
         )}
+        {projects.length > 0 && (
+          <section>
+            <h2 className={HEADING}>Projects</h2>
+            {projects.map((proj, i) => (
+              <div key={proj.id || i} className="mb-2">
+                <div className="font-bold text-gray-800">{proj.name}{proj.technologies && <span className="font-normal text-gray-500"> — {proj.technologies}</span>}</div>
+                {proj.description && <div className="text-gray-600">{proj.description}</div>}
+              </div>
+            ))}
+          </section>
+        )}
         {education.length > 0 && (
           <section>
             <h2 className="text-[8px] font-bold text-[#1e3a8a] uppercase tracking-widest border-b border-[#1e3a8a] pb-0.5 mb-1.5">Education</h2>
@@ -96,6 +109,7 @@ export default function ModernTemplate({ data }: { data: ResumeContent }) {
             ))}
           </section>
         )}
+        <CustomSectionsBlock sections={customSections} headingClassName={HEADING} />
       </div>
     </div>
   )

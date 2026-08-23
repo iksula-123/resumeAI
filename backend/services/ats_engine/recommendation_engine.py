@@ -12,6 +12,42 @@ from .llm import chat_json
 from .resume_parser import _WEAK_WORDS
 
 
+def _as_str_list(items) -> list[str]:
+    """Defensively coerce an AI-returned list into plain strings.
+
+    The prompt asks for e.g. "missing_keyword_tips": array of short strings,
+    but an LLM's JSON output isn't schema-validated — it has been observed to
+    sometimes return richer objects instead (e.g. {"keyword": "...",
+    "suggestion": "..."}) for a field the frontend renders directly as text
+    (`{tip}` in a <li>), which crashes React with "Objects are not valid as a
+    React child". Never trust the AI's output shape for what gets rendered
+    as a plain string — always normalize here before it leaves the backend.
+    """
+    if not isinstance(items, list):
+        return []
+    out = []
+    for item in items:
+        if isinstance(item, str):
+            if item.strip():
+                out.append(item.strip())
+        elif isinstance(item, dict):
+            # Prefer an explicit human-readable field; fall back to joining
+            # whatever keys are present (e.g. keyword + suggestion) rather
+            # than silently dropping the tip.
+            for key in ("suggestion", "tip", "text", "detail", "advice"):
+                val = item.get(key)
+                if isinstance(val, str) and val.strip():
+                    out.append(val.strip())
+                    break
+            else:
+                parts = [str(v).strip() for v in item.values() if isinstance(v, (str, int, float)) and str(v).strip()]
+                if parts:
+                    out.append(": ".join(parts) if len(parts) > 1 else parts[0])
+        elif item is not None:
+            out.append(str(item))
+    return out
+
+
 def _rule_based_weak_words(bullets: list[str]) -> list[dict]:
     hits = []
     for b in bullets:
@@ -102,5 +138,19 @@ async def suggest(resume: dict, job: dict, missing_keywords: list[str]) -> dict:
     result.setdefault("summary_suggestion", None)
     result.setdefault("missing_keyword_tips", [])
     result.setdefault("general_tips", [])
+
+    # bullet_rewrites is expected to be objects ({original, improved, reason})
+    # — leave it alone, but only keep well-formed entries so a malformed one
+    # can't crash the frontend the same way.
+    result["bullet_rewrites"] = [
+        r for r in (result["bullet_rewrites"] if isinstance(result["bullet_rewrites"], list) else [])
+        if isinstance(r, dict) and isinstance(r.get("original"), str) and isinstance(r.get("improved"), str)
+    ]
+    result["weak_words_found"] = _as_str_list(result["weak_words_found"])
+    result["missing_keyword_tips"] = _as_str_list(result["missing_keyword_tips"])
+    result["general_tips"] = _as_str_list(result["general_tips"])
+    if not isinstance(result.get("summary_suggestion"), (str, type(None))):
+        result["summary_suggestion"] = None
+
     result["generated_by"] = "ai"
     return result

@@ -352,3 +352,51 @@ def test_candidate_questions_do_not_invent_answers():
     questions = scoring.build_candidate_questions(resume, {"education": {}})
     assert all(q.strip().endswith("?") for q in questions)
     assert any("ABC Technologies" in q for q in questions)
+
+
+# ── AI-output shape coercion — regression for a real crash: the LLM returned
+# missing_keyword_tips as [{"keyword": ..., "suggestion": ...}] instead of
+# plain strings, which the frontend renders directly as text, crashing React
+# with "Objects are not valid as a React child." Every AI-generated list the
+# frontend treats as string[] must be defensively coerced, never trusted as-is.
+from services.ats_engine.recommendation_engine import _as_str_list  # noqa: E402
+
+
+def test_as_str_list_coerces_keyword_suggestion_objects_to_strings():
+    items = [{"keyword": "TypeScript", "suggestion": "Mention it in your frontend bullet."}]
+    out = _as_str_list(items)
+    assert out == ["Mention it in your frontend bullet."]
+    assert all(isinstance(s, str) for s in out)
+
+
+def test_as_str_list_passes_through_plain_strings():
+    assert _as_str_list(["Add more metrics.", "  ", "Use stronger verbs."]) == ["Add more metrics.", "Use stronger verbs."]
+
+
+def test_as_str_list_handles_non_list_and_unrecognized_dict_shapes():
+    assert _as_str_list(None) == []
+    assert _as_str_list("not a list") == []
+    assert _as_str_list([{"foo": "bar", "baz": 3}]) == ["bar: 3"]
+
+
+def test_recommendation_suggest_ai_path_never_returns_non_string_tips(monkeypatch):
+    import services.ats_engine.recommendation_engine as rec_mod
+
+    async def fake_chat_json(prompt, max_tokens=2000):
+        return {
+            "bullet_rewrites": [{"original": "did stuff", "improved": "Built stuff", "reason": "stronger verb"}],
+            "weak_words_found": [{"phrase": "responsible for"}],
+            "summary_suggestion": "A concise, honest summary.",
+            "missing_keyword_tips": [{"keyword": "TypeScript", "suggestion": "Add it if genuinely used."}],
+            "general_tips": ["Quantify results."],
+        }
+    monkeypatch.setattr(rec_mod, "chat_json", fake_chat_json)
+
+    resume = {"experience": [{"bullets": ["did stuff"]}]}
+    job = {"job_title": "Frontend Developer", "responsibilities": []}
+    result = _sync(rec_mod.suggest(resume, job, ["TypeScript"]))
+
+    assert result["generated_by"] == "ai"
+    for tip in result["missing_keyword_tips"] + result["weak_words_found"] + result["general_tips"]:
+        assert isinstance(tip, str)
+    assert result["missing_keyword_tips"] == ["Add it if genuinely used."]

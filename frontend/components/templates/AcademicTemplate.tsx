@@ -1,4 +1,5 @@
 import type { ResumeContent } from '../ResumeTemplates'
+import CustomSectionsBlock from './CustomSectionsBlock'
 
 const ACCENT = '#7c2d12'
 
@@ -19,6 +20,7 @@ export default function AcademicTemplate({ data }: { data: ResumeContent }) {
   const {
     personalInfo: p, summary, experience = [], education = [], skills = [],
     projects = [], certifications = [], achievements = [], languages = [], interests = [],
+    customSections = [],
   } = data
   const skillNames = skills.map(s => typeof s === 'string' ? s : s.name).filter(Boolean)
 
@@ -133,11 +135,15 @@ export default function AcademicTemplate({ data }: { data: ResumeContent }) {
       )}
 
       {interests.length > 0 && (
-        <section>
+        <section className="mb-3.5">
           {heading('Interests')}
           <p className="text-gray-600">{interests.join('  ·  ')}</p>
         </section>
       )}
+
+      <CustomSectionsBlock sections={customSections}
+        headingClassName="font-bold text-[9px] uppercase tracking-widest mb-1.5" headingStyle={{ color: ACCENT }}
+        sectionClassName="mb-3.5" />
     </div>
   )
 }

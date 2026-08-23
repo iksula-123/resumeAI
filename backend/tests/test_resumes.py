@@ -1,4 +1,5 @@
 import pytest
+import uuid
 
 
 DEMO_TOKEN = "demo-test-user"
@@ -81,3 +82,43 @@ async def test_ats_score(client):
     assert data["score"] > 0
     assert "matched" in data
     assert "python" in data["matched"] or "fastapi" in data["matched"]
+
+
+@pytest.mark.asyncio
+async def test_ats_score_never_trusts_client_supplied_value(client):
+    """ATS consolidation Phase 4 — Resume.ats_score is always the canonical
+    Resume ATS Health, computed server-side; a client-supplied ats_score is
+    ignored on create/update/restore, never persisted verbatim."""
+    email = f"ats-notrust-{uuid.uuid4().hex[:10]}@example.com"
+    r = await client.post("/api/auth/signup", json={
+        "email": email, "password": "pass123", "full_name": "No Trust Tester",
+    })
+    assert r.status_code == 200, r.text
+    token = r.json()["access_token"]
+    headers = {"Authorization": f"Bearer {token}"}
+
+    content = {
+        "personalInfo": {"fullName": "No Trust Tester", "email": email},
+        "summary": "", "experience": [], "education": [], "skills": [],
+        "projects": [], "certifications": [], "languages": [], "achievements": [], "interests": [],
+    }
+
+    # create: a smuggled ats_score=9999 must be ignored, replaced by a real
+    # server-computed canonical score for the (weak, empty) content given.
+    r2 = await client.post("/api/resumes/", json={
+        "title": "Smuggle Test", "ats_score": 9999, "content": content,
+    }, headers=headers)
+    assert r2.status_code in (200, 201), r2.text
+    resume = r2.json()
+    assert resume["ats_score"] != 9999
+    assert resume["ats_score"] is not None
+
+    # update: a smuggled ats_score=8888 must be silently ignored (field has
+    # no effect at all — the column is left to the canonical write paths).
+    r3 = await client.put(f"/api/resumes/{resume['id']}", json={
+        "ats_score": 8888,
+    }, headers=headers)
+    assert r3.status_code == 200, r3.text
+    assert r3.json()["ats_score"] != 8888
+
+    await client.delete(f"/api/resumes/{resume['id']}", headers=headers)

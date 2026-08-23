@@ -24,12 +24,13 @@ from sqlalchemy.orm import selectinload
 from database import get_db
 from models import (
     Resume, Experience, Education, Skill, Project, Certification, Language, User,
-    ResumeVersion,
+    ResumeVersion, CustomSection,
 )
 from services.deps import get_current_user
 from services.webhooks import dispatch
 from services.audit import record as audit
 from services.usage import log_usage_event, tenant_of
+from services.ats_engine import ResumeParser, mode_orchestrator
 
 router = APIRouter(prefix="/api/resumes", tags=["Resumes"])
 
@@ -43,6 +44,7 @@ _RESUME_LOADERS = (
     selectinload(Resume.projects),
     selectinload(Resume.certifications),
     selectinload(Resume.languages),
+    selectinload(Resume.custom_sections),
 )
 
 
@@ -52,6 +54,13 @@ class ResumeUpsert(BaseModel):
     template_id: Optional[str] = "modern"
     content: Optional[Any] = None
     ats_score: Optional[int] = None
+    # font_metadata/layout_metadata: {"family": str, "size": str} /
+    # {"spacing": str} — the Resume Builder's font/spacing picker. Both
+    # columns already existed on Resume (provisioned, never wired to
+    # anything); this just lets the editor actually write to them.
+    # Cosmetic-only — never read by any ATS scoring function.
+    font_metadata: Optional[dict] = None
+    layout_metadata: Optional[dict] = None
 
 
 # ── content assembly (DB → frontend) ─────────────────────────────────────────
@@ -102,6 +111,10 @@ def _to_content(r: Resume) -> dict:
         "languages": [{"name": l.name, "proficiency": l.proficiency or ""} for l in r.languages],
         "achievements": r.achievements or [],
         "interests": r.interests or [],
+        "customSections": [
+            {"id": str(cs.id), "title": cs.title or "", "content": cs.content or ""}
+            for cs in r.custom_sections
+        ],
     }
 
 
@@ -118,6 +131,7 @@ def _to_dict(r: Resume) -> dict:
         "original_file_type": r.original_file_type,
         "original_filename": r.original_filename,
         "font_metadata": r.font_metadata,
+        "layout_metadata": r.layout_metadata,
         "content": _to_content(r),
         "created_at": r.created_at.isoformat() if r.created_at else None,
         "updated_at": r.updated_at.isoformat() if r.updated_at else None,
@@ -210,6 +224,15 @@ async def _apply_content(db: AsyncSession, resume: Resume, content: dict) -> Non
         if name
     ]
 
+    resume.custom_sections = [
+        CustomSection(
+            title=cs.get("title") or "",
+            content=cs.get("content") or "",
+            sort_order=i,
+        )
+        for i, cs in enumerate(content.get("customSections") or [])
+    ]
+
 
 async def _load_full(db: AsyncSession, rid: uuid.UUID) -> Optional[Resume]:
     result = await db.execute(
@@ -227,6 +250,17 @@ async def _get_owned(db: AsyncSession, resume_id: str, user: User) -> Resume:
     if not r or (r.user_id != user.id and not user.is_admin):
         raise HTTPException(status_code=404, detail="Resume not found")
     return r
+
+
+def _canonical_ats_score(content: dict) -> Optional[int]:
+    """ATS consolidation Phase 4: Resume.ats_score = canonical Resume ATS
+    Health only (mode_orchestrator.resume_health_mode()) — never a
+    client-supplied number, Role Readiness, or Job Match. Any ats_score the
+    client sends on create/update/restore is ignored; this is the only
+    function allowed to produce a value for that column here."""
+    resume = ResumeParser.from_content(content or {})
+    health = mode_orchestrator.resume_health_mode(resume)
+    return health["score"]
 
 
 # ── version history ───────────────────────────────────────────────────────────
@@ -287,11 +321,15 @@ async def create_resume(
     db: AsyncSession = Depends(get_db),
     user: User = Depends(get_current_user),
 ):
+    # ATS consolidation Phase 4: body.ats_score is ignored — Resume.ats_score
+    # is always the canonical Resume ATS Health, computed server-side from
+    # the content actually being saved, never trusted from the client (see
+    # _canonical_ats_score).
     r = Resume(
         user_id=user.id,
         title=body.title or "Untitled Resume",
         template_id=body.template_id or "modern",
-        ats_score=body.ats_score,
+        ats_score=_canonical_ats_score(body.content or {}),
         personal_info={},
         achievements=[],
         interests=[],
@@ -409,8 +447,14 @@ async def update_resume(
         r.title = body.title
     if body.template_id is not None:
         r.template_id = body.template_id
-    if body.ats_score is not None:
-        r.ats_score = body.ats_score
+    # ATS consolidation Phase 4: body.ats_score is ignored on update — the
+    # editor's own debounced /analyze-editor call is what keeps ats_score
+    # fresh (canonical Resume ATS Health), on every content change; PUT
+    # firing on every autosave is not the place to recompute it too.
+    if body.font_metadata is not None:
+        r.font_metadata = body.font_metadata
+    if body.layout_metadata is not None:
+        r.layout_metadata = body.layout_metadata
     if body.content is not None:
         await _apply_content(db, r, body.content)
     r.updated_at = datetime.now(timezone.utc)
@@ -498,8 +542,11 @@ async def restore_version(
         r.title = v.title
     if v.template_id:
         r.template_id = v.template_id
-    if v.ats_score is not None:
-        r.ats_score = v.ats_score
+    # ATS consolidation Phase 4: the snapshotted v.ats_score is not trusted —
+    # it may predate this consolidation, or simply be stale relative to a
+    # score recomputed since that snapshot was taken. Recompute fresh,
+    # canonically, from the content actually being restored.
+    r.ats_score = _canonical_ats_score(v.content) if v.content is not None else r.ats_score
     r.updated_at = datetime.now(timezone.utc)
     await db.commit()
 
@@ -531,8 +578,9 @@ async def download_resume(
     """
     if fmt not in ("pdf", "docx"):
         raise HTTPException(status_code=400, detail="Format must be 'pdf' or 'docx'.")
+    from routers.export import _content_disposition, _safe_filename_base
     r = await _get_owned(db, resume_id, user)
-    safe_title = (r.title or "Resume").replace(" ", "_")
+    safe_title = _safe_filename_base(r.title)
     media = ("application/pdf" if fmt == "pdf"
               else "application/vnd.openxmlformats-officedocument.wordprocessingml.document")
 
@@ -558,25 +606,26 @@ async def download_resume(
                               metadata={"resume_id": resume_id})
         return StreamingResponse(
             io.BytesIO(out_bytes), media_type=media,
-            headers={"Content-Disposition": f'attachment; filename="{safe_title}.{fmt}"'},
+            headers={"Content-Disposition": _content_disposition(f"{safe_title}.{fmt}")},
         )
 
     # Not preserving an original design — use the template-aware SahiCareer
-    # generator. r.template_id (DB) is the only source consulted here — this
-    # endpoint has no request body, so there's no client-supplied value to
-    # even consider mixing in (see export.py's module docstring on
-    # template_id resolution).
-    from routers.export import TEMPLATE_BUILDERS, TEMPLATE_SPECS, DEFAULT_TEMPLATE_ID
+    # generator. r.template_id/r.font_metadata/r.layout_metadata (DB) are the
+    # only source consulted here — this endpoint has no request body, so
+    # there's no client-supplied value to even consider mixing in (see
+    # export.py's module docstring on template_id resolution).
+    from routers.export import TEMPLATE_BUILDERS, TEMPLATE_SPECS, DEFAULT_TEMPLATE_ID, _style_from_metadata
     template_id = r.template_id if r.template_id in TEMPLATE_SPECS else DEFAULT_TEMPLATE_ID
+    style = _style_from_metadata(r.font_metadata, r.layout_metadata, template_id)
     builder = TEMPLATE_BUILDERS.get(template_id, TEMPLATE_BUILDERS[DEFAULT_TEMPLATE_ID])
     sections = TEMPLATE_SPECS[template_id]["sections"]
     content = _to_content(r)
-    out_bytes = builder.pdf(content, r.title, sections) if fmt == "pdf" else builder.docx(content, r.title, sections)
+    out_bytes = builder.pdf(content, r.title, sections, style) if fmt == "pdf" else builder.docx(content, r.title, sections, style)
     await log_usage_event(str(user.id), f"download_{fmt}", tenant_id=tenant_of(user),
                           metadata={"resume_id": resume_id, "template_id": template_id})
     return StreamingResponse(
         io.BytesIO(out_bytes), media_type=media,
-        headers={"Content-Disposition": f'attachment; filename="{safe_title}.{fmt}"'},
+        headers={"Content-Disposition": _content_disposition(f"{safe_title}.{fmt}")},
     )
 
 
