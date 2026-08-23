@@ -11,7 +11,11 @@ import dynamic from 'next/dynamic'
 
 // Version history is a rarely-opened drawer — load its code on demand.
 const VersionHistory = dynamic(() => import('@/components/VersionHistory'), { ssr: false })
+import type { Version } from '@/components/VersionHistory'
 import { CATEGORY_NAMES, detectCategory, suggestSkills, popularForCategory } from '@/lib/skillsData'
+import CareerAchievements, { type Achievement } from '@/components/resume-editors/CareerAchievements'
+import ResumeJourney, { type JourneyEvent } from '@/components/resume-editors/ResumeJourney'
+import ScoreTrendChart, { type ScorePoint } from '@/components/resume-editors/ScoreTrendChart'
 // Skill/Experience/.../ResumeContent, uid(), emptyContent() and the section
 // nav config now live in @/lib/resumeContent — shared with the
 // Create-from-Scratch wizard (frontend/app/resumes/create/page.tsx) so both
@@ -122,7 +126,12 @@ export default function EditResumePage() {
   const [aiMsg, setAiMsg] = useState('')
   const [translateLang, setTranslateLang] = useState('es')
   const [centerTab, setCenterTab] = useState<'preview' | 'edit'>('preview')
-  const [rightTab, setRightTab] = useState<'assistant' | 'insights' | 'skillgap' | 'fixes'>('insights')
+  const [rightTab, setRightTab] = useState<'assistant' | 'insights' | 'skillgap' | 'fixes' | 'journey'>('insights')
+  // Phase D (Gamification) — version history reused for the Journey tab
+  // (same GET /api/resumes/{id}/versions endpoint VersionHistory.tsx's
+  // drawer already calls), lazy-loaded only when that tab is opened.
+  const [versions, setVersions] = useState<Version[]>([])
+  const [versionsLoadedFor, setVersionsLoadedFor] = useState<string | null>(null)
   // Phase D — AI apply loop: recommendations, per-recommendation UI state,
   // change history + undo. See docs/SAHICAREER_ATS_INTELLIGENCE_2.md.
   const [recs, setRecs] = useState<PersistedRec[]>([])
@@ -252,6 +261,22 @@ export default function EditResumePage() {
       setChangeHistory(r.history)
     } catch { /* ignore */ }
   }, [])
+
+  // Phase D (Gamification) — Journey tab data, same endpoint/shape as the
+  // History drawer. Lazy: only fetched the first time the tab is opened for
+  // this resume, not on every render (see spec section 23, "avoid
+  // unnecessary API calls").
+  const loadVersions = useCallback(async (rid: string) => {
+    try {
+      setVersions(await api.get<Version[]>(`/api/resumes/${rid}/versions`))
+    } catch { /* ignore — Journey tab just shows the "not enough data yet" state */ }
+    finally { setVersionsLoadedFor(rid) }
+  }, [])
+
+  useEffect(() => {
+    if (rightTab !== 'journey' || !resume) return
+    if (versionsLoadedFor !== resume.id) loadVersions(resume.id)
+  }, [rightTab, resume, versionsLoadedFor, loadVersions])
 
   // After apply/undo, the resume content on the server has actually
   // changed — reload it (not just the score) so the editor/preview reflect
@@ -737,6 +762,70 @@ export default function EditResumePage() {
     return null
   }, [recs, fixes])
 
+  // Phase D (Gamification) — Career Achievements. Every condition below
+  // reads data that's already loaded for other reasons (resume.ats_score,
+  // content, versions, changeHistory, templateId) — nothing new is computed
+  // or persisted, no DB migration. The master spec's illustrative "Created
+  // Europass CV" doesn't map to a real template this product has —
+  // substituted with the actual International template (shared/
+  // template-specs.json) rather than faking a condition that could never
+  // truthfully be met.
+  const achievements: Achievement[] = useMemo(() => {
+    const savedScore = resume?.ats_score ?? null
+    return [
+      { key: 'created', icon: '📄', label: 'Resume Created', done: !!resume },
+      { key: 'first_check', icon: '🎯', label: 'First ATS Check', done: savedScore != null },
+      { key: 'first_project', icon: '🚀', label: 'Added First Project', done: content.projects.length > 0 },
+      { key: 'health_70', icon: '📈', label: 'Reached 70+ Resume Health', done: (savedScore ?? 0) >= 70 },
+      { key: 'health_80', icon: '🏅', label: 'Reached 80+ Resume Health', done: (savedScore ?? 0) >= 80 },
+      { key: 'role_specific', icon: '🎯', label: 'Created a Role-Specific Resume', done: versions.some(v => v.source === 'role_builder') },
+      { key: 'ai_optimized', icon: '🤖', label: 'Completed AI Optimization', done: changeHistory.length > 0 || versions.some(v => v.source === 'ai_upgrade') },
+      { key: 'international', icon: '🌍', label: 'Used the International Template', done: templateId === 'international' },
+    ]
+  }, [resume, content.projects.length, versions, changeHistory, templateId])
+
+  // Phase D (Gamification) — Resume Journey + Score Improvement Graph. Built
+  // ONLY from real, already-persisted data: version snapshots (real
+  // created_at + the canonical ats_score at that point — see
+  // routers/resumes.py::_canonical_ats_score) and real applied-AI-Fix change
+  // history. No event or score is invented; an empty list renders each
+  // component's own honest "not enough data yet" state.
+  const journeyEvents: JourneyEvent[] = useMemo(() => {
+    const events: JourneyEvent[] = []
+    const chronoVersions = [...versions].reverse() // API returns newest-first
+    chronoVersions.forEach((v, i) => {
+      const isFirst = i === 0
+      const label = isFirst ? 'Resume Created'
+        : v.source === 'ai_upgrade' ? 'AI Upgrade Applied'
+        : v.source === 'rollback' ? 'Restored a Previous Version'
+        : v.source === 'role_builder' ? 'Built for a Target Role'
+        : 'Resume Updated'
+      events.push({
+        icon: isFirst ? '🌱' : v.source === 'ai_upgrade' ? '✨' : v.source === 'rollback' ? '↺' : '✎',
+        label, date: v.created_at, score: v.ats_score,
+      })
+    })
+    changeHistory.forEach(h => {
+      events.push({
+        icon: '🤖', label: 'AI Optimization',
+        sub: h.score_delta != null ? `Resume Health ${h.before_score ?? '—'} → ${h.after_score ?? '—'}` : undefined,
+        date: h.created_at, score: h.after_score,
+      })
+    })
+    return events.filter(e => e.date).sort((a, b) => new Date(a.date!).getTime() - new Date(b.date!).getTime())
+  }, [versions, changeHistory])
+
+  const scoreTrendPoints: ScorePoint[] = useMemo(() => {
+    const chronoVersions = [...versions].reverse()
+    return chronoVersions
+      .filter(v => v.ats_score != null)
+      .map((v, i) => ({
+        label: i === 0 ? 'Created' : v.source === 'ai_upgrade' ? 'AI Upgrade' : v.source === 'rollback' ? 'Rollback' : 'Edit',
+        score: v.ats_score as number,
+        date: v.created_at,
+      }))
+  }, [versions])
+
   const topBar = (
     <>
       <button onClick={() => router.push('/dashboard')} className="text-gray-500 hover:text-gray-700 text-sm flex items-center gap-1">
@@ -1033,12 +1122,13 @@ export default function EditResumePage() {
           <div className="flex border-b border-gray-100">
             {([
               ['insights', 'Insights'],
-              ['fixes', `AI Fixes${recs.length ? ` (${recs.length})` : ''}`],
-              ['assistant', 'AI Assistant'],
+              ['fixes', `Fixes${recs.length ? ` (${recs.length})` : ''}`],
+              ['journey', 'Journey'],
+              ['assistant', 'Assistant'],
               ['skillgap', 'Skill Gap'],
             ] as const).map(([t, label]) => (
               <button key={t} onClick={() => setRightTab(t)}
-                className={`flex-1 py-3 text-xs font-medium transition ${
+                className={`flex-1 py-3 text-[11px] font-medium transition ${
                   rightTab === t ? 'text-navy-700 border-b-2 border-navy-600' : 'text-gray-500 hover:text-gray-600'
                 }`}>
                 {label}
@@ -1357,6 +1447,28 @@ export default function EditResumePage() {
                   <div className="mt-2 text-xs text-green-700 bg-green-50 border border-green-100 rounded-lg px-3 py-2">
                     {aiMsg}
                   </div>
+                )}
+              </div>
+            </div>
+          ) : rightTab === 'journey' ? (
+            /* ── Phase D (Gamification): Career Achievements, Resume Journey,
+                 Score Improvement Graph — all built from real, already-loaded
+                 or lazily-fetched data (versions, changeHistory, content,
+                 resume.ats_score). See the achievements/journeyEvents/
+                 scoreTrendPoints useMemo blocks above. ──────────────────── */
+            <div className="flex-1 overflow-y-auto p-4 space-y-5">
+              <CareerAchievements achievements={achievements} />
+
+              <div className="border-t border-gray-100 pt-4">
+                <ScoreTrendChart points={scoreTrendPoints} />
+              </div>
+
+              <div className="border-t border-gray-100 pt-4">
+                <div className="text-xs font-semibold text-gray-800 mb-3">🧭 Resume Journey</div>
+                {versionsLoadedFor !== (resume?.id ?? null) ? (
+                  <p className="text-xs text-gray-400 text-center py-6">Loading your journey…</p>
+                ) : (
+                  <ResumeJourney events={journeyEvents} currentScore={atsScore} />
                 )}
               </div>
             </div>

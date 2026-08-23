@@ -3,7 +3,10 @@
 import { useCallback, useEffect, useState } from 'react'
 import { api } from '@/lib/api'
 
-interface Version {
+// Exported so the Resume Editor's Journey tab (resumes/[id]/edit/page.tsx)
+// can reuse this exact shape for the SAME GET /api/resumes/{id}/versions
+// data, instead of a second, drifting copy of this interface.
+export interface Version {
   id: string
   title: string | null
   ats_score: number | null
