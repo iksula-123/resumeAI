@@ -50,8 +50,20 @@ else:
     # incompatible with asyncpg's prepared-statement cache — disabling it
     # (statement_cache_size=0) is the documented fix. pre_ping handles
     # connections the pooler may have dropped between requests.
+    #
+    # pool_size/max_overflow: DATABASE_URL (.env.local) deliberately targets
+    # Supabase's SESSION-mode pooler (port 5432 — see that file's own
+    # comment for why 6543/transaction-mode was rejected), which caps at
+    # 15 total clients for the whole project, shared with production.
+    # SQLAlchemy's own defaults (pool_size=5, max_overflow=10 = 15) let a
+    # SINGLE local process alone reach that entire ceiling under a normal
+    # request burst (the editor fires several calls close together —
+    # autosave, analyze-editor, AI generation). Capped well below that so
+    # one local dev session can't exhaust the shared pool on its own;
+    # requests queue briefly (default pool_timeout=30s) instead of a 500
+    # if momentarily over budget, which is the safer failure mode here.
     _connect_args = {"statement_cache_size": 0}
-    _engine_kwargs = {"pool_pre_ping": True}
+    _engine_kwargs = {"pool_pre_ping": True, "pool_size": 3, "max_overflow": 2}
 
 engine = create_async_engine(
     DATABASE_URL, echo=False, connect_args=_connect_args, **_engine_kwargs
