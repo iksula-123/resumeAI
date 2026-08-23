@@ -16,6 +16,9 @@ import { CATEGORY_NAMES, detectCategory, suggestSkills, popularForCategory } fro
 import CareerAchievements, { type Achievement } from '@/components/resume-editors/CareerAchievements'
 import ResumeJourney, { type JourneyEvent } from '@/components/resume-editors/ResumeJourney'
 import ScoreTrendChart, { type ScorePoint } from '@/components/resume-editors/ScoreTrendChart'
+import ResumeInsights from '@/components/resume-editors/ResumeInsights'
+import type { InsightCategory } from '@/components/resume-editors/CategoryScoreRow'
+import type { Opportunity } from '@/components/resume-editors/TopOpportunities'
 // Skill/Experience/.../ResumeContent, uid(), emptyContent() and the section
 // nav config now live in @/lib/resumeContent — shared with the
 // Create-from-Scratch wizard (frontend/app/resumes/create/page.tsx) so both
@@ -43,7 +46,11 @@ interface Resume {
 }
 
 /* Phase C — mirrors backend/routers/ats_engine.py's POST /analyze-editor response */
-interface AtsCategory { match: number | null; completeness: number; confidence: string; matched_evidence: string[]; missing_evidence: string[]; reason: string }
+interface AtsCategory {
+  key: string; label: string; applicable: boolean; weight: number
+  match: number | null; completeness: number; confidence: string
+  matched_evidence: string[]; missing_evidence: string[]; reason: string
+}
 interface AtsRecommendation { issue: string; why: string; action: string; impact: string }
 interface AtsEditorResponse {
   scores: { overall: number | null; ats_compatibility: number | null; job_match: number | null; resume_quality: number | null }
@@ -122,10 +129,15 @@ export default function EditResumePage() {
   // job_match stays null (never 0) until a JD has been analyzed.
   const [atsLayers, setAtsLayers] = useState<{ ats_compatibility: number | null; job_match: number | null; resume_quality: number | null } | null>(null)
   const [atsConfidence, setAtsConfidence] = useState<'high' | 'medium' | 'low' | null>(null)
+  // Phase E (Resume Insights) — the SAME per-category data /analyze-editor
+  // already returns (categories.ats_compatibility/resume_quality), just not
+  // previously kept in state. No new endpoint, no new scoring.
+  const [categories, setCategories] = useState<AtsEditorResponse['categories'] | null>(null)
+  const [analyzeError, setAnalyzeError] = useState('')
   const [aiGenerating, setAiGenerating] = useState<string | null>(null)
   const [aiMsg, setAiMsg] = useState('')
   const [translateLang, setTranslateLang] = useState('es')
-  const [centerTab, setCenterTab] = useState<'preview' | 'edit'>('preview')
+  const [centerTab, setCenterTab] = useState<'preview' | 'edit' | 'insights'>('preview')
   const [rightTab, setRightTab] = useState<'assistant' | 'insights' | 'skillgap' | 'fixes' | 'journey'>('insights')
   // Phase D (Gamification) — version history reused for the Journey tab
   // (same GET /api/resumes/{id}/versions endpoint VersionHistory.tsx's
@@ -187,14 +199,20 @@ export default function EditResumePage() {
       setAtsScore(r.scores.overall)
       setAtsLayers(r.scores)
       setAtsConfidence(r.score_confidence)
+      setCategories(r.categories)
+      setAnalyzeError('')
       setBreakdown([
         { label: 'ATS Compatibility', value: r.scores.ats_compatibility ?? 0 },
         { label: 'Resume Quality', value: r.scores.resume_quality ?? 0 },
         ...(r.scores.job_match != null ? [{ label: 'Job Match', value: r.scores.job_match }] : []),
       ])
       setFixes([...r.recommendations.high, ...r.recommendations.medium].map(f => ({ title: f.issue, detail: `${f.why} ${f.action}` })))
-    } catch {
-      /* best-effort — leave the last known score/breakdown in place */
+    } catch (e) {
+      // Resume Insights (Phase E) surfaces this with a retry action; the
+      // rest of the editor keeps behaving as before (best-effort — leave
+      // the last known score/breakdown in place, never show a fabricated
+      // fallback score).
+      setAnalyzeError(e instanceof Error ? e.message : "Resume Health couldn't be recalculated. Your previous score is still available.")
     } finally {
       setAnalyzing(false)
     }
@@ -274,9 +292,12 @@ export default function EditResumePage() {
   }, [])
 
   useEffect(() => {
-    if (rightTab !== 'journey' || !resume) return
+    // Also lazy-loads for centerTab 'insights' (Phase E's Score History
+    // card reuses this same version data) — still fetched at most once per
+    // resume, not on every render.
+    if ((rightTab !== 'journey' && centerTab !== 'insights') || !resume) return
     if (versionsLoadedFor !== resume.id) loadVersions(resume.id)
-  }, [rightTab, resume, versionsLoadedFor, loadVersions])
+  }, [rightTab, centerTab, resume, versionsLoadedFor, loadVersions])
 
   // After apply/undo, the resume content on the server has actually
   // changed — reload it (not just the score) so the editor/preview reflect
@@ -826,6 +847,32 @@ export default function EditResumePage() {
       }))
   }, [versions])
 
+  // Phase E (Resume Insights) — Record<string, AtsCategory> -> InsightCategory[],
+  // for ATSCompatibilityCard/ResumeQualityCard. No value is changed, only
+  // reshaped for rendering.
+  const compatCategoryList: InsightCategory[] = useMemo(
+    () => Object.values(categories?.ats_compatibility ?? {}), [categories])
+  const qualityCategoryList: InsightCategory[] = useMemo(
+    () => Object.values(categories?.resume_quality ?? {}), [categories])
+
+  // Top Opportunities — filters + sorts the SAME category data above
+  // (applicable, scored, below the same 75 "worth fixing" floor
+  // mode_orchestrator._PRIORITY_THRESHOLD already uses), display-ordering
+  // only. No score is computed; `reason` is shown verbatim.
+  const topOpportunities: Opportunity[] = useMemo(() => {
+    const all = [...compatCategoryList, ...qualityCategoryList]
+      .filter(c => c.applicable && c.match != null && c.match < 75)
+      .sort((a, b) => (a.match as number) - (b.match as number))
+    return all.slice(0, 3).map(c => ({ key: c.key, label: c.label, score: Math.round(c.match as number), reason: c.reason }))
+  }, [compatCategoryList, qualityCategoryList])
+
+  // Score History (Phase E, section 12) — earliest real ResumeVersion.
+  // ats_score vs. the current live score. Never a second calculation.
+  const scoreHistoryPrevious = useMemo(() => {
+    const chronoVersions = [...versions].reverse()
+    return chronoVersions.find(v => v.ats_score != null)?.ats_score ?? null
+  }, [versions])
+
   const topBar = (
     <>
       <button onClick={() => router.push('/dashboard')} className="text-gray-500 hover:text-gray-700 text-sm flex items-center gap-1">
@@ -1084,15 +1131,39 @@ export default function EditResumePage() {
         {/* ── CENTER: Preview ───────────────────────────────────── */}
         <div className="flex-1 flex flex-col overflow-hidden bg-[#F0F2F8]">
           <div className="flex items-center justify-center gap-1 py-2 bg-white border-b border-gray-100">
-            {(['preview', 'edit'] as const).map(t => (
+            {(['preview', 'edit', 'insights'] as const).map(t => (
               <button key={t} onClick={() => setCenterTab(t)}
                 className={`px-4 py-1.5 rounded-full text-xs font-medium transition ${
                   centerTab === t ? 'bg-navy-600 text-white' : 'text-gray-500 hover:text-gray-700'
                 }`}>
-                {t.charAt(0).toUpperCase() + t.slice(1)}
+                {t === 'insights' ? 'Resume Insights' : t.charAt(0).toUpperCase() + t.slice(1)}
               </button>
             ))}
           </div>
+          {centerTab === 'insights' ? (
+            /* ── Resume Insights (Phase E) — a wider, read-only view of the
+                 SAME canonical scores/categories the Insights tab already
+                 shows; see components/resume-editors/ResumeInsights.tsx. ── */
+            <div className="flex-1 overflow-y-auto">
+              <ResumeInsights
+                loading={analyzing && atsScore == null}
+                error={analyzeError}
+                onRetry={() => resume && analyzeContent(content, resume.id)}
+                score={atsScore}
+                confidence={atsConfidence}
+                compatScore={atsLayers?.ats_compatibility ?? null}
+                qualityScore={atsLayers?.resume_quality ?? null}
+                compatCategories={compatCategoryList}
+                qualityCategories={qualityCategoryList}
+                completionPct={completion.pct}
+                completionSections={completion.sections}
+                opportunities={topOpportunities}
+                scoreHistoryPrevious={scoreHistoryPrevious}
+                scoreHistoryCurrent={atsScore}
+                onImprove={() => setRightTab('fixes')}
+              />
+            </div>
+          ) : (
           <div className="flex-1 overflow-y-auto p-6 flex justify-center">
             <div className="w-full max-w-[600px] resume-preview-styled">
               {/* Font family/size + spacing are cosmetic-only (never read by
@@ -1114,6 +1185,7 @@ export default function EditResumePage() {
               <ResumeTemplates content={content} template={templateId} />
             </div>
           </div>
+          )}
         </div>
 
         {/* ── RIGHT: ATS + AI panel ─────────────────────────────── */}
