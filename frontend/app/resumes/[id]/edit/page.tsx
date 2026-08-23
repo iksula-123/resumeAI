@@ -19,6 +19,7 @@ import ScoreTrendChart, { type ScorePoint } from '@/components/resume-editors/Sc
 import ResumeInsights from '@/components/resume-editors/ResumeInsights'
 import type { InsightCategory } from '@/components/resume-editors/CategoryScoreRow'
 import type { Opportunity } from '@/components/resume-editors/TopOpportunities'
+import ResumeCopilot, { type CopilotOpportunity, type CopilotChatTurn } from '@/components/resume-editors/ResumeCopilot'
 // Skill/Experience/.../ResumeContent, uid(), emptyContent() and the section
 // nav config now live in @/lib/resumeContent — shared with the
 // Create-from-Scratch wizard (frontend/app/resumes/create/page.tsx) so both
@@ -873,6 +874,69 @@ export default function EditResumePage() {
     return chronoVersions.find(v => v.ats_score != null)?.ats_score ?? null
   }, [versions])
 
+  // Phase F (Resume Copilot) — up to 2 items reused verbatim from the SAME
+  // real category data Resume Insights' Top Opportunities already surfaces
+  // (topOpportunities, above), plus at most 1 zero-AI structural check
+  // (a section that's genuinely empty). No new score, no new AI call, no
+  // invented advice — every action routes to existing functionality.
+  const copilotOpportunities: CopilotOpportunity[] = useMemo(() => {
+    const items: CopilotOpportunity[] = topOpportunities.slice(0, 2).map(o => ({
+      key: `cat-${o.key}`, label: o.label, detail: o.reason,
+      actionLabel: 'Improve', action: () => setRightTab('fixes'),
+    }))
+    const emptySections = [
+      { key: 'projects', label: 'Projects' },
+      { key: 'certifications', label: 'Certifications' },
+      { key: 'achievements', label: 'Achievements' },
+    ] as const
+    const firstEmpty = emptySections.find(s => content[s.key].length === 0)
+    if (firstEmpty && items.length < 3) {
+      const singular = firstEmpty.label.replace(/s$/, '')
+      items.push({
+        key: `empty-${firstEmpty.key}`, label: `${firstEmpty.label} section is empty`,
+        detail: `Add at least one ${singular.toLowerCase()} to strengthen your resume.`,
+        actionLabel: `Add ${singular}`, action: () => setActiveSection(firstEmpty.key),
+      })
+    }
+    return items.slice(0, 3)
+  }, [topOpportunities, content])
+
+  // Ask AI — reuses the existing career-coach endpoint (services/ai.py::
+  // career_copilot via POST /api/ai/copilot). Read-only chat; never writes
+  // to `content`. profile_context is built ONLY from real, already-known
+  // facts (job title, counts, current score) — nothing invented.
+  const [copilotChat, setCopilotChat] = useState<CopilotChatTurn[]>([])
+  const [copilotInput, setCopilotInput] = useState('')
+  const [copilotLoading, setCopilotLoading] = useState(false)
+  const [copilotError, setCopilotError] = useState('')
+
+  const askCopilot = async () => {
+    const message = copilotInput.trim()
+    if (!message || copilotLoading) return
+    setCopilotInput('')
+    setCopilotError('')
+    const nextHistory: CopilotChatTurn[] = [...copilotChat, { role: 'user', content: message }]
+    setCopilotChat(nextHistory)
+    setCopilotLoading(true)
+    try {
+      const profileContext = [
+        content.personalInfo.jobTitle ? `Target role: ${content.personalInfo.jobTitle}.` : '',
+        `${content.experience.length} experience entr${content.experience.length === 1 ? 'y' : 'ies'}, ${content.skills.length} skill(s) listed, ${content.projects.length} project(s).`,
+        atsScore != null ? `Current Resume ATS Health: ${atsScore}/100.` : '',
+      ].filter(Boolean).join(' ')
+      const r = await api.post<{ reply: string; ai: boolean }>('/api/ai/copilot', {
+        message,
+        history: nextHistory.slice(-6).map(t => ({ role: t.role, content: t.content })),
+        profile_context: profileContext,
+      })
+      setCopilotChat(h => [...h, { role: 'assistant', content: r.reply, ai: r.ai }])
+    } catch (e) {
+      setCopilotError(e instanceof Error ? e.message : 'Copilot is temporarily unavailable — your resume and ATS scoring still work.')
+    } finally {
+      setCopilotLoading(false)
+    }
+  }
+
   const topBar = (
     <>
       <button onClick={() => router.push('/dashboard')} className="text-gray-500 hover:text-gray-700 text-sm flex items-center gap-1">
@@ -1160,7 +1224,7 @@ export default function EditResumePage() {
                 opportunities={topOpportunities}
                 scoreHistoryPrevious={scoreHistoryPrevious}
                 scoreHistoryCurrent={atsScore}
-                onImprove={() => setRightTab('fixes')}
+                onImprove={() => { setRightTab('fixes'); setCenterTab('preview') }}
               />
             </div>
           ) : (
@@ -1196,7 +1260,7 @@ export default function EditResumePage() {
               ['insights', 'Insights'],
               ['fixes', `Fixes${recs.length ? ` (${recs.length})` : ''}`],
               ['journey', 'Journey'],
-              ['assistant', 'Assistant'],
+              ['assistant', 'Copilot'],
               ['skillgap', 'Skill Gap'],
             ] as const).map(([t, label]) => (
               <button key={t} onClick={() => setRightTab(t)}
@@ -1545,8 +1609,22 @@ export default function EditResumePage() {
               </div>
             </div>
           ) : rightTab === 'assistant' ? (
-            /* AI Assistant panel */
+            /* AI Assistant / Resume Copilot panel */
             <div className="flex-1 overflow-y-auto p-4 space-y-4">
+              {/* Phase F — Resume Copilot: grounded opportunities + Ask AI.
+                  See components/resume-editors/ResumeCopilot.tsx. */}
+              <ResumeCopilot
+                opportunities={copilotOpportunities}
+                chat={copilotChat}
+                input={copilotInput}
+                onInputChange={setCopilotInput}
+                onSend={askCopilot}
+                loading={copilotLoading}
+                error={copilotError}
+              />
+
+              <div className="text-[11px] font-semibold text-gray-400 uppercase tracking-wide pt-1">More AI Tools</div>
+
               {/* One-click starter draft */}
               <div className="rounded-xl bg-brand-gradient p-3.5 text-white shadow-glow">
                 <div className="text-xs font-semibold mb-1">🚀 Quick Start</div>
