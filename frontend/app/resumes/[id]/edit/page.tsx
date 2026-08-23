@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState, useCallback, useRef } from 'react'
+import { useEffect, useState, useCallback, useMemo, useRef } from 'react'
 import { useParams, useRouter, useSearchParams } from 'next/navigation'
 import { useAuthStore } from '@/lib/store'
 import { api } from '@/lib/api'
@@ -21,12 +21,13 @@ import { CATEGORY_NAMES, detectCategory, suggestSkills, popularForCategory } fro
 import {
   type Skill, type Experience, type Education, type Project, type Certification,
   type Language, type CustomSection, type ResumeContent,
-  RESUME_SECTIONS as SECTIONS, uid, emptyContent,
+  RESUME_SECTIONS as SECTIONS, uid, emptyContent, computeCompletion,
 } from '@/lib/resumeContent'
 import {
   PersonalInfoEditor, ExperienceEditor, EducationEditor, SkillsEditor, ProjectsEditor,
   CertificationsEditor, LanguagesEditor, ListEditor, CustomSectionEditor,
 } from '@/components/resume-editors/SectionEditors'
+import ResumeProgress from '@/components/resume-editors/ResumeProgress'
 
 /* ─── Types ───────────────────────────────────────────────────── */
 
@@ -712,15 +713,29 @@ export default function EditResumePage() {
   }
 
 
-  const sectionComplete = (key: string) => {
-    const c = content as any
-    const v = c[key]
-    if (!v) return false
-    if (typeof v === 'string') return v.trim().length > 10
-    if (Array.isArray(v)) return v.length > 0
-    if (typeof v === 'object') return Object.values(v).some(x => x)
-    return false
-  }
+  // Profile Completeness — ONE definition, shared with the Create-from-Scratch
+  // wizard's completion helper (@/lib/resumeContent's computeCompletion),
+  // instead of a second, differently-thresholded heuristic living here.
+  // Deliberately NOT Resume ATS Health (see docs/ATS_ANALYSIS_MODES.md) —
+  // never sent to or derived from any ATS endpoint.
+  const completion = useMemo(() => computeCompletion(content), [content])
+  const doneMap = useMemo(
+    () => Object.fromEntries(completion.sections.map(s => [s.key, s.done])) as Record<string, boolean>,
+    [completion])
+  const sectionComplete = (key: string) => doneMap[key] ?? false
+
+  // Next Best Action — pick the single highest-priority item from data that's
+  // already computed for the "AI Suggestions" list / "AI Fixes" tab. Prefers
+  // a persisted, addressable recommendation (Phase D `recs`) over the lighter
+  // analyze-editor `fixes`; invents nothing new.
+  const PRIORITY_RANK: Record<string, number> = { high: 0, medium: 1, low: 2 }
+  const nextBestAction = useMemo(() => {
+    const pending = recs.filter(r => r.status === 'pending')
+      .sort((a, b) => PRIORITY_RANK[a.priority] - PRIORITY_RANK[b.priority])
+    if (pending[0]) return { title: pending[0].title, detail: pending[0].reason }
+    if (fixes[0]) return { title: fixes[0].title, detail: fixes[0].detail }
+    return null
+  }, [recs, fixes])
 
   const topBar = (
     <>
@@ -844,6 +859,7 @@ export default function EditResumePage() {
         <div
           style={{ width: sectionsWidth }}
           className="bg-white border-r border-gray-100 flex flex-col overflow-y-auto flex-shrink-0">
+          <ResumeProgress content={content} />
           <div className="px-3 py-3 border-b border-gray-100">
             <div className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Resume Sections</div>
           </div>
@@ -1033,11 +1049,22 @@ export default function EditResumePage() {
           {rightTab === 'fixes' ? (
             /* ── Phase D: AI ATS Agent — recommendation lifecycle ────── */
             <div className="flex-1 overflow-y-auto p-4 space-y-4">
-              {applyBanner && (
-                <div className="text-xs text-navy-700 bg-royal-50 border border-royal-200 rounded-lg px-3 py-2">
-                  {applyBanner}
-                </div>
-              )}
+              {applyBanner && (() => {
+                // Presentation only — applyBanner's TEXT is set entirely by
+                // doApply()/doUndo() from the backend's real before/after
+                // score (never invented here); this just picks a tone.
+                const isImprovement = applyBanner.startsWith('✓') && /\(\+\d/.test(applyBanner)
+                const isError = !applyBanner.startsWith('✓') && !applyBanner.startsWith('↩')
+                return (
+                  <div className={`text-xs rounded-lg px-3 py-2 border ${
+                    isImprovement ? 'text-green-800 bg-green-50 border-green-200'
+                    : isError ? 'text-red-700 bg-red-50 border-red-200'
+                    : 'text-navy-700 bg-royal-50 border-royal-200'}`}>
+                    {isImprovement && <span className="font-semibold">🎉 Nice improvement! </span>}
+                    {applyBanner}
+                  </div>
+                )
+              })()}
 
               <div>
                 <div className="text-xs font-semibold text-gray-800 mb-1">AI-Recommended Fixes</div>
@@ -1165,13 +1192,17 @@ export default function EditResumePage() {
             </div>
           ) : rightTab === 'insights' ? (
             <div className="flex-1 overflow-y-auto">
-              {/* Resume ATS Health — canonical mode_orchestrator.resume_health_mode()
-                  score; resume-only, never blended with Job Match even when a JD is
-                  loaded (Job Match is its own separate number a few lines below). */}
+              {/* Resume Health Card — canonical mode_orchestrator.resume_health_mode()
+                  score (via /api/ats/v2/analyze-editor, unchanged this phase);
+                  resume-only, never blended with Job Match even when a JD is
+                  loaded (Job Match shown as its own row below, from the same
+                  already-computed `breakdown`, never merged into the headline
+                  score). Phase C (UI/UX) — visual redesign only, folds the old
+                  separate "three layers" grid + "Score Breakdown" block into one
+                  card, per the master-phase spec's Resume Health Card. */}
               <div className="px-4 py-4 border-b border-gray-100">
                 <div className="flex items-center justify-between mb-3">
                   <span className="text-sm font-semibold text-gray-800">Resume ATS Health</span>
-                  <button className="text-xs text-gray-500">▲</button>
                 </div>
                 {atsScore == null ? (
                   <div className="flex flex-col items-center py-6 text-xs text-gray-400">
@@ -1179,13 +1210,10 @@ export default function EditResumePage() {
                   </div>
                 ) : (
                   <div className={`flex flex-col items-center py-2 transition-opacity ${analyzing ? 'opacity-60' : ''}`}>
-                    <CircularScore score={atsScore} max={100} size={100} color={atsScore >= 80 ? '#1E7A46' : atsScore >= 60 ? '#F5A623' : '#c0392b'} />
-                    <div className={`text-xs font-medium mt-2 ${atsScore >= 80 ? 'text-green-600' : atsScore >= 60 ? 'text-yellow-600' : 'text-red-600'}`}>
-                      {atsScore >= 80 ? 'Excellent' : atsScore >= 60 ? 'Good' : 'Needs Work'}
+                    <CircularScore score={atsScore} max={100} size={104} color={atsScore >= 80 ? '#1E7A46' : atsScore >= 60 ? '#F5A623' : '#c0392b'} />
+                    <div className={`text-sm font-semibold mt-2 ${atsScore >= 80 ? 'text-green-600' : atsScore >= 60 ? 'text-yellow-600' : 'text-red-600'}`}>
+                      {atsScore >= 85 ? 'Excellent! 🌟' : atsScore >= 70 ? 'Good Progress 🚀' : atsScore >= 50 ? 'Making Progress 💪' : 'Just Getting Started 🌱'}
                     </div>
-                    <p className="text-xs text-gray-500 text-center mt-1">
-                      {atsScore >= 80 ? 'This resume is highly likely to pass ATS.' : 'Add more keywords to improve your score.'}
-                    </p>
                     {atsConfidence && (
                       <span className={`mt-2 text-[10px] font-medium px-2 py-0.5 rounded-full border ${
                         atsConfidence === 'high' ? 'bg-green-50 text-green-700 border-green-200'
@@ -1194,45 +1222,49 @@ export default function EditResumePage() {
                         {atsConfidence} confidence
                       </span>
                     )}
+
+                    {breakdown.length > 0 && (
+                      <div className="w-full mt-4 space-y-2">
+                        {breakdown.map(item => (
+                          <div key={item.label} className="flex items-center justify-between">
+                            <span className="text-xs text-gray-500">{item.label}</span>
+                            <div className="flex items-center gap-2">
+                              <div className="w-24 h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                                <div className="h-full bg-gradient-to-r from-royal-500 to-teal-500 rounded-full" style={{ width: `${item.value}%` }} />
+                              </div>
+                              <span className="text-xs font-medium text-gray-700 w-8 text-right">{item.value}</span>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+
+                    <button onClick={() => setRightTab('fixes')} className="btn-primary w-full mt-4 text-xs py-2">
+                      Improve My Resume
+                    </button>
                   </div>
                 )}
               </div>
 
-              {/* ATS Intelligence 2.0 — three layers (Phase C) */}
-              {atsLayers && (
-                <div className="px-4 py-4 border-b border-gray-100 grid grid-cols-3 gap-2 text-center">
-                  {([
-                    ['ats_compatibility', 'ATS Compat.'],
-                    ['job_match', 'Job Match'],
-                    ['resume_quality', 'Quality'],
-                  ] as const).map(([key, label]) => {
-                    const v = atsLayers[key]
-                    return (
-                      <div key={key} className="rounded-lg bg-gray-50 py-2">
-                        <div className="text-sm font-bold text-gray-800">{v == null ? '—' : v}</div>
-                        <div className="text-[10px] text-gray-500">{label}</div>
-                      </div>
-                    )
-                  })}
-                </div>
-              )}
-
-              {/* Score Breakdown */}
-              {breakdown.length > 0 && (
+              {/* Next Best Action — the single highest-priority item from the
+                  SAME already-computed data the "AI Suggestions" list below and
+                  the "AI Fixes" tab use (persisted recommendations first, the
+                  lighter analyze-editor fix as a fallback). Invents no advice;
+                  "Improve This" only switches to the AI Fixes tab where the
+                  real apply/reparse/rescore loop lives — no score change is
+                  ever claimed here, only after a real apply (see applyBanner). */}
+              {nextBestAction && (
                 <div className="px-4 py-4 border-b border-gray-100">
-                  <div className="text-xs font-semibold text-gray-800 mb-3">Score Breakdown</div>
-                  <div className="space-y-2">
-                    {breakdown.map(item => (
-                      <div key={item.label} className="flex items-center justify-between">
-                        <span className="text-xs text-gray-500">{item.label}</span>
-                        <div className="flex items-center gap-2">
-                          <div className="w-24 h-1.5 bg-gray-100 rounded-full overflow-hidden">
-                            <div className="h-full bg-gradient-to-r from-royal-500 to-teal-500 rounded-full" style={{ width: `${item.value}%` }} />
-                          </div>
-                          <span className="text-xs font-medium text-gray-700 w-8 text-right">{item.value}</span>
-                        </div>
-                      </div>
-                    ))}
+                  <div className="text-xs font-semibold text-gray-800 mb-2">🎯 Next Best Action</div>
+                  <div className="rounded-xl bg-gradient-to-br from-royal-50 to-teal-50 border border-royal-100 p-3">
+                    <div className="text-sm font-medium text-gray-800">{nextBestAction.title}</div>
+                    {nextBestAction.detail && (
+                      <p className="text-xs text-gray-600 mt-1">{nextBestAction.detail}</p>
+                    )}
+                    <button onClick={() => setRightTab('fixes')}
+                      className="mt-2.5 text-xs font-medium text-navy-700 bg-white border border-royal-200 rounded-lg px-3 py-1.5 hover:bg-royal-50 transition">
+                      Improve This →
+                    </button>
                   </div>
                 </div>
               )}
