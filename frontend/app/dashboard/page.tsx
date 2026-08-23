@@ -122,7 +122,7 @@ export default function DashboardPage() {
   const nextActions: Action[] = (() => {
     const out: Action[] = []
     if (!loading && resumes.length === 0) {
-      out.push({ icon: '🚀', title: 'Create your first resume', desc: 'Build an ATS-ready resume with AI in minutes', href: '/resumes/new', cta: 'Get started', tone: 'from-royal-500 to-teal-500' })
+      out.push({ icon: '🚀', title: 'Create your first resume', desc: 'Build an ATS-ready resume with AI in minutes', href: '/resumes/choose', cta: 'Get started', tone: 'from-royal-500 to-teal-500' })
     } else {
       const weakest = [...resumes].sort((a, b) => (a.ats_score || 0) - (b.ats_score || 0))[0]
       if (weakest && (weakest.ats_score == null || weakest.ats_score < 75)) {
@@ -231,11 +231,8 @@ export default function DashboardPage() {
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-xl font-bold text-gray-900 font-display">My Resumes</h2>
               <div className="flex gap-2">
-                <button onClick={() => router.push('/resumes/build')} className="btn-primary text-sm">
-                  <span>✨</span> Build from Role
-                </button>
-                <button onClick={() => router.push('/resumes/new')} className="text-sm px-3 py-2 rounded-lg border border-gray-200 text-gray-700 hover:bg-gray-50 transition">
-                  Blank resume
+                <button onClick={() => router.push('/resumes/choose')} className="btn-primary text-sm">
+                  <span>+</span> Create Resume
                 </button>
               </div>
             </div>
@@ -249,7 +246,7 @@ export default function DashboardPage() {
                 <div className="text-5xl mb-4">📄</div>
                 <h3 className="text-lg font-semibold text-gray-800 mb-2 font-display">No resumes yet</h3>
                 <p className="text-gray-500 text-sm mb-6">Create your first AI-powered resume in minutes</p>
-                <button onClick={() => router.push('/resumes/new')} className="btn-primary">Create Your First Resume</button>
+                <button onClick={() => router.push('/resumes/choose')} className="btn-primary">Create Your First Resume</button>
               </div>
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">

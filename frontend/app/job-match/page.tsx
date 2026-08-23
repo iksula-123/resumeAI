@@ -184,7 +184,7 @@ export default function JobMatchPage() {
                 <div className="h-10 rounded-xl bg-gray-100 shimmer" />
               ) : resumes.length === 0 ? (
                 <div className="text-sm text-gray-500">
-                  No resumes yet. <button onClick={() => router.push('/resumes/new')} className="text-navy-600 hover:underline">Create one</button>.
+                  No resumes yet. <button onClick={() => router.push('/resumes/choose')} className="text-navy-600 hover:underline">Create one</button>.
                 </div>
               ) : (
                 <select value={resumeId} onChange={e => { setResumeId(e.target.value); setResult(null) }} className="input-premium">

@@ -54,20 +54,14 @@ export default function Sidebar({ open = true, onClose }: { open?: boolean; onCl
         </div>
       </div>
 
-      {/* Create buttons */}
-      <div className="px-3 py-3 space-y-2">
+      {/* Create button */}
+      <div className="px-3 py-3">
         <button
-          onClick={() => { onClose?.(); router.push('/resumes/build') }}
+          onClick={() => { onClose?.(); router.push('/resumes/choose') }}
           className="btn-primary w-full text-sm py-2.5"
         >
-          <span className="text-base leading-none">✨</span>
-          Build from Role
-        </button>
-        <button
-          onClick={() => { onClose?.(); router.push('/resumes/new') }}
-          className="w-full text-sm py-2 rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50 transition"
-        >
-          Blank resume
+          <span className="text-base leading-none">+</span>
+          Create Resume
         </button>
       </div>
 

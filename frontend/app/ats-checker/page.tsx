@@ -674,7 +674,7 @@ export default function AtsCheckerPage() {
                 <span className="text-2xl">📄</span>
                 <p className="text-sm text-gray-600">Create or upload a resume first</p>
                 <div className="flex gap-2">
-                  <button onClick={() => router.push('/resumes/new')} className="btn-primary text-xs !min-h-0 px-4 py-2">Create Resume</button>
+                  <button onClick={() => router.push('/resumes/choose')} className="btn-primary text-xs !min-h-0 px-4 py-2">Create Resume</button>
                   <button onClick={() => router.push('/ai-upgrade')} className="btn-secondary text-xs !min-h-0 px-4 py-2">Upload Resume</button>
                 </div>
               </div>
