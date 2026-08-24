@@ -6,7 +6,7 @@ import uuid
 from datetime import datetime
 from zoneinfo import ZoneInfo
 
-from sqlalchemy import select, func
+from sqlalchemy import select, func, or_
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from models import Event, EventAttendee, Profile
@@ -22,10 +22,15 @@ def _event_to_dict(e: Event, *, attendee_count: int = 0, is_registered: bool = F
     }
 
 
-async def list_events(db: AsyncSession, viewer_id: uuid.UUID, *, upcoming_only: bool = True) -> list[dict]:
+async def list_events(db: AsyncSession, viewer_id: uuid.UUID, *, upcoming_only: bool = True,
+                        tenant_id: uuid.UUID | None = None) -> list[dict]:
+    # Phase 1A: same "NULL = global" convention as mentor_categories/programs
+    # — see programs.py::list_programs for the rationale.
     query = select(Event).where(Event.deleted_at.is_(None))
     if upcoming_only:
         query = query.where(Event.event_date >= datetime.now(ZoneInfo("UTC")))
+    if tenant_id is not None:
+        query = query.where(or_(Event.tenant_id == tenant_id, Event.tenant_id.is_(None)))
     rows = (await db.execute(query.order_by(Event.event_date.asc()))).scalars().all()
 
     my_registrations = set((await db.execute(
@@ -38,8 +43,12 @@ async def list_events(db: AsyncSession, viewer_id: uuid.UUID, *, upcoming_only: 
     return [_event_to_dict(e, attendee_count=counts.get(e.id, 0), is_registered=e.id in my_registrations) for e in rows]
 
 
-async def get_event(db: AsyncSession, event_id: uuid.UUID, viewer_id: uuid.UUID) -> dict:
-    e = (await db.execute(select(Event).where(Event.id == event_id, Event.deleted_at.is_(None)))).scalar_one_or_none()
+async def get_event(db: AsyncSession, event_id: uuid.UUID, viewer_id: uuid.UUID,
+                     tenant_id: uuid.UUID | None = None) -> dict:
+    query = select(Event).where(Event.id == event_id, Event.deleted_at.is_(None))
+    if tenant_id is not None:
+        query = query.where(or_(Event.tenant_id == tenant_id, Event.tenant_id.is_(None)))
+    e = (await db.execute(query)).scalar_one_or_none()
     if e is None:
         raise BookingNotFoundError("Event not found")
     count = (await db.execute(select(func.count()).select_from(EventAttendee).where(EventAttendee.event_id == event_id))).scalar() or 0

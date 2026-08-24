@@ -13,6 +13,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from database import get_db
 from models import Resume, User
 from services.apikeys import require_api_key
+from services.deps import tenant_id_of
 from routers.resumes import _to_dict, _load_full, _RESUME_LOADERS
 
 router = APIRouter(prefix="/api/v1", tags=["Public API v1"])
@@ -32,7 +33,7 @@ async def v1_me(user: User = Depends(require_api_key)):
 @router.get("/resumes")
 async def v1_list_resumes(db: AsyncSession = Depends(get_db), user: User = Depends(require_api_key)):
     res = await db.execute(
-        select(Resume).where(Resume.user_id == user.id)
+        select(Resume).where(Resume.user_id == user.id, Resume.tenant_id == tenant_id_of(user))
         .options(*_RESUME_LOADERS).order_by(Resume.updated_at.desc())
     )
     return {"data": [_to_dict(r) for r in res.scalars().unique().all()]}
@@ -45,6 +46,6 @@ async def v1_get_resume(resume_id: str, db: AsyncSession = Depends(get_db), user
     except ValueError:
         raise HTTPException(status_code=404, detail="Resume not found")
     r = await _load_full(db, rid)
-    if not r or r.user_id != user.id:
+    if not r or r.user_id != user.id or r.tenant_id != tenant_id_of(user):
         raise HTTPException(status_code=404, detail="Resume not found")
     return {"data": _to_dict(r)}

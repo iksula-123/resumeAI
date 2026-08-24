@@ -7,7 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from database import get_db
 from models import ApiKey, User
-from services.deps import get_current_user
+from services.deps import get_current_user, tenant_id_of
 from services.apikeys import generate_key, hash_key, prefix_of
 from services.audit import record as audit
 
@@ -32,7 +32,9 @@ def _dict(k: ApiKey) -> dict:
 @router.get("/")
 async def list_keys(db: AsyncSession = Depends(get_db), user: User = Depends(get_current_user)):
     res = await db.execute(
-        select(ApiKey).where(ApiKey.user_id == user.id).order_by(ApiKey.created_at.desc())
+        select(ApiKey)
+        .where(ApiKey.user_id == user.id, ApiKey.tenant_id == tenant_id_of(user))
+        .order_by(ApiKey.created_at.desc())
     )
     return [_dict(k) for k in res.scalars().all()]
 
@@ -40,7 +42,8 @@ async def list_keys(db: AsyncSession = Depends(get_db), user: User = Depends(get
 @router.post("/", status_code=201)
 async def create_key(body: KeyCreate, db: AsyncSession = Depends(get_db), user: User = Depends(get_current_user)):
     raw = generate_key()
-    rec = ApiKey(user_id=user.id, name=body.name or "API Key", key_prefix=prefix_of(raw), key_hash=hash_key(raw))
+    rec = ApiKey(user_id=user.id, tenant_id=tenant_id_of(user), name=body.name or "API Key",
+                 key_prefix=prefix_of(raw), key_hash=hash_key(raw))
     db.add(rec)
     await db.commit()
     await db.refresh(rec)
@@ -57,7 +60,7 @@ async def revoke_key(key_id: str, db: AsyncSession = Depends(get_db), user: User
     except ValueError:
         raise HTTPException(status_code=404, detail="Key not found")
     rec = (await db.execute(select(ApiKey).where(ApiKey.id == kid))).scalar_one_or_none()
-    if not rec or rec.user_id != user.id:
+    if not rec or rec.user_id != user.id or rec.tenant_id != tenant_id_of(user):
         raise HTTPException(status_code=404, detail="Key not found")
     rec.revoked = True
     await db.commit()

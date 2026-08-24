@@ -61,6 +61,7 @@ def _mentor_to_dict(m: Mentor) -> dict:
 async def list_mentors(
     db: AsyncSession,
     *,
+    tenant_id: uuid.UUID | None = None,
     search: str = "",
     category_slug: str | None = None,
     skills: list[str] | None = None,
@@ -73,6 +74,11 @@ async def list_mentors(
     page: int = 1,
     page_size: int = 12,
 ) -> dict:
+    """Phase 1A: tenant_id scopes the marketplace to the caller's own
+    tenant (unlike mentor_categories, a mentor row's tenant_id has no
+    "NULL = global" meaning — see models.py — so this is a strict equality
+    filter, applied only when a tenant_id is actually given, matching the
+    existing pattern of every other optional filter here)."""
     page = max(1, page)
     page_size = max(1, min(page_size, MAX_PAGE_SIZE))
 
@@ -120,6 +126,9 @@ async def list_mentors(
     if country:
         query = query.where(Mentor.country.ilike(country))
 
+    if tenant_id is not None:
+        query = query.where(Mentor.tenant_id == tenant_id)
+
     if min_experience is not None:
         query = query.where(Mentor.years_experience >= min_experience)
 
@@ -149,19 +158,25 @@ async def list_mentors(
     }
 
 
-async def list_categories(db: AsyncSession) -> list[dict]:
-    rows = (await db.execute(
-        select(MentorCategory)
-        .where(MentorCategory.is_active.is_(True))
-        .order_by(MentorCategory.sort_order, MentorCategory.name)
-    )).scalars().all()
+async def list_categories(db: AsyncSession, tenant_id: uuid.UUID | None = None) -> list[dict]:
+    """Phase 1A: mentor_categories.tenant_id IS NULL means GLOBAL (visible to
+    every tenant) by explicit design — see supabase/migrations/0006's own
+    comment. So this returns tenant_id-matching rows PLUS every NULL row,
+    never NULL-only or tenant-only. Never "fixed" to a strict equality
+    filter — that would break every existing global category."""
+    query = select(MentorCategory).where(MentorCategory.is_active.is_(True))
+    if tenant_id is not None:
+        query = query.where(or_(MentorCategory.tenant_id == tenant_id, MentorCategory.tenant_id.is_(None)))
+    rows = (await db.execute(query.order_by(MentorCategory.sort_order, MentorCategory.name))).scalars().all()
     return [{"id": str(c.id), "name": c.name, "slug": c.slug, "icon": c.icon} for c in rows]
 
 
-async def list_filter_options(db: AsyncSession) -> dict:
+async def list_filter_options(db: AsyncSession, tenant_id: uuid.UUID | None = None) -> dict:
     """Distinct skills/languages/countries actually present among approved
     mentors — populated from real data, never a static list."""
     approved_mentor_ids = select(Mentor.id).where(Mentor.status == "approved", Mentor.deleted_at.is_(None))
+    if tenant_id is not None:
+        approved_mentor_ids = approved_mentor_ids.where(Mentor.tenant_id == tenant_id)
 
     skills = (await db.execute(
         select(MentorSkill.skill).where(MentorSkill.mentor_id.in_(approved_mentor_ids)).distinct()
@@ -308,10 +323,12 @@ async def _compute_upcoming_slots(db: AsyncSession, mentor_id: uuid.UUID, mentor
     return slots
 
 
-async def get_mentor(db: AsyncSession, mentor_id: uuid.UUID) -> dict | None:
+async def get_mentor(db: AsyncSession, mentor_id: uuid.UUID, tenant_id: uuid.UUID | None = None) -> dict | None:
+    query = select(Mentor).where(Mentor.id == mentor_id, Mentor.deleted_at.is_(None))
+    if tenant_id is not None:
+        query = query.where(Mentor.tenant_id == tenant_id)
     mentor = (await db.execute(
-        select(Mentor)
-        .where(Mentor.id == mentor_id, Mentor.deleted_at.is_(None))
+        query
         .options(
             selectinload(Mentor.profile),
             selectinload(Mentor.skills),

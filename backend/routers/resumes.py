@@ -26,7 +26,7 @@ from models import (
     Resume, Experience, Education, Skill, Project, Certification, Language, User,
     ResumeVersion, CustomSection,
 )
-from services.deps import get_current_user
+from services.deps import get_current_user, tenant_id_of
 from services.webhooks import dispatch
 from services.audit import record as audit
 from services.usage import log_usage_event, tenant_of
@@ -242,13 +242,29 @@ async def _load_full(db: AsyncSession, rid: uuid.UUID) -> Optional[Resume]:
 
 
 async def _get_owned(db: AsyncSession, resume_id: str, user: User) -> Resume:
+    """The single ownership gate every resume-scoped endpoint below goes
+    through (get/put/delete/duplicate/versions/download/share/change-template).
+
+    Phase 1A: requires BOTH user ownership AND tenant match — not tenant
+    instead of user, both (a guessed/leaked resume_id from another tenant's
+    user is rejected even though UUIDs never collide across tenants, closing
+    the gap for any future query that might filter by resume_id alone).
+    Admin keeps its existing, unchanged platform-wide bypass — this mirrors
+    exactly the bypass that already existed for user_id, so admin's
+    cross-tenant access is neither newly granted nor newly restricted.
+    Same 404-not-403 behavior as before: never reveal whether a resource
+    exists in another tenant.
+    """
     try:
         rid = uuid.UUID(resume_id)
     except ValueError:
         raise HTTPException(status_code=404, detail="Resume not found")
     r = await _load_full(db, rid)
-    if not r or (r.user_id != user.id and not user.is_admin):
+    if not r:
         raise HTTPException(status_code=404, detail="Resume not found")
+    if not user.is_admin:
+        if r.user_id != user.id or r.tenant_id != tenant_id_of(user):
+            raise HTTPException(status_code=404, detail="Resume not found")
     return r
 
 
@@ -274,8 +290,17 @@ def _version_dict(v: ResumeVersion) -> dict:
     }
 
 
-async def _snapshot(db: AsyncSession, r: Resume, user_id, source: str, throttle: bool = False) -> None:
-    """Save a point-in-time snapshot of the resume; throttle + prune old ones."""
+async def _snapshot(db: AsyncSession, r: Resume, user_id, source: str, throttle: bool = False,
+                     tenant_id=None) -> None:
+    """Save a point-in-time snapshot of the resume; throttle + prune old ones.
+
+    tenant_id defaults to the resume's own tenant_id when not passed
+    explicitly — the resume was already loaded through _get_owned (or just
+    created in the caller's own tenant), so r.tenant_id is always correct
+    and available without every call site needing to thread the user object
+    through. Never left unset: an explicit value is always used, matching
+    the "never rely on the DB default" rule applied everywhere else in 1A.
+    """
     if throttle:
         res = await db.execute(
             select(ResumeVersion.created_at)
@@ -290,7 +315,8 @@ async def _snapshot(db: AsyncSession, r: Resume, user_id, source: str, throttle:
                 return
 
     db.add(ResumeVersion(
-        resume_id=r.id, user_id=user_id, title=r.title, template_id=r.template_id,
+        resume_id=r.id, user_id=user_id, tenant_id=tenant_id if tenant_id is not None else r.tenant_id,
+        title=r.title, template_id=r.template_id,
         content=_to_content(r), ats_score=r.ats_score, source=source,
     ))
     await db.flush()
@@ -308,8 +334,12 @@ async def _snapshot(db: AsyncSession, r: Resume, user_id, source: str, throttle:
 # ── endpoints ─────────────────────────────────────────────────────────────────
 @router.get("/")
 async def list_resumes(db: AsyncSession = Depends(get_db), user: User = Depends(get_current_user)):
+    # Phase 1A: user_id already fully determines "my resumes" (a UUID never
+    # collides across tenants) — tenant_id is added as a second, independent
+    # filter anyway, per the approved architecture ("we need BOTH"), so a
+    # bug in the user_id clause alone can never leak another tenant's rows.
     result = await db.execute(
-        select(Resume).where(Resume.user_id == user.id)
+        select(Resume).where(Resume.user_id == user.id, Resume.tenant_id == tenant_id_of(user))
         .options(*_RESUME_LOADERS).order_by(Resume.updated_at.desc())
     )
     return [_to_dict(r) for r in result.scalars().unique().all()]
@@ -327,6 +357,7 @@ async def create_resume(
     # _canonical_ats_score).
     r = Resume(
         user_id=user.id,
+        tenant_id=tenant_id_of(user),
         title=body.title or "Untitled Resume",
         template_id=body.template_id or "modern",
         ats_score=_canonical_ats_score(body.content or {}),
@@ -408,6 +439,7 @@ async def duplicate_resume(
     content = _to_content(src)
     copy = Resume(
         user_id=user.id,
+        tenant_id=tenant_id_of(user),
         title=f"{src.title} (Copy)",
         template_id=src.template_id,
         ats_score=src.ats_score,

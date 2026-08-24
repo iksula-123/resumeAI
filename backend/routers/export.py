@@ -44,11 +44,11 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from database import get_db
-from models import Resume
+from models import Resume, Profile
 from services.auth import verify_token
 from services.storage import upload_bytes
 from services.webhooks import dispatch
-from services.usage import log_usage_event
+from services.usage import log_usage_event, PILOT_TENANT_ID
 
 router = APIRouter(prefix="/api/export", tags=["Export"])
 security = HTTPBearer()
@@ -174,14 +174,25 @@ async def _resolve_template_id(req: ExportRequest, db: AsyncSession, user) -> st
         except ValueError:
             raise HTTPException(status_code=404, detail="Resume not found")
         row = (await db.execute(
-            select(Resume.template_id, Resume.user_id).where(Resume.id == rid)
+            select(Resume.template_id, Resume.user_id, Resume.tenant_id).where(Resume.id == rid)
         )).first()
         # NOTE: this router's _auth/verify_token returns the raw Supabase auth
         # user (id is a str), unlike services/deps.py::get_current_user (used
         # elsewhere) which returns our Profile row (id is a uuid.UUID) — so
         # this comparison must be string-normalized on both sides, or a UUID
         # vs str mismatch makes every resume look "not owned" by its own owner.
-        if not row or (str(row.user_id) != str(user.id) and not getattr(user, "is_admin", False)):
+        if not row:
+            raise HTTPException(status_code=404, detail="Resume not found")
+        if str(row.user_id) != str(user.id) and not getattr(user, "is_admin", False):
+            raise HTTPException(status_code=404, detail="Resume not found")
+        # Phase 1A: same raw-Supabase-user situation as above means no
+        # tenant_id is available on `user` here either — resolve it the same
+        # lightweight, read-only way as routers/ai.py::_auth.
+        caller_tenant = (await db.execute(
+            select(Profile.tenant_id).where(Profile.id == uuid.UUID(str(user.id)))
+        )).scalar_one_or_none()
+        caller_tenant = str(caller_tenant) if caller_tenant else PILOT_TENANT_ID
+        if str(row.tenant_id) != caller_tenant and not getattr(user, "is_admin", False):
             raise HTTPException(status_code=404, detail="Resume not found")
         tid = row.template_id or DEFAULT_TEMPLATE_ID
         if tid not in TEMPLATE_SPECS:

@@ -5,7 +5,11 @@ Flow:
   1. Bearer token verified against the identity provider (Supabase) via verify_token
   2. The user is mirrored into our local DB (created on first sight) with a role
   3. Role is derived from ADMIN_EMAILS env on first creation / promotion
-  4. Endpoints depend on get_current_user (any logged-in user) or require_admin
+  4. tenant_id is resolved server-side from profiles.tenant_id (Phase 1A —
+     multi-tenant guardrails) and attached to the same user object every
+     router already receives via get_current_user — never trust a client-
+     supplied tenant value (no header/query/body field for it exists).
+  5. Endpoints depend on get_current_user (any logged-in user) or require_admin
 """
 import os
 import uuid
@@ -19,6 +23,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from database import get_db
 from models import User, ROLE_USER, ROLE_ADMIN
 from services.auth import verify_token
+from services.usage import PILOT_TENANT_ID
 
 security = HTTPBearer()
 
@@ -69,7 +74,18 @@ async def get_current_user(
     db_user = result.scalar_one_or_none()
 
     if db_user is None:
-        # First time we see this identity → auto-create the profile row
+        # First time we see this identity → auto-create the profile row.
+        # tenant_id is set EXPLICITLY here, never left to the DB column
+        # DEFAULT: profiles.tenant_id is a plain, nullable SQLAlchemy Column
+        # with no client-side default, so an ORM INSERT that doesn't set it
+        # sends an explicit NULL — which overrides a DB-level DEFAULT (a
+        # DEFAULT only applies when a column is omitted from the INSERT, not
+        # when NULL is given explicitly). This was found actually happening
+        # in production data during the Phase 1A audit (see migration
+        # 0014's comment) and is also the only way this works correctly on
+        # local SQLite dev, which has no DB-level default at all. Every
+        # profile is the pilot tenant today — no tenant-selection logic is
+        # introduced here, matching current single-tenant behavior exactly.
         role = ROLE_ADMIN if email in admins else ROLE_USER
         db_user = User(
             id=user_id,
@@ -77,6 +93,7 @@ async def get_current_user(
             full_name=_full_name(auth_user),
             avatar_url=_avatar_url(auth_user),
             role=role,
+            tenant_id=uuid.UUID(PILOT_TENANT_ID),
             last_login=datetime.now(timezone.utc),
         )
         db.add(db_user)
@@ -91,6 +108,12 @@ async def get_current_user(
             db_user.full_name = _full_name(auth_user)
         if not db_user.avatar_url:
             db_user.avatar_url = _avatar_url(auth_user)
+        # Self-heal any existing row a prior instance of the bug above left
+        # without a tenant (the one-time DB backfill in migration 0014
+        # already fixed every row that existed at that point — this is
+        # defense-in-depth so the condition can never silently recur).
+        if db_user.tenant_id is None:
+            db_user.tenant_id = uuid.UUID(PILOT_TENANT_ID)
         db_user.last_login = datetime.now(timezone.utc)
         await db.commit()
         await db.refresh(db_user)
@@ -106,3 +129,17 @@ async def require_admin(user: User = Depends(get_current_user)) -> User:
     if not user.is_admin:
         raise HTTPException(status_code=403, detail="Admin access required")
     return user
+
+
+def tenant_id_of(user: User) -> uuid.UUID:
+    """The authenticated user's tenant, as a real uuid.UUID for direct use in
+    an ORM `.where(Model.tenant_id == tenant_id_of(user))` filter clause.
+
+    get_current_user() above always sets/self-heals profiles.tenant_id, so
+    `user.tenant_id` should never be None by the time a router sees it — the
+    PILOT_TENANT_ID fallback here is defense-in-depth only, mirroring
+    services.usage.tenant_of() (which does the same for cost-attribution
+    logging; this is the query-filtering counterpart). Never derived from
+    any client-supplied value — always the server-resolved identity.
+    """
+    return user.tenant_id if user.tenant_id else uuid.UUID(PILOT_TENANT_ID)

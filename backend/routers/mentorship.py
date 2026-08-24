@@ -17,7 +17,7 @@ from services import events as events_svc
 from services import tasks as tasks_svc
 from services import platform_feedback as pf_svc
 from services import privacy_requests as pr_svc
-from services.deps import get_current_user, require_admin
+from services.deps import get_current_user, require_admin, tenant_id_of
 
 router = APIRouter(prefix="/api/mentorship", tags=["Mentorship"])
 
@@ -47,6 +47,7 @@ async def list_mentors(
 ):
     return await svc.list_mentors(
         db,
+        tenant_id=tenant_id_of(user),
         search=search,
         category_slug=category,
         skills=[s.strip() for s in skills.split(",") if s.strip()] if skills else None,
@@ -66,7 +67,7 @@ async def get_categories(
     db: AsyncSession = Depends(get_db),
     user: User = Depends(get_current_user),
 ):
-    return {"categories": await svc.list_categories(db)}
+    return {"categories": await svc.list_categories(db, tenant_id=tenant_id_of(user))}
 
 
 @router.get("/filters")
@@ -74,7 +75,7 @@ async def get_filter_options(
     db: AsyncSession = Depends(get_db),
     user: User = Depends(get_current_user),
 ):
-    return await svc.list_filter_options(db)
+    return await svc.list_filter_options(db, tenant_id=tenant_id_of(user))
 
 
 @router.get("/mentors/{mentor_id}")
@@ -87,7 +88,7 @@ async def get_mentor(
         mid = uuid.UUID(mentor_id)
     except ValueError:
         raise HTTPException(status_code=404, detail="Mentor not found")
-    mentor = await svc.get_mentor(db, mid)
+    mentor = await svc.get_mentor(db, mid, tenant_id=tenant_id_of(user))
     if mentor is None:
         raise HTTPException(status_code=404, detail="Mentor not found")
     return mentor
@@ -796,14 +797,14 @@ class ProgramJoinRequest(BaseModel):
 
 @router.get("/programs")
 async def list_programs(db: AsyncSession = Depends(get_db), user: User = Depends(get_current_user)):
-    return {"programs": await programs_svc.list_programs(db, user.id)}
+    return {"programs": await programs_svc.list_programs(db, user.id, tenant_id=tenant_id_of(user))}
 
 
 @router.get("/programs/{program_id}")
 async def get_program(program_id: str, db: AsyncSession = Depends(get_db), user: User = Depends(get_current_user)):
     pid = _uuid_or_404(program_id, "Program")
     try:
-        return await programs_svc.get_program(db, pid, user.id)
+        return await programs_svc.get_program(db, pid, user.id, tenant_id=tenant_id_of(user))
     except svc.BookingNotFoundError as exc:
         raise HTTPException(status_code=404, detail=str(exc))
 
@@ -835,14 +836,14 @@ async def leave_program(program_id: str, db: AsyncSession = Depends(get_db), use
 
 @router.get("/events")
 async def list_events(upcoming_only: bool = True, db: AsyncSession = Depends(get_db), user: User = Depends(get_current_user)):
-    return {"events": await events_svc.list_events(db, user.id, upcoming_only=upcoming_only)}
+    return {"events": await events_svc.list_events(db, user.id, upcoming_only=upcoming_only, tenant_id=tenant_id_of(user))}
 
 
 @router.get("/events/{event_id}")
 async def get_event(event_id: str, db: AsyncSession = Depends(get_db), user: User = Depends(get_current_user)):
     eid = _uuid_or_404(event_id, "Event")
     try:
-        return await events_svc.get_event(db, eid, user.id)
+        return await events_svc.get_event(db, eid, user.id, tenant_id=tenant_id_of(user))
     except svc.BookingNotFoundError as exc:
         raise HTTPException(status_code=404, detail=str(exc))
 

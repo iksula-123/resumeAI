@@ -1,10 +1,15 @@
+import uuid
 from typing import Any, Union
 from fastapi import APIRouter, Depends, Request
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
 from pydantic import BaseModel, field_validator
 
+from database import get_db
+from models import Profile
 from services.auth import verify_token
-from services.usage import set_usage_context
+from services.usage import set_usage_context, PILOT_TENANT_ID
 from services.ai import (
     generate_bullets, enhance_bullet, generate_summary, generate_cover_letter,
     suggest_skills, generate_interview_questions, answer_feedback, sample_answer,
@@ -16,11 +21,24 @@ router = APIRouter(prefix="/api/ai", tags=["AI"])
 security = HTTPBearer()
 
 
-async def _auth(request: Request, c: HTTPAuthorizationCredentials = Depends(security)):
+async def _auth(request: Request, c: HTTPAuthorizationCredentials = Depends(security),
+                 db: AsyncSession = Depends(get_db)):
+    """Unchanged identity check (still verify_token, still the raw Supabase
+    user — this router intentionally never went through get_current_user's
+    local-DB mirroring, and that is NOT altered here). The added lookup
+    below is read-only and used ONLY to tag AIUsage.tenant_id correctly
+    (Phase 1A) — it changes what gets logged, never who is authenticated or
+    what they're authorized to do."""
     user = await verify_token(c.credentials)
     # tag AI token usage with the caller + which feature (last path segment)
     feature = request.url.path.rstrip("/").rsplit("/", 1)[-1] or "ai"
-    set_usage_context(str(user.id), feature)
+    tenant_id = None
+    try:
+        row = (await db.execute(select(Profile.tenant_id).where(Profile.id == uuid.UUID(str(user.id))))).first()
+        tenant_id = str(row[0]) if row and row[0] else None
+    except Exception:
+        pass  # best-effort — set_usage_context's own fallback covers this
+    set_usage_context(str(user.id), feature, tenant_id=tenant_id or PILOT_TENANT_ID)
     return user
 
 

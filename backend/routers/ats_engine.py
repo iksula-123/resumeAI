@@ -25,7 +25,7 @@ from services.ats_engine import (
     ats_intelligence_v2, scoring as ats_scoring, ai_recommendations, apply_fix,
     ats_config, mode_orchestrator,
 )
-from services.deps import get_current_user
+from services.deps import get_current_user, tenant_id_of
 from services import roles as roles_service
 from services.usage import log_usage_event, tenant_of
 
@@ -213,7 +213,9 @@ async def analyze_saved_resume(
         select(Resume).where(Resume.id == rid).options(*_RESUME_LOADERS)
     )
     resume_row = owned.scalar_one_or_none()
-    if not resume_row or (resume_row.user_id != user.id and not getattr(user, "is_admin", False)):
+    if not resume_row or (not getattr(user, "is_admin", False) and (
+        resume_row.user_id != user.id or resume_row.tenant_id != tenant_id_of(user)
+    )):
         raise HTTPException(status_code=404, detail="Resume not found")
 
     job_description = (req.job_description or "").strip()
@@ -339,7 +341,9 @@ async def check_modes(
             raise HTTPException(status_code=404, detail="Resume not found")
         owned = await db.execute(select(Resume).where(Resume.id == rid).options(*_RESUME_LOADERS))
         resume_row = owned.scalar_one_or_none()
-        if not resume_row or (resume_row.user_id != user.id and not getattr(user, "is_admin", False)):
+        if not resume_row or (not getattr(user, "is_admin", False) and (
+            resume_row.user_id != user.id or resume_row.tenant_id != tenant_id_of(user)
+        )):
             raise HTTPException(status_code=404, detail="Resume not found")
         resume = ResumeParser.from_content(_resume_to_content(resume_row))
     elif req.resume_text and req.resume_text.strip():
@@ -454,14 +458,21 @@ async def ats_history(
     except ValueError:
         raise HTTPException(status_code=404, detail="Resume not found")
 
-    owned = await db.execute(select(Resume.id, Resume.user_id).where(Resume.id == rid))
+    owned = await db.execute(select(Resume.id, Resume.user_id, Resume.tenant_id).where(Resume.id == rid))
     row = owned.first()
-    if not row or (row.user_id != user.id and not getattr(user, "is_admin", False)):
+    is_admin = getattr(user, "is_admin", False)
+    if not row or (not is_admin and (row.user_id != user.id or row.tenant_id != tenant_id_of(user))):
         raise HTTPException(status_code=404, detail="Resume not found")
 
-    reports = (await db.execute(
-        select(AtsReport).where(AtsReport.resume_id == rid).order_by(AtsReport.created_at.desc())
-    )).scalars().all()
+    # Resume ownership (just verified above, admin-bypassable) already fully
+    # scopes which reports can be reached via this resume_id — the tenant
+    # clause is added only for a non-admin caller, so an admin's existing
+    # cross-tenant bypass isn't accidentally narrowed by a filter it never
+    # had before.
+    reports_q = select(AtsReport).where(AtsReport.resume_id == rid)
+    if not is_admin:
+        reports_q = reports_q.where(AtsReport.tenant_id == tenant_id_of(user))
+    reports = (await db.execute(reports_q.order_by(AtsReport.created_at.desc()))).scalars().all()
 
     summaries = [_report_summary(r) for r in reports]
     # ATS consolidation Phase 6: the trend only ever compares reports that
@@ -494,7 +505,9 @@ async def get_ats_report(
     except ValueError:
         raise HTTPException(status_code=404, detail="Report not found")
     report = (await db.execute(select(AtsReport).where(AtsReport.id == pid))).scalar_one_or_none()
-    if not report or (report.user_id != user.id and not getattr(user, "is_admin", False)):
+    if not report or (not getattr(user, "is_admin", False) and (
+        report.user_id != user.id or report.tenant_id != tenant_id_of(user)
+    )):
         raise HTTPException(status_code=404, detail="Report not found")
     return {
         "id": str(report.id), "resume_id": str(report.resume_id),
@@ -649,7 +662,7 @@ async def analyze_editor(
                     persisted_recs = []
                     for s in staged:
                         rec = AtsRecommendation(
-                            resume_id=rid, user_id=user.id, ats_report_id=report.id,
+                            resume_id=rid, user_id=user.id, tenant_id=tenant_of(user), ats_report_id=report.id,
                             action_type=s["action_type"], priority=s["priority"], title=s["title"],
                             reason=s["reason"], affected_section=s["affected_section"],
                             affected_item_id=s["affected_item_id"], target_text=s["target_text"],
@@ -720,12 +733,17 @@ async def analyze_editor(
 # ═══════════════════════════════════════════════════════════════════════════
 
 async def _owned_recommendation(db: AsyncSession, recommendation_id: str, user: User) -> AtsRecommendation:
+    """Phase 1A: requires both user ownership AND tenant match, same as
+    routers/resumes.py::_get_owned — admin keeps its existing, unchanged
+    platform-wide bypass."""
     try:
         rid = uuid.UUID(recommendation_id)
     except ValueError:
         raise HTTPException(status_code=404, detail="Recommendation not found")
     rec = await db.get(AtsRecommendation, rid)
-    if not rec or (rec.user_id != user.id and not getattr(user, "is_admin", False)):
+    if not rec:
+        raise HTTPException(status_code=404, detail="Recommendation not found")
+    if not getattr(user, "is_admin", False) and (rec.user_id != user.id or rec.tenant_id != tenant_id_of(user)):
         raise HTTPException(status_code=404, detail="Recommendation not found")
     return rec
 
@@ -733,7 +751,9 @@ async def _owned_recommendation(db: AsyncSession, recommendation_id: str, user: 
 async def _owned_resume_for(db: AsyncSession, resume_id, user: User) -> Resume:
     from routers.resumes import _load_full
     r = await _load_full(db, resume_id)
-    if not r or (r.user_id != user.id and not getattr(user, "is_admin", False)):
+    if not r:
+        raise HTTPException(status_code=404, detail="Resume not found")
+    if not getattr(user, "is_admin", False) and (r.user_id != user.id or r.tenant_id != tenant_id_of(user)):
         raise HTTPException(status_code=404, detail="Resume not found")
     return r
 
@@ -749,14 +769,15 @@ async def list_recommendations(
         rid = uuid.UUID(resume_id)
     except ValueError:
         raise HTTPException(status_code=404, detail="Resume not found")
-    owned = (await db.execute(select(Resume.id, Resume.user_id).where(Resume.id == rid))).first()
-    if not owned or (owned.user_id != user.id and not getattr(user, "is_admin", False)):
+    owned = (await db.execute(select(Resume.id, Resume.user_id, Resume.tenant_id).where(Resume.id == rid))).first()
+    is_admin = getattr(user, "is_admin", False)
+    if not owned or (not is_admin and (owned.user_id != user.id or owned.tenant_id != tenant_id_of(user))):
         raise HTTPException(status_code=404, detail="Resume not found")
 
-    recs = (await db.execute(
-        select(AtsRecommendation).where(AtsRecommendation.resume_id == rid, AtsRecommendation.status != "applied")
-        .order_by(AtsRecommendation.created_at.desc())
-    )).scalars().all()
+    recs_q = select(AtsRecommendation).where(AtsRecommendation.resume_id == rid, AtsRecommendation.status != "applied")
+    if not is_admin:
+        recs_q = recs_q.where(AtsRecommendation.tenant_id == tenant_id_of(user))
+    recs = (await db.execute(recs_q.order_by(AtsRecommendation.created_at.desc()))).scalars().all()
     return [
         {"id": str(r.id), "action_type": r.action_type, "priority": r.priority, "title": r.title,
          "reason": r.reason, "affected_section": r.affected_section, "score_impact_estimate": r.score_impact_estimate,
@@ -936,13 +957,17 @@ async def get_change_history(
         rid = uuid.UUID(resume_id)
     except ValueError:
         raise HTTPException(status_code=404, detail="Resume not found")
-    owned = (await db.execute(select(Resume.id, Resume.user_id, Resume.ats_score).where(Resume.id == rid))).first()
-    if not owned or (owned.user_id != user.id and not getattr(user, "is_admin", False)):
+    owned = (await db.execute(
+        select(Resume.id, Resume.user_id, Resume.tenant_id, Resume.ats_score).where(Resume.id == rid)
+    )).first()
+    is_admin = getattr(user, "is_admin", False)
+    if not owned or (not is_admin and (owned.user_id != user.id or owned.tenant_id != tenant_id_of(user))):
         raise HTTPException(status_code=404, detail="Resume not found")
 
-    rows = (await db.execute(
-        select(AtsChangeHistory).where(AtsChangeHistory.resume_id == rid).order_by(AtsChangeHistory.created_at.desc())
-    )).scalars().all()
+    history_q = select(AtsChangeHistory).where(AtsChangeHistory.resume_id == rid)
+    if not is_admin:
+        history_q = history_q.where(AtsChangeHistory.tenant_id == tenant_id_of(user))
+    rows = (await db.execute(history_q.order_by(AtsChangeHistory.created_at.desc()))).scalars().all()
     return {
         "current_score": owned.ats_score,
         "history": [
@@ -968,7 +993,11 @@ async def undo_change_endpoint(
     except ValueError:
         raise HTTPException(status_code=404, detail="Change not found")
     history_row = await db.get(AtsChangeHistory, hid)
-    if not history_row or (history_row.user_id != user.id and not getattr(user, "is_admin", False)):
+    if not history_row:
+        raise HTTPException(status_code=404, detail="Change not found")
+    if not getattr(user, "is_admin", False) and (
+        history_row.user_id != user.id or history_row.tenant_id != tenant_id_of(user)
+    ):
         raise HTTPException(status_code=404, detail="Change not found")
 
     resume_row = await _owned_resume_for(db, history_row.resume_id, user)

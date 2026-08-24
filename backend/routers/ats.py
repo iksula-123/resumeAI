@@ -9,7 +9,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from database import get_db
 from models import AtsReport, Resume, User
 from services.ats import score_resume, analyze_resume_prioritized
-from services.deps import get_current_user
+from services.deps import get_current_user, tenant_id_of
 from services.usage import log_usage_event, tenant_of
 
 router = APIRouter(prefix="/api/ats", tags=["ATS"])
@@ -60,10 +60,11 @@ async def ats_score(
         if rid:
             owned = await db.execute(select(Resume).where(Resume.id == rid))
             resume = owned.scalar_one_or_none()
-            if resume and resume.user_id == user.id:
+            if resume and resume.user_id == user.id and resume.tenant_id == tenant_id_of(user):
                 report = AtsReport(
                     resume_id=rid,
                     user_id=user.id,
+                    tenant_id=tenant_id_of(user),
                     job_title=req.job_title,
                     job_description=req.job_description,
                     score=result["score"],
@@ -124,7 +125,9 @@ async def list_reports(
 ):
     """All ATS scans for the current user, newest first."""
     result = await db.execute(
-        select(AtsReport).where(AtsReport.user_id == user.id).order_by(AtsReport.created_at.desc())
+        select(AtsReport)
+        .where(AtsReport.user_id == user.id, AtsReport.tenant_id == tenant_id_of(user))
+        .order_by(AtsReport.created_at.desc())
     )
     return [_report_dict(r) for r in result.scalars().all()]
 
@@ -142,7 +145,7 @@ async def reports_for_resume(
         raise HTTPException(status_code=404, detail="Resume not found")
     result = await db.execute(
         select(AtsReport)
-        .where(AtsReport.resume_id == rid, AtsReport.user_id == user.id)
+        .where(AtsReport.resume_id == rid, AtsReport.user_id == user.id, AtsReport.tenant_id == tenant_id_of(user))
         .order_by(AtsReport.created_at.desc())
     )
     return [_report_dict(r) for r in result.scalars().all()]
@@ -160,7 +163,9 @@ async def delete_report(
         raise HTTPException(status_code=404, detail="Report not found")
     result = await db.execute(select(AtsReport).where(AtsReport.id == rid))
     report = result.scalar_one_or_none()
-    if not report or (report.user_id != user.id and not user.is_admin):
+    if not report:
+        raise HTTPException(status_code=404, detail="Report not found")
+    if not user.is_admin and (report.user_id != user.id or report.tenant_id != tenant_id_of(user)):
         raise HTTPException(status_code=404, detail="Report not found")
     await db.delete(report)
     await db.commit()

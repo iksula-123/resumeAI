@@ -7,7 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from database import get_db
 from models import Webhook, WebhookDelivery, User
-from services.deps import get_current_user
+from services.deps import get_current_user, tenant_id_of
 from services.webhooks import EVENTS, generate_secret, send_test
 from services.audit import record as audit
 
@@ -45,7 +45,7 @@ async def _owned(db: AsyncSession, wid: str, user: User) -> Webhook:
     except ValueError:
         raise HTTPException(status_code=404, detail="Webhook not found")
     w = (await db.execute(select(Webhook).where(Webhook.id == _id))).scalar_one_or_none()
-    if not w or w.user_id != user.id:
+    if not w or w.user_id != user.id or w.tenant_id != tenant_id_of(user):
         raise HTTPException(status_code=404, detail="Webhook not found")
     return w
 
@@ -57,7 +57,11 @@ async def available_events(user: User = Depends(get_current_user)):
 
 @router.get("/")
 async def list_webhooks(db: AsyncSession = Depends(get_db), user: User = Depends(get_current_user)):
-    res = await db.execute(select(Webhook).where(Webhook.user_id == user.id).order_by(Webhook.created_at.desc()))
+    res = await db.execute(
+        select(Webhook)
+        .where(Webhook.user_id == user.id, Webhook.tenant_id == tenant_id_of(user))
+        .order_by(Webhook.created_at.desc())
+    )
     return [_dict(w) for w in res.scalars().all()]
 
 
@@ -66,7 +70,8 @@ async def create_webhook(body: WebhookCreate, db: AsyncSession = Depends(get_db)
     if not body.url.startswith(("http://", "https://")):
         raise HTTPException(status_code=400, detail="URL must start with http:// or https://")
     events = [e for e in body.events if e in EVENTS] or EVENTS
-    w = Webhook(user_id=user.id, url=body.url, secret=generate_secret(), events=events, active=True)
+    w = Webhook(user_id=user.id, tenant_id=tenant_id_of(user), url=body.url, secret=generate_secret(),
+                events=events, active=True)
     db.add(w)
     await db.commit()
     await db.refresh(w)

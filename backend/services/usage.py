@@ -19,8 +19,13 @@ PRICE_OUTPUT_PER_TOKEN = 0.30 / 1_000_000
 _ctx: contextvars.ContextVar[dict | None] = contextvars.ContextVar("ai_usage_ctx", default=None)
 
 
-def set_usage_context(user_id: str | None, feature: str) -> None:
-    _ctx.set({"user_id": user_id, "feature": feature})
+def set_usage_context(user_id: str | None, feature: str, tenant_id: str | None = None) -> None:
+    """tenant_id is optional (existing call sites that don't pass it keep
+    working — record_usage() below falls back to PILOT_TENANT_ID exactly
+    like tenant_of() does elsewhere) but every call site was updated
+    alongside this to pass the caller's server-resolved tenant explicitly
+    (Phase 1A) rather than rely on that fallback in the normal case."""
+    _ctx.set({"user_id": user_id, "feature": feature, "tenant_id": tenant_id})
 
 
 def estimate_cost(input_tokens: int, output_tokens: int) -> float:
@@ -101,6 +106,11 @@ async def record_usage(model: str, input_tokens: int, output_tokens: int) -> Non
         async with AsyncSessionLocal() as s:
             s.add(AIUsage(
                 user_id=_as_uuid(ctx.get("user_id")),
+                # Phase 1A: explicit, never left to the DB default (see
+                # models.py::Subscription.tenant_id for why) — falls back to
+                # PILOT_TENANT_ID only if a call site genuinely didn't pass
+                # one, same fallback tenant_of() already uses.
+                tenant_id=_as_uuid(ctx.get("tenant_id")) or uuid.UUID(PILOT_TENANT_ID),
                 feature=ctx.get("feature") or "unknown",
                 model=model,
                 input_tokens=input_tokens,

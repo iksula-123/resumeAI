@@ -65,6 +65,15 @@ class Resume(Base):
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     user_id = Column(UUID(as_uuid=True), ForeignKey("profiles.id", ondelete="CASCADE"), nullable=False, index=True)
+    # Phase 1A (multi-tenant guardrails) — this column has existed in the DB
+    # since migration 0003 but was never mapped in the ORM, which is
+    # precisely why it never suffered the NULL-write bug described on
+    # Subscription.tenant_id below (SQLAlchemy never touched a column it
+    # didn't know about, so the DB DEFAULT always applied cleanly). Mapping
+    # it now to allow real query-level filtering — every resume-creation
+    # call site is updated alongside this to set it explicitly, so that
+    # guarantee isn't lost now that the ORM is aware of the column.
+    tenant_id = Column(UUID(as_uuid=True), nullable=True)
     title = Column(String(255), nullable=False, default="Untitled Resume")
     template_id = Column(String(50), default="modern")
     slug = Column(String(255), unique=True, nullable=True)
@@ -237,6 +246,9 @@ class CoverLetter(Base):
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     user_id = Column(UUID(as_uuid=True), ForeignKey("profiles.id", ondelete="CASCADE"), nullable=False, index=True)
     resume_id = Column(UUID(as_uuid=True), ForeignKey("resumes.id", ondelete="SET NULL"), nullable=True)
+    # Phase 1A (multi-tenant guardrails) — see Resume.tenant_id above (same
+    # "existed in DB since 0003, newly mapped here" situation).
+    tenant_id = Column(UUID(as_uuid=True), nullable=True)
     title = Column(String(255), nullable=False, default="Untitled Cover Letter")
     content = Column(Text, nullable=True)
     job_title = Column(String(255), nullable=True)
@@ -255,6 +267,16 @@ class Subscription(Base):
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     user_id = Column(UUID(as_uuid=True), ForeignKey("profiles.id", ondelete="CASCADE"), nullable=False, unique=True, index=True)
+    # Phase 1A (multi-tenant guardrails) — added by migration 0014. Lower
+    # priority per the audit (no dedicated enforcement wiring in 1A), but the
+    # column exists and is backfilled. IMPORTANT: always set this explicitly
+    # at row-creation time in application code — never rely on the DB
+    # column's DEFAULT alone. A plain nullable Column with no client-side
+    # default causes SQLAlchemy to send an explicit NULL on INSERT when the
+    # attribute is unset, which overrides a DB-level DEFAULT (confirmed
+    # actually happening in production data for profiles/ats_reports before
+    # this fix — see migration 0014's comment and services/deps.py).
+    tenant_id = Column(UUID(as_uuid=True), nullable=True)
     plan = Column(String(50), default="free")
     status = Column(String(50), default="active")
     stripe_customer_id = Column(String(255), nullable=True)
@@ -355,6 +377,10 @@ class AtsRecommendation(Base):
     resume_id = Column(UUID(as_uuid=True), ForeignKey("resumes.id", ondelete="CASCADE"), nullable=False, index=True)
     user_id = Column(UUID(as_uuid=True), ForeignKey("profiles.id", ondelete="CASCADE"), nullable=False, index=True)
     ats_report_id = Column(UUID(as_uuid=True), ForeignKey("ats_reports.id", ondelete="SET NULL"), nullable=True, index=True)
+    # Phase 1A (multi-tenant guardrails, migration 0014) — see the identical
+    # comment on Subscription.tenant_id above: always set explicitly at
+    # creation time, never rely on the DB DEFAULT alone.
+    tenant_id = Column(UUID(as_uuid=True), nullable=True)
 
     action_type = Column(String(50), nullable=False)          # one of ATS_ACTION_TYPES — never arbitrary free text
     priority = Column(String(10), nullable=False, default="low")  # high | medium | low
@@ -422,6 +448,8 @@ class AtsChangeHistory(Base):
     # references (the report itself could later be pruned/rotated).
     ats_report_id = Column(UUID(as_uuid=True), ForeignKey("ats_reports.id", ondelete="SET NULL"), nullable=True, index=True)
     recommendation_id = Column(UUID(as_uuid=True), ForeignKey("ats_recommendations.id", ondelete="SET NULL"), nullable=True, index=True)
+    # Phase 1A (multi-tenant guardrails, migration 0014) — see Subscription.tenant_id above.
+    tenant_id = Column(UUID(as_uuid=True), nullable=True)
     action_type = Column(String(50), nullable=True)
     before_content = Column(Text, nullable=True)   # the exact field's value before the change — enough to restore it
     after_content = Column(Text, nullable=True)
@@ -446,6 +474,8 @@ class Payment(Base):
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     user_id = Column(UUID(as_uuid=True), ForeignKey("profiles.id", ondelete="CASCADE"), nullable=False, index=True)
     subscription_id = Column(UUID(as_uuid=True), ForeignKey("subscriptions.id", ondelete="SET NULL"), nullable=True)
+    # Phase 1A (multi-tenant guardrails, migration 0014) — see Subscription.tenant_id above.
+    tenant_id = Column(UUID(as_uuid=True), nullable=True)
     amount = Column(Integer, nullable=False, default=0)        # smallest currency unit (cents)
     currency = Column(String(10), nullable=False, default="usd")
     status = Column(String(30), nullable=False, default="pending")  # succeeded | pending | failed | refunded
@@ -466,6 +496,8 @@ class Webhook(Base):
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     user_id = Column(UUID(as_uuid=True), ForeignKey("profiles.id", ondelete="CASCADE"), nullable=False, index=True)
+    # Phase 1A (multi-tenant guardrails, migration 0014) — see Subscription.tenant_id above.
+    tenant_id = Column(UUID(as_uuid=True), nullable=True)
     url = Column(Text, nullable=False)
     secret = Column(String(80), nullable=False)              # signing secret (whsec_…)
     events = Column(JSON, nullable=False, default=list)        # list[str] of subscribed events
@@ -499,6 +531,8 @@ class ApiKey(Base):
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     user_id = Column(UUID(as_uuid=True), ForeignKey("profiles.id", ondelete="CASCADE"), nullable=False, index=True)
+    # Phase 1A (multi-tenant guardrails, migration 0014) — see Subscription.tenant_id above.
+    tenant_id = Column(UUID(as_uuid=True), nullable=True)
     name = Column(String(100), nullable=False, default="API Key")
     key_prefix = Column(String(24), nullable=False)          # shown in UI, e.g. rsk_live_ab12cd
     key_hash = Column(String(64), nullable=False, unique=True, index=True)  # sha256 of full key
@@ -533,6 +567,8 @@ class AIUsage(Base):
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     user_id = Column(UUID(as_uuid=True), ForeignKey("profiles.id", ondelete="SET NULL"), nullable=True, index=True)
+    # Phase 1A (multi-tenant guardrails, migration 0014) — see Subscription.tenant_id above.
+    tenant_id = Column(UUID(as_uuid=True), nullable=True)
     feature = Column(String(50), nullable=False, default="unknown", index=True)
     model = Column(String(60), nullable=True)
     input_tokens = Column(Integer, nullable=False, default=0)
@@ -577,6 +613,8 @@ class ResumeVersion(Base):
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     resume_id = Column(UUID(as_uuid=True), ForeignKey("resumes.id", ondelete="CASCADE"), nullable=False, index=True)
     user_id = Column(UUID(as_uuid=True), ForeignKey("profiles.id", ondelete="CASCADE"), nullable=False, index=True)
+    # Phase 1A (multi-tenant guardrails, migration 0014) — see Subscription.tenant_id above.
+    tenant_id = Column(UUID(as_uuid=True), nullable=True)
     title = Column(String(255), nullable=True)
     template_id = Column(String(50), nullable=True)
     content = Column(JSON, nullable=True)

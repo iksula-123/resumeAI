@@ -194,7 +194,12 @@ async def apply_recommendation(
         resume.ats_score = after_score
 
     history = AtsChangeHistory(
-        resume_id=resume.id, user_id=resume.user_id, ats_report_id=recommendation.ats_report_id,
+        # tenant_id from the resume itself (Phase 1A) — resume was already
+        # verified to belong to the caller's tenant by _owned_resume_for
+        # before this function is ever called, so this is always correct
+        # without threading the user object through the whole apply/rescore
+        # pipeline just for this one field.
+        resume_id=resume.id, user_id=resume.user_id, tenant_id=resume.tenant_id, ats_report_id=recommendation.ats_report_id,
         recommendation_id=recommendation.id, action_type=recommendation.action_type,
         before_content=before_value, after_content=final_content_text,
         user_approved=True, before_score=before_score, after_score=after_score, score_delta=score_delta,
@@ -287,7 +292,8 @@ async def undo_change(db: AsyncSession, history_row: AtsChangeHistory, resume: R
         resume.ats_score = after_score
 
     undo_history = AtsChangeHistory(
-        resume_id=resume.id, user_id=resume.user_id, ats_report_id=history_row.ats_report_id,
+        # tenant_id from the resume itself — see the matching note above.
+        resume_id=resume.id, user_id=resume.user_id, tenant_id=resume.tenant_id, ats_report_id=history_row.ats_report_id,
         recommendation_id=history_row.recommendation_id, action_type="undo",
         before_content=history_row.after_content, after_content=history_row.before_content,
         user_approved=True, before_score=before_score, after_score=after_score, score_delta=score_delta,

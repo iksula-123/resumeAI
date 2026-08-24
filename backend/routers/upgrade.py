@@ -29,7 +29,7 @@ from services.deps import get_current_user
 from services.parsing import extract_text, quick_contact, heuristic_structured_parse, validate_upload, InvalidUpload
 from services.ai import parse_resume_to_content, enhance_resume, _normalize_content
 from services.ats_engine import mode_orchestrator, resume_parser as ats_resume_parser
-from services.usage import set_usage_context
+from services.usage import set_usage_context, tenant_of
 
 # ATS consolidation Phase 3: AI Resume Upgrade's before/after ATS scoring
 # used to be services.ats.analyze_resume() — a separate, simpler legacy
@@ -78,7 +78,7 @@ async def parse(file: UploadFile = File(...), user: User = Depends(get_current_u
     if len(text.strip()) < 30:
         raise HTTPException(status_code=422, detail="Couldn't read text from this file. If it's a scanned image, try a text-based PDF or DOCX.")
 
-    set_usage_context(str(user.id), "parse")
+    set_usage_context(str(user.id), "parse", tenant_id=tenant_of(user))
     content = await parse_resume_to_content(text)
     parsed_by = "ai"
     if content is None:
@@ -113,7 +113,7 @@ async def analyze(body: ContentBody, user: User = Depends(get_current_user)):
 
 @router.post("/enhance")
 async def enhance(body: ContentBody, user: User = Depends(get_current_user)):
-    set_usage_context(str(user.id), "upgrade")
+    set_usage_context(str(user.id), "upgrade", tenant_id=tenant_of(user))
     original = body.content or {}
     enhanced = await enhance_resume(original)
 
@@ -226,6 +226,7 @@ async def save_preserved(
     from models import Resume
     from services.storage import upload_bytes
     from services.usage import tenant_of, log_usage_event
+    from services.deps import tenant_id_of
     from services.docx_editor import extract_font_color_metadata
     # Reused verbatim from routers/resumes.py so a preserved-design resume
     # decomposes into the same normalized tables/version history as any other.
@@ -259,6 +260,7 @@ async def save_preserved(
     # computed and showed the user this exact number as "ats_after".
     r = Resume(
         user_id=user.id,
+        tenant_id=tenant_id_of(user),
         title=body.title or "Untitled Resume",
         template_id=body.template_id or "modern",
         template_type="uploaded_original" if body.preserve_original else "sahicareer",

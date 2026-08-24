@@ -7,7 +7,7 @@ import uuid
 from datetime import datetime
 from zoneinfo import ZoneInfo
 
-from sqlalchemy import select, func
+from sqlalchemy import select, func, or_
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from models import Program, ProgramParticipant, Profile, Mentor
@@ -30,8 +30,16 @@ async def _counts(db: AsyncSession, program_id: uuid.UUID) -> tuple[int, int]:
     return counts.get("mentor", 0), counts.get("mentee", 0)
 
 
-async def list_programs(db: AsyncSession, viewer_id: uuid.UUID) -> list[dict]:
-    rows = (await db.execute(select(Program).where(Program.deleted_at.is_(None), Program.status == "active").order_by(Program.created_at.desc()))).scalars().all()
+async def list_programs(db: AsyncSession, viewer_id: uuid.UUID, tenant_id: uuid.UUID | None = None) -> list[dict]:
+    # Phase 1A: programs are entirely admin-created platform content (no
+    # user-initiated creation path exists), same "NULL = global" convention
+    # as mentor_categories — a tenant-specific program is additive, never
+    # required, so an admin-created program stays visible to everyone unless
+    # it's explicitly given a tenant_id later.
+    query = select(Program).where(Program.deleted_at.is_(None), Program.status == "active")
+    if tenant_id is not None:
+        query = query.where(or_(Program.tenant_id == tenant_id, Program.tenant_id.is_(None)))
+    rows = (await db.execute(query.order_by(Program.created_at.desc()))).scalars().all()
     my_roles = dict((await db.execute(
         select(ProgramParticipant.program_id, ProgramParticipant.role).where(ProgramParticipant.profile_id == viewer_id)
     )).all())
@@ -42,8 +50,12 @@ async def list_programs(db: AsyncSession, viewer_id: uuid.UUID) -> list[dict]:
     return out
 
 
-async def get_program(db: AsyncSession, program_id: uuid.UUID, viewer_id: uuid.UUID) -> dict:
-    p = (await db.execute(select(Program).where(Program.id == program_id, Program.deleted_at.is_(None)))).scalar_one_or_none()
+async def get_program(db: AsyncSession, program_id: uuid.UUID, viewer_id: uuid.UUID,
+                        tenant_id: uuid.UUID | None = None) -> dict:
+    query = select(Program).where(Program.id == program_id, Program.deleted_at.is_(None))
+    if tenant_id is not None:
+        query = query.where(or_(Program.tenant_id == tenant_id, Program.tenant_id.is_(None)))
+    p = (await db.execute(query)).scalar_one_or_none()
     if p is None:
         raise BookingNotFoundError("Program not found")
     mc, ec = await _counts(db, p.id)
