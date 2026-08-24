@@ -9,7 +9,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from database import get_db
 from models import User, ROLE_USER, ROLE_ADMIN
-from services.auth import signup_user, login_user
+from services.auth import signup_user, login_user, refresh_session
 from services.deps import get_current_user, _admin_emails, _full_name
 from services.audit import record as audit
 
@@ -26,6 +26,10 @@ class SignupRequest(BaseModel):
 class LoginRequest(BaseModel):
     email: EmailStr
     password: str
+
+
+class RefreshRequest(BaseModel):
+    refresh_token: str
 
 
 async def _serialize(db: AsyncSession, u: User) -> dict:
@@ -92,6 +96,10 @@ async def signup(request: SignupRequest, db: AsyncSession = Depends(get_db)):
     return {
         "message": "User registered successfully",
         "access_token": result["token"],
+        # Phase 1B — optional/additive: an older frontend build that doesn't
+        # read these two fields keeps working exactly as before.
+        "refresh_token": result.get("refresh_token"),
+        "expires_at": result.get("expires_at"),
         "user": await _serialize(db, db_user),
     }
 
@@ -113,6 +121,37 @@ async def login(request: LoginRequest, db: AsyncSession = Depends(get_db)):
     return {
         "message": "Login successful",
         "access_token": result["token"],
+        # Phase 1B — optional/additive, see the matching note on /signup.
+        "refresh_token": result.get("refresh_token"),
+        "expires_at": result.get("expires_at"),
+        "user": await _serialize(db, db_user),
+    }
+
+
+@router.post("/refresh")
+async def refresh(request: RefreshRequest, db: AsyncSession = Depends(get_db)):
+    """Phase 1B — exchange a refresh token for a new access token, keeping a
+    session alive without asking for the password again. Does not create or
+    modify a profile row (unlike /login, /signup) — the user already exists;
+    this only re-issues credentials for an identity already established.
+    """
+    result = await refresh_session(request.refresh_token)
+    auth_user = result["user"]
+    user_id = uuid.UUID(str(auth_user.id))
+    result_db = await db.execute(select(User).where(User.id == user_id))
+    db_user = result_db.scalar_one_or_none()
+    if not db_user:
+        # Identity is valid per Supabase but has no local profile yet — same
+        # edge case get_current_user() already handles for any other
+        # endpoint; mirror it here rather than 500ing.
+        db_user = await _upsert_user(db, user_id, auth_user.email, _full_name(auth_user))
+    if not db_user.is_active:
+        raise HTTPException(status_code=403, detail="Your account has been disabled. Contact support.")
+
+    return {
+        "access_token": result["token"],
+        "refresh_token": result.get("refresh_token"),
+        "expires_at": result.get("expires_at"),
         "user": await _serialize(db, db_user),
     }
 

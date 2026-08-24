@@ -22,11 +22,15 @@ export default function AuthCallbackPage() {
   const done = useRef(false)
 
   useEffect(() => {
-    const finish = async (token: string) => {
+    // Phase 1B: forwards refresh_token/expires_at (already present on the
+    // Supabase session — nothing new fetched here) so this session can be
+    // silently refreshed later too, same as a password login. The OAuth
+    // sign-in/PKCE/redirect mechanics below are otherwise untouched.
+    const finish = async (session: { access_token: string; refresh_token?: string; expires_at?: number }) => {
       if (done.current) return
       done.current = true
       try {
-        await syncSession(token)
+        await syncSession(session.access_token, session.refresh_token, session.expires_at)
         const freshUser = useAuthStore.getState().user
         router.replace(takePostLoginRedirect(freshUser ? roleLandingPath(freshUser) : '/dashboard'))
       } catch (e) {
@@ -36,12 +40,12 @@ export default function AuthCallbackPage() {
 
     // 1. Session may already be ready by the time this effect runs.
     supabase.auth.getSession().then(({ data }) => {
-      if (data.session?.access_token) finish(data.session.access_token)
+      if (data.session?.access_token) finish(data.session)
     })
 
     // 2. Otherwise wait for the code→session exchange to complete.
     const { data: sub } = supabase.auth.onAuthStateChange((_event, session) => {
-      if (session?.access_token) finish(session.access_token)
+      if (session?.access_token) finish(session)
     })
 
     // 3. Safety net: if nothing happens in 8s, surface an error.
