@@ -27,8 +27,8 @@ const mukta = Mukta({
 })
 
 export const metadata: Metadata = {
-  title: 'SahiCareer — My Resume',
-  description: 'Pick your job. We build your resume — from real Indian jobs, in your language, in two minutes. Free.',
+  title: 'SahiCareer — Your Career Journey Starts Here',
+  description: 'SahiCareer helps you build your resume, get AI-powered career guidance, and connect with mentors — all in one place.',
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

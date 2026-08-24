@@ -82,12 +82,20 @@ const config: Config = {
           '0%, 100%': { boxShadow: '0 8px 30px -6px rgba(99,102,241,0.45)' },
           '50%': { boxShadow: '0 8px 40px -2px rgba(124,58,237,0.65)' },
         },
+        // Auth pages' marketing panel — a very slow background-position
+        // drift, not a hue/color change. Only ever applied via
+        // `motion-safe:` so prefers-reduced-motion disables it entirely.
+        'bg-drift': {
+          '0%, 100%': { backgroundPosition: '0% 50%' },
+          '50%': { backgroundPosition: '100% 50%' },
+        },
       },
       animation: {
         'fade-up': 'fade-up 0.5s cubic-bezier(0.22, 1, 0.36, 1) both',
         float: 'float 9s ease-in-out infinite',
         shimmer: 'shimmer 1.6s infinite',
         'pulse-glow': 'pulse-glow 3s ease-in-out infinite',
+        'bg-drift': 'bg-drift 18s ease-in-out infinite',
       },
     },
   },

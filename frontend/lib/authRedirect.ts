@@ -25,6 +25,36 @@ function isSafePath(path: string): boolean {
   return path.startsWith('/') && !path.startsWith('//')
 }
 
+/**
+ * The three SahiCareer services, as a single source of truth for the
+ * ?service= slug <-> destination path mapping. Used by:
+ *  - the landing page's service cards (components/landing/Services.tsx),
+ *    to send a logged-out visitor straight to /auth/login?service=X instead
+ *    of bouncing them through the (guarded) destination page first
+ *  - the login/signup pages, to show a contextual "Continue to X" badge and
+ *    to redirect there after a successful auth
+ * Resume Builder's destination is deliberately still /dashboard, matching
+ * Services.tsx's existing (pre-existing, unchanged) href for that card —
+ * this file does not introduce a new destination, just names the existing one.
+ */
+export const SERVICES = {
+  'resume-builder': { label: 'Resume Builder', path: '/dashboard' },
+  'ai-buddy': { label: 'AI Buddy', path: '/copilot' },
+  mentorly: { label: 'Mentorly', path: '/mentorship' },
+} as const
+
+export type ServiceSlug = keyof typeof SERVICES
+
+export function isServiceSlug(v: string | null): v is ServiceSlug {
+  return !!v && v in SERVICES
+}
+
+/** The path a given service slug lands on — falls back to /dashboard for an
+ * unrecognized/missing slug, never an invented or external path. */
+export function serviceDestination(slug: string | null): string {
+  return isServiceSlug(slug) ? SERVICES[slug].path : '/dashboard'
+}
+
 export function setPostLoginRedirect(path: string) {
   if (typeof window === 'undefined' || !isSafePath(path) || path === '/dashboard') return
   try { window.sessionStorage.setItem(KEY, path) } catch { /* ignore */ }

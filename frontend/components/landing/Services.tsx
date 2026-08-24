@@ -4,8 +4,13 @@ import Link from 'next/link'
 import { motion } from 'framer-motion'
 import { FileText, MessageCircle, Users2, ArrowRight, Check } from 'lucide-react'
 import { Container, Reveal, SectionHeading } from './shared'
+import { useAuthStore } from '@/lib/store'
+import type { ServiceSlug } from '@/lib/authRedirect'
 
-const SERVICES = [
+const SERVICES: {
+  icon: typeof FileText; title: string; description: string; features: string[]
+  cta: string; href: string; slug: ServiceSlug; gradient: string; ring: string; featured?: boolean
+}[] = [
   {
     icon: FileText,
     title: 'Resume Builder',
@@ -13,6 +18,7 @@ const SERVICES = [
     features: ['AI Resume Generation', 'ATS Score', 'Resume Templates', 'Cover Letters', 'Resume Tailoring'],
     cta: 'Explore Resume Builder',
     href: '/dashboard',
+    slug: 'resume-builder',
     gradient: 'from-navy-600 to-navy-500',
     ring: 'group-hover:shadow-navy-500/20',
   },
@@ -26,6 +32,7 @@ const SERVICES = [
     ],
     cta: 'Talk to AI Buddy',
     href: '/copilot',
+    slug: 'ai-buddy',
     gradient: 'from-royal-600 to-royal-500',
     ring: 'group-hover:shadow-royal-500/20',
     featured: true,
@@ -37,12 +44,21 @@ const SERVICES = [
     features: ['Book Mentors', 'Career Sessions', 'Mock Interviews', 'Portfolio Reviews', 'Roadmaps', 'Industry Guidance'],
     cta: 'Find a Mentor',
     href: '/mentorship',
+    slug: 'mentorly',
     gradient: 'from-teal-600 to-teal-500',
     ring: 'group-hover:shadow-teal-500/20',
   },
 ]
 
 export default function Services() {
+  // Authenticated visitors go straight to the service (unchanged behavior —
+  // these hrefs are the same ones this component always used); a logged-out
+  // visitor goes to the shared SahiCareer login with ?service= context
+  // instead of bouncing through the (guarded) destination page first. Do
+  // not duplicate authentication here — this only chooses a destination,
+  // the actual auth guard on each service page is untouched.
+  const user = useAuthStore((s) => s.user)
+
   return (
     <section id="services" className="relative py-24 lg:py-32">
       <Container>
@@ -55,6 +71,7 @@ export default function Services() {
         <div className="mt-16 grid gap-8 lg:grid-cols-3">
           {SERVICES.map((s, i) => {
             const Icon = s.icon
+            const href = user ? s.href : `/auth/login?service=${s.slug}`
             return (
               <Reveal key={s.title} delay={i * 0.1}>
                 <div
@@ -92,7 +109,7 @@ export default function Services() {
                     </ul>
 
                     <Link
-                      href={s.href}
+                      href={href}
                       className={`group/btn mt-8 inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r px-5 py-3 text-sm font-semibold text-white shadow-md transition hover:-translate-y-0.5 hover:shadow-lg ${s.gradient}`}
                     >
                       {s.cta}
