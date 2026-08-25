@@ -3,10 +3,8 @@ from typing import Any, Union
 from fastapi import APIRouter, Depends, Request
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from sqlalchemy import select
-from sqlalchemy.ext.asyncio import AsyncSession
 from pydantic import BaseModel, field_validator
 
-from database import get_db
 from models import Profile
 from services.auth import verify_token
 from services.usage import set_usage_context, PILOT_TENANT_ID
@@ -21,20 +19,34 @@ router = APIRouter(prefix="/api/ai", tags=["AI"])
 security = HTTPBearer()
 
 
-async def _auth(request: Request, c: HTTPAuthorizationCredentials = Depends(security),
-                 db: AsyncSession = Depends(get_db)):
+async def _auth(request: Request, c: HTTPAuthorizationCredentials = Depends(security)):
     """Unchanged identity check (still verify_token, still the raw Supabase
     user — this router intentionally never went through get_current_user's
-    local-DB mirroring, and that is NOT altered here). The added lookup
+    local-DB mirroring, and that is NOT altered here). The tenant lookup
     below is read-only and used ONLY to tag AIUsage.tenant_id correctly
     (Phase 1A) — it changes what gets logged, never who is authenticated or
-    what they're authorized to do."""
+    what they're authorized to do.
+
+    Phase 1B follow-up: this used to take `db: AsyncSession = Depends(get_db)`
+    — a FastAPI-managed session whose connection stays checked out for the
+    ENTIRE request (not just this one query), because that's how yield
+    dependencies work. Since every endpoint in this router calls out to
+    Gemini/OpenAI right after this dependency resolves, that meant a pooled
+    DB connection sat idle-but-checked-out for the full AI call duration on
+    every single request here — a real, confirmed contributor to Supabase's
+    session-mode pooler exhaustion (EMAXCONNSESSION). Opening a short-lived
+    session directly instead — used only for this one read, closed before
+    returning — means the connection is back in the pool before the AI call
+    even starts. No behavior change: same query, same fallback-to-pilot-
+    tenant semantics, same identity/authorization logic (untouched)."""
     user = await verify_token(c.credentials)
     # tag AI token usage with the caller + which feature (last path segment)
     feature = request.url.path.rstrip("/").rsplit("/", 1)[-1] or "ai"
     tenant_id = None
     try:
-        row = (await db.execute(select(Profile.tenant_id).where(Profile.id == uuid.UUID(str(user.id))))).first()
+        from database import AsyncSessionLocal
+        async with AsyncSessionLocal() as db:
+            row = (await db.execute(select(Profile.tenant_id).where(Profile.id == uuid.UUID(str(user.id))))).first()
         tenant_id = str(row[0]) if row and row[0] else None
     except Exception:
         pass  # best-effort — set_usage_context's own fallback covers this

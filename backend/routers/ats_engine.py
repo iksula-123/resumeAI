@@ -791,6 +791,19 @@ class AnswerRequest(BaseModel):
     answer: str
 
 
+async def _record_recommendation_update(rec_id: uuid.UUID, values: dict) -> None:
+    """Phase 1B follow-up — short-lived session used ONLY to persist an
+    already-computed AI proposal result, opened fresh after the AI call has
+    already finished (see answer_recommendation/preview_recommendation's own
+    comments for why). Scoped by primary key only — the caller has already
+    done every ownership/tenant check that matters, back when it first
+    loaded the row in its own short read session."""
+    from database import AsyncSessionLocal
+    async with AsyncSessionLocal() as s:
+        await s.execute(update(AtsRecommendation).where(AtsRecommendation.id == rec_id).values(**values))
+        await s.commit()
+
+
 @router.post("/recommendations/{recommendation_id}/answer")
 async def answer_recommendation(
     recommendation_id: str,
@@ -800,7 +813,23 @@ async def answer_recommendation(
 ):
     """Part 5/20 — the candidate supplies the missing evidence a question
     asked for. Generates the AI proposal immediately from ONLY this
-    confirmed fact (never fabricates beyond it) — see ai_recommendations.py."""
+    confirmed fact (never fabricates beyond it) — see ai_recommendations.py.
+
+    Phase 1B follow-up: previously held the request's DB session open for
+    the ENTIRE duration of the ai_recommendations.generate_proposal() call
+    below (a real Gemini/OpenAI round-trip, multi-second, longer under
+    provider-side retries) — a confirmed contributor to Supabase's
+    session-mode pooler exhaustion (EMAXCONNSESSION), the same class of
+    issue already fixed for webhooks in ad5e0ac. Restructured into three
+    phases: Phase A does every DB read AND ownership/tenant check exactly as
+    before, then extracts only the plain values the AI call needs and
+    explicitly closes the session; Phase B makes the AI call with zero DB
+    session held; Phase C opens a brand-new short-lived session only to
+    persist the result. Every check, every field, every response value is
+    unchanged — only when the connection is held changed.
+    """
+    # ── Phase A: every read + ownership/tenant check exactly as before,
+    # using the request's own session — then close it early. ──
     rec = await _owned_recommendation(db, recommendation_id, user)
     if rec.status == "applied":
         raise HTTPException(status_code=409, detail="This recommendation has already been applied.")
@@ -811,22 +840,26 @@ async def answer_recommendation(
     from routers.resumes import _to_content
     content = _to_content(resume_row)
     original = _find_original_text(rec, content)
-
     overused_term = _extract_skill_term(rec) if rec.action_type in ("add_keyword", "improve_skills") else None
+
+    rec_id, action_type, reason = rec.id, rec.action_type, rec.reason
+    resume_summary = resume_row.summary or ""
+    await db.close()
+
+    # ── Phase B: the AI call itself — no DB session held for any of this. ──
     proposal = await ai_recommendations.generate_proposal(
-        rec.action_type, original or "", content, user_answer=req.answer,
-        raw_text=resume_row.summary or "", overused_term=overused_term,
+        action_type, original or "", content, user_answer=req.answer,
+        raw_text=resume_summary, overused_term=overused_term,
     )
 
-    rec.user_answer = req.answer
-    rec.proposed_content = proposal["proposed_content"]
-    rec.evidence_tier = proposal["evidence_tier"]
-    rec.status = "answered"
-    await db.commit()
-    await db.refresh(rec)
+    # ── Phase C: short-lived session, only to persist the result. ──
+    await _record_recommendation_update(rec_id, {
+        "user_answer": req.answer, "proposed_content": proposal["proposed_content"],
+        "evidence_tier": proposal["evidence_tier"], "status": "answered",
+    })
 
-    return {"id": str(rec.id), "proposed_content": rec.proposed_content, "evidence_tier": rec.evidence_tier,
-            "source_note": proposal["source_note"], "status": rec.status}
+    return {"id": str(rec_id), "proposed_content": proposal["proposed_content"], "evidence_tier": proposal["evidence_tier"],
+            "source_note": proposal["source_note"], "status": "answered"}
 
 
 @router.post("/recommendations/{recommendation_id}/preview")
@@ -836,7 +869,13 @@ async def preview_recommendation(
     user: User = Depends(get_current_user),
 ):
     """Part 6 — for recommendations that don't need new evidence (reword-
-    only types), generates the AI proposal on demand (lazy — Part 32)."""
+    only types), generates the AI proposal on demand (lazy — Part 32).
+
+    Phase 1B follow-up: same 3-phase restructuring as answer_recommendation
+    above, for the exact same reason (see that function's docstring) — the
+    AI call below now runs with zero DB session held.
+    """
+    # ── Phase A ──
     rec = await _owned_recommendation(db, recommendation_id, user)
     if rec.status == "applied":
         raise HTTPException(status_code=409, detail="This recommendation has already been applied.")
@@ -848,19 +887,25 @@ async def preview_recommendation(
     content = _to_content(resume_row)
     original = _find_original_text(rec, content)
 
-    proposal = await ai_recommendations.generate_proposal(
-        rec.action_type, original or "", content, user_answer=rec.user_answer,
-        raw_text=resume_row.summary or "",
-    )
-    rec.proposed_content = proposal["proposed_content"]
-    rec.evidence_tier = proposal["evidence_tier"]
-    if rec.status == "pending":
-        rec.status = "approved"
-    await db.commit()
-    await db.refresh(rec)
+    rec_id, action_type, user_answer, status, reason = rec.id, rec.action_type, rec.user_answer, rec.status, rec.reason
+    resume_summary = resume_row.summary or ""
+    await db.close()
 
-    return {"id": str(rec.id), "current": original, "proposed_content": rec.proposed_content,
-            "evidence_tier": rec.evidence_tier, "source_note": proposal["source_note"], "why": rec.reason}
+    # ── Phase B ──
+    proposal = await ai_recommendations.generate_proposal(
+        action_type, original or "", content, user_answer=user_answer,
+        raw_text=resume_summary,
+    )
+    new_status = "approved" if status == "pending" else status
+
+    # ── Phase C ──
+    await _record_recommendation_update(rec_id, {
+        "proposed_content": proposal["proposed_content"], "evidence_tier": proposal["evidence_tier"],
+        "status": new_status,
+    })
+
+    return {"id": str(rec_id), "current": original, "proposed_content": proposal["proposed_content"],
+            "evidence_tier": proposal["evidence_tier"], "source_note": proposal["source_note"], "why": reason}
 
 
 class ApplyRequest(BaseModel):

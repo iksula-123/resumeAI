@@ -58,7 +58,18 @@ class ContentBody(BaseModel):
 
 
 @router.post("/parse")
-async def parse(file: UploadFile = File(...), user: User = Depends(get_current_user)):
+async def parse(file: UploadFile = File(...), user: User = Depends(get_current_user), db: AsyncSession = Depends(get_db)):
+    # Phase 1B follow-up: `db` is declared here only to get a handle to the
+    # SAME session get_current_user() already resolved internally (FastAPI
+    # caches identical Depends() calls within one request) — not to do any
+    # new query. That session's connection would otherwise stay checked out
+    # for this whole request (a yield-dependency's lifetime spans the full
+    # request, not just get_current_user()'s own body), including across
+    # the AI call below — a confirmed contributor to Supabase's session-mode
+    # pooler exhaustion. Closing it immediately, before any AI call, releases
+    # the connection right away. get_current_user() itself — identity,
+    # role/tenant resolution, is_active check — is completely untouched.
+    await db.close()
     name = (file.filename or "").lower()
     if not name.endswith(ALLOWED):
         raise HTTPException(status_code=400, detail="Please upload a PDF, DOCX, or TXT file.")
@@ -112,7 +123,11 @@ async def analyze(body: ContentBody, user: User = Depends(get_current_user)):
 
 
 @router.post("/enhance")
-async def enhance(body: ContentBody, user: User = Depends(get_current_user)):
+async def enhance(body: ContentBody, user: User = Depends(get_current_user), db: AsyncSession = Depends(get_db)):
+    # Phase 1B follow-up — same reasoning as parse() above: release the
+    # session get_current_user() already used internally before the AI call
+    # below, instead of holding it checked out for the whole request.
+    await db.close()
     set_usage_context(str(user.id), "upgrade", tenant_id=tenant_of(user))
     original = body.content or {}
     enhanced = await enhance_resume(original)
